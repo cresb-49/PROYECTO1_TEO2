@@ -1,0 +1,11 @@
+{
+  "name": "back_p_teo2",
+  "version": "1.0.0",
+  "description": "Backend Proyecto 1 Teoria de Sistemas 2",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
