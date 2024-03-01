@@ -1,4 +1,4 @@
-# front_p_teo2
+# ecomercegt
 
 ## Project setup
 ```
