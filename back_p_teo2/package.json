@@ -1,16 +1,27 @@
 {
   "name": "back_p_teo2",
   "version": "1.0.0",
-  "description": "Backend Proyecto 1 Teoria de Sistemas 2",
+  "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npx nodemon src/index.js",
+    "migrate": "cd src/ && npx sequelize db:migrate",
+    "fresh": "cd src/ && npx sequelize db:drop && npx sequelize db:create && npx sequelize db:migrate",
+    "seed": "cd src/ && npx sequelize db:seed:all"
   },
+  "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2",
+    "express": "^4.18.3",
     "mysql2": "^3.9.2",
     "sequelize": "^6.37.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0",
+    "sequelize-cli": "^6.6.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
   }
 }
