@@ -4,9 +4,19 @@
             <div class="card-body">
                 <form class="form-group" @submit.prevent="registroUsuario">
                     <div class="mb-3">
-                        <label for="name">Nombre de usuario</label>
-                        <input type="text" class="form-control" id="name" placeholder="Ingrese su nombre de usuario"
-                            v-model="user" required>
+                        <label for="names">Nombres</label>
+                        <input type="text" class="form-control" id="names" placeholder="Ingrese su nombre o nombres"
+                            v-model="nombres" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="lastname">Apellidos</label>
+                        <input type="text" class="form-control" id="lastname" placeholder="Ingrese su apellido o apellidos"
+                            v-model="apellidos" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="birtday">Fecha Nacimiento</label>
+                        <input type="date" class="form-control" id="birtday" placeholder="Ingrese su fecha de nacimiento"
+                            v-model="f_nacimiento" required>
                     </div>
                     <div class="mb-3">
                         <label for="email">Correo electrónico</label>
@@ -40,23 +50,25 @@ export default {
     props: ['typeRole'],
     data() {
         return {
-            user: null,
+            nombres: null,
+            apellidos: null,
+            f_nacimiento: null,
             email: null,
             password: null,
-            password2: null,
-            role:'USUARIO'
+            password2: null
         }
     },
     methods: {
         registroUsuario() {
             let data = {
-                user: this.user,
+                nombres: this.nombres,
+                apellidos: this.apellidos,
                 email: this.email,
                 password: this.password,
                 password2: this.password2,
-                role: this.role
+                f_nacimiento: this.f_nacimiento
             }
-            this.axios.post('/api/usuario', data)
+            this.axios.post('/usuario', data)
                 .then(response => {
                     console.log(response.data);
                     toast.success('Registro correcto!!!');
@@ -72,8 +84,8 @@ export default {
     mounted() {
         // Código que se ejecuta cuando el componente se monta en la página
     },
-    created(){
-        if(this.typeRole){
+    created() {
+        if (this.typeRole) {
             this.role = this.typeRole;
         }
     }
@@ -83,5 +95,6 @@ export default {
 <style scoped>
 .card {
     border-radius: 0px 0px 5px 5px;
-}</style>
+}
+</style>
   

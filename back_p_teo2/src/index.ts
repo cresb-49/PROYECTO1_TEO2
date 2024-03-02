@@ -1,8 +1,7 @@
 import sequelize from "./database/database";
 import express, { Application } from "express";
 import bodyParser from "body-parser";
-
-// import cors from 'cors'
+import cors from 'cors'
 // import dotenv from 'dotenv';
 
 //Carga de las variables de entorno
@@ -18,14 +17,13 @@ app.use(bodyParser.urlencoded({ extended: true }))
 // const allowedOrigins = ['http://localhost:1420','https://tauri.localhost']
 // const allowedOrigins = ['https://tauri.localhost']
 
-// const corsOptions = {
-//     //origin: 'http://localhost:1420', //Permite la conexion del forntend 
-//     origin: 'https://tauri.localhost', //Permite la conexion del forntend 
-//     credentials: true,            //access-control-allow-credentials:true
-//     optionSuccessStatus: 200,
-//     exposedHeaders: 'Content-Disposition',
-// }
-// app.use(cors(corsOptions));
+const corsOptions = {
+    origin: '*',
+    credentials: true,
+    optionSuccessStatus: 200,
+    exposedHeaders: 'Content-Disposition',
+}
+app.use(cors(corsOptions));
 
 // app.use((req, res, next) => {
 //     console.log('Origin:', req.headers.origin);

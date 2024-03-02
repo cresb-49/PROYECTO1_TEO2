@@ -4,8 +4,8 @@
             <div class="card-body">
                 <form class="form-group" @submit.prevent="loginUsuario">
                     <div class="mb-3">
-                        <label for="user">Usuario</label>
-                        <input type="text" class="form-control" id="user" placeholder="Ingrese su nombre de usuario"
+                        <label for="user">Email</label>
+                        <input type="text" class="form-control" id="user" placeholder="Ingrese su correo electrónico"
                             v-model="user" required>
                     </div>
                     <div class="mb-3">

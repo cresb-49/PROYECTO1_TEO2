@@ -11,10 +11,10 @@ import router from './router'
 
 import storage from './storage';
 
-axios.defaults.baseURL='http://localhost:3000';
+axios.defaults.baseURL='http://localhost:3000/api';
 
-let token = localStorage.getItem('token');
-axios.defaults.headers.common['Authorization']='Bearer '+token;
+// let token = localStorage.getItem('token');
+// axios.defaults.headers.common['Authorization']='Bearer '+token;
 
 createApp(App).use(router).use(storage).use(VueAxios,axios).mount('#app')
 
