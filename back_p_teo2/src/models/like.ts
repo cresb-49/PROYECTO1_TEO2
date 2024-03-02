@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database/database";
 
-export const Cuenta = sequelize.define('like',
+export const Like = sequelize.define('like',
     {
         id: {
             allowNull: false,

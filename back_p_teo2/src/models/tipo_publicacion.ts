@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database/database";
 
-export const Articulo = sequelize.define('tipo_publicacion',
+export const TipoPublicacion = sequelize.define('tipo_publicacion',
     {
         id: {
             allowNull: false,

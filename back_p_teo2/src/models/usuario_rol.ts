@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database/database";
 
-export const Articulo = sequelize.define('usuario_rol',
+export const UsuarioRol = sequelize.define('usuario_rol',
     {
         id_rol: {
             type: DataTypes.INTEGER,
