@@ -4,10 +4,10 @@ import { Request, Response } from "express";
 export const getUsuarios = async (req: Request, res: Response) => {
     Usuario.findAll()
         .then((value: any[]) => {
-            console.log(value);
+            res.status(200).json(value);
         })
         .catch((reason: any) => {
-            console.error(reason);
+            res.status(500).json(reason);
         })
 };
 

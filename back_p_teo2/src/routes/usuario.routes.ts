@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { getUsuario, getUsuarios, deleteUsuario, updateUsuario, createUsuario } from '../controllers/usuario.controller';
 const router = Router();
 
-router.get('/usuarios', getUsuario);
+router.get('/usuarios', getUsuarios);
 
 router.get('/usuario/:id', getUsuario);
 
