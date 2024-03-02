@@ -1,6 +1,48 @@
-import app from "./app";
 import sequelize from "./database/database";
+import express, { Application } from "express";
+import bodyParser from "body-parser";
 
+// import cors from 'cors'
+// import dotenv from 'dotenv';
+
+//Carga de las variables de entorno
+
+// dotenv.config({ path: __dirname + '/.env' });
+
+const app: Application = express();
+// Implementacion de body parser
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
+
+//Uso de CORS
+// const allowedOrigins = ['http://localhost:1420','https://tauri.localhost']
+// const allowedOrigins = ['https://tauri.localhost']
+
+// const corsOptions = {
+//     //origin: 'http://localhost:1420', //Permite la conexion del forntend 
+//     origin: 'https://tauri.localhost', //Permite la conexion del forntend 
+//     credentials: true,            //access-control-allow-credentials:true
+//     optionSuccessStatus: 200,
+//     exposedHeaders: 'Content-Disposition',
+// }
+// app.use(cors(corsOptions));
+
+// app.use((req, res, next) => {
+//     console.log('Origin:', req.headers.origin);
+//     next();
+// });
+
+// Implementacion de las rutas
+import usuarioRoutes from './routes/usuario.routes';
+app.use('/api', usuarioRoutes);
+
+//Inicio del servidor
+const PORT: string | undefined = process.env.SERVER_PORT;
+app.listen(PORT, (): void => {
+    console.log('SERVIDOR EN EL PUERTO:' + PORT);
+});
+
+//Prueba de conexion a la base de datos
 async function main() {
     try {
         await sequelize.authenticate();
