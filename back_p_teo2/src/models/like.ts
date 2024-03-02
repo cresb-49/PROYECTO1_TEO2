@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database/database";
 
-export const Articulo = sequelize.define('articulo',
+export const Cuenta = sequelize.define('like',
     {
         id: {
             allowNull: false,
@@ -9,22 +9,15 @@ export const Articulo = sequelize.define('articulo',
             primaryKey: true,
             type: DataTypes.INTEGER
         },
-        nombre: {
-            type: DataTypes.STRING(200),
+        tipo: {
+            type: DataTypes.BOOLEAN,
             allowNull: false
         },
-        valor: {
-            type: DataTypes.DECIMAL(8, 2),
-            allowNull: false
-        },
-        descripcion: {
-            type: DataTypes.TEXT
-        },
-        id_categoria: {
+        id_publicacion: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'categoria',
+                model: 'publicacion',
                 key: 'id'
             }
         },
@@ -36,12 +29,6 @@ export const Articulo = sequelize.define('articulo',
                 key: 'id'
             }
         },
-        f_desactivado: {
-            type: DataTypes.DATE
-        },
-        cantidad: {
-            type: DataTypes.INTEGER
-        },
         created_at: {
             allowNull: false,
             type: DataTypes.DATE
@@ -49,12 +36,16 @@ export const Articulo = sequelize.define('articulo',
         updated_at: {
             allowNull: false,
             type: DataTypes.DATE
+        },
+        deleted_at: {
+            type: DataTypes.DATE
         }
     },
     {
         timestamps: true,
         createdAt: 'created_at',
         updatedAt: 'updated_at',
-        tableName: 'articulo'
+        deletedAt: 'deleted_at',
+        tableName: 'like'
     }
 );

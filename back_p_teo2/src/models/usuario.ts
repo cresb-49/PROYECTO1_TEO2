@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database/database";
 
-export const Articulo = sequelize.define('articulo',
+export const Articulo = sequelize.define('usuario',
     {
         id: {
             allowNull: false,
@@ -9,38 +9,33 @@ export const Articulo = sequelize.define('articulo',
             primaryKey: true,
             type: DataTypes.INTEGER
         },
-        nombre: {
+        nombres: {
             type: DataTypes.STRING(200),
             allowNull: false
         },
-        valor: {
-            type: DataTypes.DECIMAL(8, 2),
+        apellidos: {
+            type: DataTypes.STRING(200),
             allowNull: false
         },
-        descripcion: {
-            type: DataTypes.TEXT
+        f_nacimiento: {
+            type: DataTypes.DATE,
+            allowNull: false
         },
-        id_categoria: {
+        id_cuenta: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'categoria',
+                model: 'cuenta',
                 key: 'id'
             }
         },
-        id_usuario: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'usuario',
-                key: 'id'
-            }
+        email: {
+            type: DataTypes.STRING(100),
+            allowNull: false
         },
-        f_desactivado: {
-            type: DataTypes.DATE
-        },
-        cantidad: {
-            type: DataTypes.INTEGER
+        password: {
+            type: DataTypes.STRING(100),
+            allowNull: false
         },
         created_at: {
             allowNull: false,
@@ -55,6 +50,6 @@ export const Articulo = sequelize.define('articulo',
         timestamps: true,
         createdAt: 'created_at',
         updatedAt: 'updated_at',
-        tableName: 'articulo'
+        tableName: 'usuario'
     }
 );
