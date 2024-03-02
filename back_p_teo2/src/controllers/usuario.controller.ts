@@ -1,8 +1,14 @@
-import {Usuario} from '../models/usuario';
+import { Usuario } from '../models/usuario';
+import { Request, Response } from "express";
 
 export const getUsuarios = async (req: Request, res: Response) => {
-    const usuarios = await Usuario.findAll();
-    res.json(usuarios);
+    Usuario.findAll()
+        .then((value: any[]) => {
+            console.log(value);
+        })
+        .catch((reason: any) => {
+            console.error(reason);
+        })
 };
 
 export const getUsuario = async (req: Request, res: Response) => {

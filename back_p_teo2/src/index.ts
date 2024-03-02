@@ -1,6 +1,5 @@
 import app from "./app";
 import sequelize from "./database/database";
-import { Rol } from "./models/rol";
 
 async function main() {
     try {
@@ -12,10 +11,6 @@ async function main() {
     } catch (error) {
         console.error("Unable to connect to the database:", error);
     }
-    let result = Rol.create({
-        nombre: "Administrador"
-    });
-    console.log(result);
 }
 
 main();
