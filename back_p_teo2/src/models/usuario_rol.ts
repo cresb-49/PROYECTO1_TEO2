@@ -3,12 +3,6 @@ import sequelize from "../database/database";
 
 export const Articulo = sequelize.define('usuario_rol',
     {
-        id: {
-            allowNull: false,
-            autoIncrement: true,
-            primaryKey: true,
-            type: DataTypes.INTEGER
-        },
         id_rol: {
             type: DataTypes.INTEGER,
             allowNull: false,

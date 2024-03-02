@@ -8,12 +8,14 @@
     "dev": "npx nodemon src/index.js",
     "migrate": "cd src/ && npx sequelize db:migrate",
     "fresh": "cd src/ && npx sequelize db:drop && npx sequelize db:create && npx sequelize db:migrate",
-    "seed": "cd src/ && npx sequelize db:seed:all"
+    "seed": "cd src/ && npx sequelize db:seed:all",
+    "fresh:seed": "cd src/ && npx sequelize db:drop && npx sequelize db:create && npx sequelize db:migrate && npx sequelize db:seed:all"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "express": "^4.18.3",
     "mysql2": "^3.9.2",
     "sequelize": "^6.37.1"

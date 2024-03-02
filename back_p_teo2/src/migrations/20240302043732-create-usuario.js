@@ -23,7 +23,7 @@ module.exports = {
       },
       id_cuenta: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: {
           model: 'cuenta',
           key: 'id'
