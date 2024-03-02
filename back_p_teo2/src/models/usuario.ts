@@ -23,7 +23,7 @@ export const Usuario = sequelize.define('usuario',
         },
         id_cuenta: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
             references: {
                 model: 'cuenta',
                 key: 'id'

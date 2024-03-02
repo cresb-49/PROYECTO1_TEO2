@@ -73,7 +73,7 @@ export default {
                     console.log(response.data);
                     toast.success('Registro correcto!!!');
                     //Reinico de las variables del formulario
-                    this.user = null; this.email = null; this.password = null; this.password2 = null;
+                    this.nombres = null; this.apellidos = null; this.f_nacimiento = null; this.email = null; this.password = null; this.password2 = null;
                 })
                 .catch(response => {
                     const data = response.response.data;
