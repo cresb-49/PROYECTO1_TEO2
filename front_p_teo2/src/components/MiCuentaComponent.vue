@@ -125,9 +125,29 @@ export default {
                     Authorization: `Bearer ${state.token}` // Incluye el token en el encabezado Authorization
                 },
             }).then(response => {
-                console.log(response.data);
-                this.miCuenta = response.data;
+                let data = response.data.data;
+                this.miCuenta.saldoRetirable = data.saldo_retirable;
+                this.miCuenta.saldoNoRetirable = data.saldo_no_retirable;
+                this.miCuenta.nombres = data.nombres;
+                this.miCuenta.apellidos = data.apellidos;
                 this.email = response.data.email;
+            }).catch(error => {
+                toast.error(error.response.data.error);
+                let errores = error.response.data.errores;
+                for (let index = 0; index < errores.length; index++) {
+                    toast.error(errores[index]);
+                }
+            });
+        },
+        infoUsuario(){
+            let state = this.$store.state;
+            this.axios.get(`usuario/${state.id}`, {
+                headers: {
+                    Authorization: `Bearer ${state.token}` // Incluye el token en el encabezado Authorization
+                },
+            }).then(response => {
+                let data = response.data.data;
+                this.email = data.email;
             }).catch(error => {
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
@@ -139,6 +159,7 @@ export default {
     },
     mounted() {
         this.infoCuenta();
+        this.infoUsuario();
     }
 }
 </script>

@@ -16,7 +16,20 @@ export const getUsuarios = async (req: Request, res: Response) => {
 };
 
 export const getUsuario = async (req: Request, res: Response) => {
-
+    const { idUsuario } = req.params;
+    Usuario.findByPk(idUsuario)
+        .then((value: any) => {
+            let data = {
+                "nombres": value.nombres,
+                "apellidos": value.apellidos,
+                "f_nacimiento": value.f_nacimiento,
+                "email": value.email
+            }
+            responseAPI(HttpStatus.OK, res, data, "Usuario encontrado con exito");
+        })
+        .catch((reason: any) => {
+            responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
+        })
 };
 
 export const createUsuario = async (req: Request, res: Response) => {

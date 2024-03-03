@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { responseAPI } from '../handler/responseAPI';
 import { HttpStatus } from '../enums/httpStatus';
 import { Cuenta } from '../models/cuenta';
+import { Usuario } from '../models/usuario';
 
 
 export const getCuenta = async (req: Request, res: Response) => {
@@ -10,8 +11,9 @@ export const getCuenta = async (req: Request, res: Response) => {
     if (tokenPayload.usuarioId !== idUsuario) {
         return responseAPI(HttpStatus.UNAUTHORIZED, res, null, 'No tienes permisos para ver esta cuenta');
     }
-    let cuenta: any = await Cuenta.findOne({ where: { id: idUsuario } });
-    if (cuenta) {
+    const usuario: any = await Usuario.findOne({ where: { id: idUsuario }, include: Cuenta });
+    if (usuario) {
+        const cuenta = usuario.cuentum;
         const data = {
             "nombres": cuenta.nombres,
             "apellidos": cuenta.apellidos,
@@ -20,6 +22,7 @@ export const getCuenta = async (req: Request, res: Response) => {
         }
         return responseAPI(HttpStatus.OK, res, data, 'Cuenta encontrada con exito');
     } else {
-        return responseAPI(HttpStatus.NOT_FOUND, res, null, 'Cuenta no encontrada');
+        return responseAPI(HttpStatus.NOT_FOUND, res, null, 'Cuenta no encontrada', 'Cuenta no encontrada');
     }
 }
+
