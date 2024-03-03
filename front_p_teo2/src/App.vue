@@ -2,7 +2,7 @@
   <div id="contenedorHeader">
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container-fluid">
-        <a class="navbar-brand">E-Comerce GT</a>
+        <a class="navbar-brand">MayaMarketGT</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll"
           aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -15,6 +15,10 @@
             <li class="nav-item">
               <router-link v-if="$store.state.isAuthenticated && $store.state.role === 'USUARIO'" class="nav-link active"
                 aria-current="page" to="/Seguimiento">Seguimiento</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link v-if="$store.state.isAuthenticated"  class="nav-link active"
+                aria-current="page" to="/MiCuenta">Mi Cuenta</router-link> 
             </li>
             <li class="nav-item dropdown" v-if="$store.state.isAuthenticated && $store.state.role === 'USUARIO'">
               <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -89,11 +93,11 @@
             <div>
               <a href="/" class="d-flex align-items-center p-0 text-dark">
                 <img alt="logo" src="./assets/logo.png" width="30px" />
-                <span class="ms-3 h5 font-weight-bold">E-Comerce GT</span>
+                <span class="ms-3 h5 font-weight-bold">MayaMarketGT</span>
               </a>
               <p class="my-3" style="width: 250px">
                 Somos la pagina mas segura de compra y venta del pais, pioneros en el estandar de envio y manejo de paquetes, si tienes algo que vender
-                E-Comerce GT es la mejor opcion
+                MayaMarketGT es la mejor opcion
               </p>
             </div>
             <div>
@@ -108,7 +112,7 @@
               </ul>
             </div>
           </div>
-          <small class="text-center mt-5">&copy; E-Comerce GT, 2023. All rights reserved.</small>
+          <small class="text-center mt-5">&copy; MayaMarketGT, 2023. All rights reserved.</small>
         </div>
       </footer>
     </div>

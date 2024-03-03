@@ -1,12 +1,14 @@
 <template>
-    <h2>Articulos Disponibles</h2>
-    <form @submit.prevent="buscarProductos">
-        <div class="input-group">
-            <input type="text" class="form-control rounded" placeholder="Search" aria-label="Search"
-                aria-describedby="search-addon" v-model="nombre" />
-            <button type="submit" class="btn btn-outline-primary">search</button>
-        </div>
-    </form>
+    <h2>¿Qué Busco Hoy.gt?</h2>
+    <div class="container mt-4">
+        <form @submit.prevent="buscarProductos">
+            <div class="input-group">
+                <input type="text" class="form-control rounded" placeholder="Search" aria-label="Search"
+                    aria-describedby="search-addon" v-model="nombre" />
+                <button type="submit" class="btn btn-outline-primary">search</button>
+            </div>
+        </form>
+    </div>
     <div id="contenedorProductos" style="margin-top: 20px;">
         <div class="row row-cols-1 row-cols-md-3 g-4">
             <template v-for="articulo in articulos" :key="articulo._1d">

@@ -17,12 +17,17 @@ import ListaArticulosUsuario from '../components/ListaArticulosUsuario.vue';
 import ModificarArticulo from '../components/ModificarArticulo.vue';
 import ModificarUsuarioComponent from '../components/ModificarUsuarioComponent.vue';
 import ListaUsuariosSistema from '../components/ListaUsuariosSistema.vue';
-
+import MiCuentaComponent from '../components/MiCuentaComponent.vue';
 const routes = [
     {
         path: '/',
         name: 'VistaProductosCoponent',
         component: VistaArticulosCoponent
+    },
+    {
+        path: '/MiCuenta',
+        name: 'MiCuentaComponent',
+        component: MiCuentaComponent
     },
     {
         path: '/Login',
