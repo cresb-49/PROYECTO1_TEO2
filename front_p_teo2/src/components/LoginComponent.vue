@@ -6,7 +6,7 @@
                     <div class="mb-3">
                         <label for="user">Email</label>
                         <input type="text" class="form-control" id="user" placeholder="Ingrese su correo electrónico"
-                            v-model="user" required>
+                            v-model="email" required>
                     </div>
                     <div class="mb-3">
                         <label for="password">Contraseña</label>
@@ -31,28 +31,26 @@ export default {
     },
     data() {
         return {
-            user: null,
+            email: null,
             password: null
         }
     },
     methods: {
         loginUsuario() {
             let data = {
-                user: this.user,
+                email: this.email,
                 password: this.password
             }
-            this.axios.post('/api/login', data)
-                .then(response => {
+            this.axios.post('/login', data)
+                .then(() => {
                     //Reinico de las variables del formulario
-                    this.user = null; this.password = null; 
-                    const data = response.data;
+                    this.email = null; this.password = null;
                     toast.success('Session iniciada');
-                    this.axios.defaults.headers.common['Authorization']='Bearer '+data.token;
-                    localStorage.setItem('token',data.token);
-                    this.$store.commit('setAuthenticated',true);
-                    this.$store.commit('setUser',data.data.user);
-                    this.$store.commit('setId',data.data._id);
-                    this.$store.commit('setRole',data.data.role);
+                    //this.axios.defaults.headers.common['Authorization']='Bearer '+data.token;
+                    //localStorage.setItem('token',data.token);
+                    this.$store.commit('setAuthenticated', true);
+                    this.$store.commit('setToken', data.token);
+                    this.$store.commit('setId', data.id_usuario);
                     //Redireccion al inicio de la pagina
                     this.$router.push('/');
                 })

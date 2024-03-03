@@ -5,39 +5,30 @@ import router from '../router';
 const storage = createStore({
     state: {
         isAuthenticated: false,
-        user: '',
+        token: '',
         id: null,
-        role: null
-    }, 
+    },
     mutations: {
-        setAuthenticated(state,value)
-        {
+        setAuthenticated(state, value) {
             state.isAuthenticated = value;
         },
-        setUser(state,user)
-        {
-            state.user=user;
+        setToken(state, token) {
+            state.token = token;
         },
-        setId(state,id)
-        {
-            state.id=id;
+        setId(state, id) {
+            state.id = id;
         },
-        setRole(state,role)
-        {
-            state.role = role;
-        },
-        logout(state){
+        logout(state) {
             state.isAuthenticated = false;
             localStorage.removeItem('token');
-            state.user = '';
-            state.id=null;
-            state.role=null;
+            state.token = '';
+            state.id = null;
             router.push('/');
         }
     },
-    plugins:[
+    plugins: [
         new VuexPersistence({
-            storage:window.localStorage
+            storage: window.localStorage
         }).plugin
     ]
 });

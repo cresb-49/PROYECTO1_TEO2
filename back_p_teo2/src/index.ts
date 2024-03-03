@@ -34,6 +34,9 @@ app.use(cors(corsOptions));
 import usuarioRoutes from './routes/usuario.routes';
 app.use('/api', usuarioRoutes);
 
+import sessionRoutes from './routes/session.routes';
+app.use('/api', sessionRoutes);
+
 //Inicio del servidor
 const PORT: string | undefined = process.env.SERVER_PORT;
 app.listen(PORT, (): void => {
