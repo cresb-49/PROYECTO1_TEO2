@@ -9,9 +9,9 @@ export interface TokenPayload {
 }
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
-    const token = req.header('Authorization');
-    console.log(token);
-    // if (!token) return res.status(401).json({ data: null, mensaje: 'Acceso denegado\nInicia sesion para continuar', error: null });
+    let token = req.header('Authorization');
+    //Quitamos la palabra Bearer del token y los espacios al inicio y al final
+    token = token?.replace('Bearer', '').trim();
     if (!token) return responseAPI(HttpStatus.UNAUTHORIZED, res, null, 'Acceso denegado\nInicia sesion para continuar');
     try {
         const payload = jwt.verify(token, 'ItR2z9hm3') as TokenPayload;
