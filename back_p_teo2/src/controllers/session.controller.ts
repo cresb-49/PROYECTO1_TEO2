@@ -5,6 +5,8 @@ import bcrypt from "bcrypt"
 import { generarToken } from "../handler/generateJWT";
 import { Rol } from "../models/rol";
 import { UsuarioRol } from "../models/usuario_rol";
+import { responseAPI } from '../handler/responseAPI';
+import { HttpStatus } from '../enums/httpStatus';
 
 export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
@@ -40,26 +42,15 @@ export const login = async (req: Request, res: Response) => {
                             f_validez: fecha_validez
                         });
                     }
-                    res.status(200).json(
-                        {
-                            data: {
-                                token: token,
-                                id_usuario: usuario.id,
-                            },
-                            mensaje: "Usuario logueado con exito"
-                        });
+                    responseAPI(HttpStatus.OK, res, { token: token, id_usuario: usuario.id }, "Usuario logueado con exito");
                 } else {
-                    res.status(400).json({ mensaje: "Contrasena incorrecta" });
+                    responseAPI(HttpStatus.BAD_REQUEST, res, null, "Contrasena incorrecta");
                 }
             } else {
-                res.status(400).json({ mensaje: "Usuario no encontrado" });
+                responseAPI(HttpStatus.NOT_FOUND, res, null, "Usuario no encontrado");
             }
         })
         .catch((reason: any) => {
-            console.error(reason);
-            res.status(500).json({ mensaje: reason.message });
+            responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
         });
-
-
-    console.log(email, password);
 };

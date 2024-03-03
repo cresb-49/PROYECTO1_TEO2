@@ -2,14 +2,16 @@ import { Usuario } from '../models/usuario';
 import { Request, Response } from "express";
 import bcrypt from "bcrypt"
 import { Cuenta } from '../models/cuenta';
+import { responseAPI } from '../handler/responseAPI';
+import { HttpStatus } from '../enums/httpStatus';
 
 export const getUsuarios = async (req: Request, res: Response) => {
     Usuario.findAll()
         .then((value: any[]) => {
-            res.status(200).json(value);
+            responseAPI(HttpStatus.OK, res, value, "Usuarios encontrados con exito");
         })
         .catch((reason: any) => {
-            res.status(500).json(reason);
+            responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
         })
 };
 
@@ -21,7 +23,7 @@ export const createUsuario = async (req: Request, res: Response) => {
     const { nombres, apellidos, email, password, f_nacimiento, password2 } = req.body;
 
     if (!(password === password2)) {
-        res.status(400).json({ mensaje: "Las contrasenas no coinciden" })
+        responseAPI(HttpStatus.BAD_REQUEST, res, null, "Las contrasenas no coinciden");
     } else {
         let nuevaCuenta = {
             "nombres": nombres,
@@ -42,15 +44,13 @@ export const createUsuario = async (req: Request, res: Response) => {
                 nuevoUsuario.id_cuenta = cuenta.id;
                 Usuario.create(nuevoUsuario)
                     .then((value: any) => {
-                        res.status(200).json({ mensaje: "Usuario creado con exito" });
+                        responseAPI(HttpStatus.OK, res, null, "Usuario creado con exito");
                     }).catch((reason: any) => {
-                        console.error(reason);
-                        res.status(500).json({ mensaje: reason });
+                        responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
                     })
             })
             .catch((reason: any) => {
-                console.error(reason);
-                res.status(500).json({ mensaje: reason });
+                responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
             });
     }
 };

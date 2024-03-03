@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
+import { TokenPayload } from '../middleware/authMiddleware';
 
 // Clave secreta para firmar el token (puedes cambiarla)
-const secretKey = 'tuclaveSecreta';
+const secretKey = 'ItR2z9hm3';
 
 // Función para generar el token de inicio de sesión
 export const generarToken = async (usuarioId: string | number) => {
@@ -10,7 +11,7 @@ export const generarToken = async (usuarioId: string | number) => {
     if (typeof usuarioId === 'number') {
         usuarioId = usuarioId.toString();
     }
-    const payload = {
+    const payload:TokenPayload = {
         usuarioId: usuarioId,
         create_at: new Date().getTime(),
         // Puedes incluir más datos relevantes aquí
