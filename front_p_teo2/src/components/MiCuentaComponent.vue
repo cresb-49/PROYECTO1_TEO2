@@ -40,7 +40,7 @@
                 <!-- Lado Derecho: Bloques para Cambio de Email y Contraseña -->
                 <div class="col-md-6">
                     <!-- Bloque para Cambio de Email -->
-                    <form>
+                    <form @submit.prevent="actulizarEmail">
                         <div class="border p-3 mb-4">
                             <h5 class="mb-3">Cambio de Email</h5>
                             <div class="mb-3">
@@ -61,7 +61,7 @@
                     <!-- Fin del Bloque para Cambio de Email -->
 
                     <!-- Bloque para Cambio de Contraseña -->
-                    <form>
+                    <form @submit.prevent="actualizarPassword">
                         <div class="border p-3 mb-4">
                             <h5 class="mb-3">Cambio de Contraseña</h5>
                             <div class="mb-3">
@@ -139,7 +139,7 @@ export default {
                 }
             });
         },
-        infoUsuario(){
+        infoUsuario() {
             let state = this.$store.state;
             this.axios.get(`usuario/${state.id}`, {
                 headers: {
@@ -148,6 +148,51 @@ export default {
             }).then(response => {
                 let data = response.data.data;
                 this.email = data.email;
+            }).catch(error => {
+                toast.error(error.response.data.error);
+                let errores = error.response.data.errores;
+                for (let index = 0; index < errores.length; index++) {
+                    toast.error(errores[index]);
+                }
+            });
+        },
+        actulizarEmail() {
+            let state = this.$store.state;
+            let data = {
+                email: this.email2
+            }
+            this.axios.put(`usuario/email/${state.id}`, data, {
+                headers: {
+                    Authorization: `Bearer ${state.token}` // Incluye el token en el encabezado Authorization
+                },
+            }).then(response => {
+                toast.success(response.data.mensaje);
+                this.email = this.email2;
+                this.email2 = null;
+            }).catch(error => {
+                toast.error(error.response.data.error);
+                let errores = error.response.data.errores;
+                for (let index = 0; index < errores.length; index++) {
+                    toast.error(errores[index]);
+                }
+            });
+        },
+        actualizarPassword() {
+            let state = this.$store.state;
+            let data = {
+                password: this.password,
+                password2: this.password2,
+                password3: this.password3
+            }
+            this.axios.put(`usuario/password/${state.id}`, data, {
+                headers: {
+                    Authorization: `Bearer ${state.token}` // Incluye el token en el encabezado Authorization
+                },
+            }).then(response => {
+                toast.success(response.data.mensaje);
+                this.password = null;
+                this.password2 = null;
+                this.password3 = null;
             }).catch(error => {
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
