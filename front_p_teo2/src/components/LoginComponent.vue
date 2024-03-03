@@ -19,7 +19,7 @@
         </div>
     </div>
 </template>
-  
+
 <script>
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
@@ -42,17 +42,23 @@ export default {
                 password: this.password
             }
             this.axios.post('/login', data)
-                .then(() => {
-                    //Reinico de las variables del formulario
-                    this.email = null; this.password = null;
-                    toast.success('Session iniciada');
-                    //this.axios.defaults.headers.common['Authorization']='Bearer '+data.token;
-                    //localStorage.setItem('token',data.token);
-                    this.$store.commit('setAuthenticated', true);
-                    this.$store.commit('setToken', data.token);
-                    this.$store.commit('setId', data.id_usuario);
-                    //Redireccion al inicio de la pagina
-                    this.$router.push('/');
+                .then(value => {
+                    const { token, id_usuario } = value.data.data;
+                    if (token === undefined || id_usuario === undefined) {
+                        toast.error('Error al iniciar sesión');
+                        return;
+                    } else {
+                        //Reinico de las variables del formulario
+                        this.email = null; this.password = null;
+                        toast.success('Session iniciada');
+                        //this.axios.defaults.headers.common['Authorization']='Bearer '+data.token;
+                        //localStorage.setItem('token',data.token);
+                        this.$store.commit('setAuthenticated', true);
+                        this.$store.commit('setToken', token);
+                        this.$store.commit('setId', id_usuario);
+                        //Redireccion al inicio de la pagina
+                        this.$router.push('/');
+                    }
                 })
                 .catch(response => {
                     //Mensaje de error por el response
@@ -72,4 +78,3 @@ export default {
     border-radius: 0px 0px 5px 5px;
 }
 </style>
-  

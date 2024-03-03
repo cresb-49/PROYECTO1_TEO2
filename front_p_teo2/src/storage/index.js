@@ -20,7 +20,6 @@ const storage = createStore({
         },
         logout(state) {
             state.isAuthenticated = false;
-            localStorage.removeItem('token');
             state.token = '';
             state.id = null;
             router.push('/');

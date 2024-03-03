@@ -109,6 +109,10 @@ export default {
     },
     mounted() {
         // Código que se ejecuta cuando el componente se monta en la página
+        // let ver_obj = JSON.parse(localStorage.getItem('vuex'));
+        // console.log(ver_obj);
+        let state = this.$store.state;
+        console.log(state);
     }
 }
 </script>
