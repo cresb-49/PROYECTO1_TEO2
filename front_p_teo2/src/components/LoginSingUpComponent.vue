@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="container mt-3">
         <div class="sombra">
             <div class="tabs-container">
                 <div class="tabs-item tab-login" @click="HandleTabClick(tabNames.LOGIN)"
