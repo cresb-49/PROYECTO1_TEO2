@@ -2,7 +2,9 @@
   <div id="contenedorHeader">
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container-fluid">
-        <a class="navbar-brand">MayaMarketGT</a>
+        <a class="navbar-brand textoLogo">
+          <span class="celeste">Maya</span><span class="blanco">Market</span><span class="celeste">GT</span>
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll"
           aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -13,12 +15,12 @@
               <router-link class="nav-link active" aria-current="page" to="/">Home</router-link>
             </li>
             <li class="nav-item">
-              <router-link v-if="$store.state.isAuthenticated && $store.state.role === 'USUARIO'" class="nav-link active"
-                aria-current="page" to="/Seguimiento">Seguimiento</router-link>
+              <router-link v-if="$store.state.isAuthenticated && $store.state.role === 'USUARIO'"
+                class="nav-link active" aria-current="page" to="/Seguimiento">Seguimiento</router-link>
             </li>
             <li class="nav-item">
-              <router-link v-if="$store.state.isAuthenticated"  class="nav-link active"
-                aria-current="page" to="/MiCuenta">Mi Cuenta</router-link> 
+              <router-link v-if="$store.state.isAuthenticated" class="nav-link active" aria-current="page"
+                to="/MiCuenta">Mi Cuenta</router-link>
             </li>
             <li class="nav-item dropdown" v-if="$store.state.isAuthenticated && $store.state.role === 'USUARIO'">
               <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -41,8 +43,8 @@
               </ul>
             </li>
             <li class="nav-item">
-              <router-link v-if="$store.state.isAuthenticated && $store.state.role === 'USUARIO'" class="nav-link active"
-                aria-current="page" to="/CreditCard">Agregar Tarjeta</router-link>
+              <router-link v-if="$store.state.isAuthenticated && $store.state.role === 'USUARIO'"
+                class="nav-link active" aria-current="page" to="/CreditCard">Agregar Tarjeta</router-link>
             </li>
             <li class="nav-item">
               <router-link v-if="$store.state.isAuthenticated && $store.state.role === 'ADMIN'" class="nav-link active"
@@ -96,7 +98,8 @@
                 <span class="ms-3 h5 font-weight-bold">MayaMarketGT</span>
               </a>
               <p class="my-3" style="width: 250px">
-                Somos la pagina mas segura de compra y venta del pais, pioneros en el estandar de envio y manejo de paquetes, si tienes algo que vender
+                Somos la pagina mas segura de compra y venta del pais, pioneros en el estandar de envio y manejo de
+                paquetes, si tienes algo que vender
                 MayaMarketGT es la mejor opcion
               </p>
             </div>
@@ -104,10 +107,8 @@
               <p class="h5 mb-4" style="font-weight: 600">Help</p>
               <ul class="p-0" style="list-style: none; cursor: pointer">
                 <li class="my-2">
-                  <router-link v-if="!$store.state.isAuthenticated" class="text-dark"
-                    to="/Login">Login</router-link>
-                  <a v-if="$store.state.isAuthenticated" @click="$store.commit('logout')"
-                    class="text-dark">Logout</a>
+                  <router-link v-if="!$store.state.isAuthenticated" class="text-dark" to="/Login">Login</router-link>
+                  <a v-if="$store.state.isAuthenticated" @click="$store.commit('logout')" class="text-dark">Logout</a>
                 </li>
               </ul>
             </div>
@@ -127,14 +128,26 @@ export default {
 
 <style scoped>
 #contenedorHeader {
-  padding-bottom: 20px;
+  padding-bottom: 1%;
+  padding-top: 1%;
   padding-left: 2%;
   padding-right: 2%;
-  background: #00ff7f;
+  background: #bfff00;
 }
 
 .ventanaPrincipal {
   min-height: 550px;
+}
+
+.textoLogo {
+  font-size: 30px;
+  font-weight: bold;
+}
+
+div,
+ul,
+li {
+  font-size: 20px;
 }
 
 .contenedor {
@@ -142,6 +155,27 @@ export default {
   margin-right: 1%;
   margin-top: 20px;
   margin-bottom: 1%;
-  background: #00ff7f;
+  background: #bfff00;
+}
+
+.textoLogo {
+  /* border: 1px solid white; */
+  /* Borde blanco */
+  padding: 2px 5px;
+  /* Espaciado interno */
+  text-decoration: none;
+  /* Quita la subrayado predeterminado de los enlaces */
+  font-weight: bold;
+  /* Texto en negrita */
+}
+
+.textoLogo .celeste {
+  color: #007bff;
+  /* Color celeste */
+}
+
+.textoLogo .blanco {
+  color: white;
+  /* Color blanco */
 }
 </style>
