@@ -7,7 +7,7 @@ export const responseAPI = (status: number, res: Response, data: any = null, men
                 "mensaje": mensaje,
                 "mensajes": mensajes,
                 "error": error,
-                "errors": errors
+                "errores": errors
             });
     return;
 }

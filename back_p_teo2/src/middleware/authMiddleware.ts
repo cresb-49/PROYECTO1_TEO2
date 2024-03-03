@@ -19,7 +19,6 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
         next();
     } catch (error) {
         // return res.status(400).json({ data: null, mensaje: 'Token no válido\nInicia sesion nuevamente', error: error.message });
-        return responseAPI(HttpStatus.BAD_REQUEST, res, null, 'Token no válido\nInicia sesion nuevamente', error.message);
+        return responseAPI(HttpStatus.BAD_REQUEST, res, null, 'Inicia sesion nuevamente', 'Inicia sesion nuevamente', null, [error.message]);
     }
-
 }

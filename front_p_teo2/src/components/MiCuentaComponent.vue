@@ -129,8 +129,11 @@ export default {
                 this.miCuenta = response.data;
                 this.email = response.data.email;
             }).catch(error => {
-                toast.error(error.response.data)
-                console.log(error.response.data);
+                toast.error(error.response.data.error);
+                let errores = error.response.data.errores;
+                for (let index = 0; index < errores.length; index++) {
+                    toast.error(errores[index]);
+                }
             });
         }
     },

@@ -37,6 +37,9 @@ app.use('/api', usuarioRoutes);
 import sessionRoutes from './routes/session.routes';
 app.use('/api', sessionRoutes);
 
+import cuentaRoutes from './routes/cuenta.routes';
+app.use('/api', cuentaRoutes);
+
 //Inicio del servidor
 const PORT: string | undefined = process.env.SERVER_PORT;
 app.listen(PORT, (): void => {
