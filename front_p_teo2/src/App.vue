@@ -130,6 +130,7 @@ export default {
   padding-bottom: 20px;
   padding-left: 2%;
   padding-right: 2%;
+  background: #00ff7f;
 }
 
 .ventanaPrincipal {
@@ -141,5 +142,6 @@ export default {
   margin-right: 1%;
   margin-top: 20px;
   margin-bottom: 1%;
+  background: #00ff7f;
 }
 </style>
