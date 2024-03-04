@@ -18,6 +18,8 @@ import ModificarArticulo from '../components/ModificarArticulo.vue';
 import ModificarUsuarioComponent from '../components/ModificarUsuarioComponent.vue';
 import ListaUsuariosSistema from '../components/ListaUsuariosSistema.vue';
 import MiCuentaComponent from '../components/MiCuentaComponent.vue';
+import MisTransaccionesComponent from '../components/MisTransaccionesComponent.vue';
+import CompraRetiraCreditosComponent from "@/components/CompraRetiraCreditosComponent.vue";
 const routes = [
     {
         path: '/',
@@ -28,6 +30,16 @@ const routes = [
         path: '/MiCuenta',
         name: 'MiCuentaComponent',
         component: MiCuentaComponent
+    },
+    {
+        path: '/MisTransacciones',
+        name: 'MisTransaccionesComponent',
+        component: MisTransaccionesComponent
+    },
+    {
+        path: '/CompraRetiraCreditos',
+        name: 'CompraRetiraCreditosComponent',
+        component: CompraRetiraCreditosComponent
     },
     {
         path: '/Login',

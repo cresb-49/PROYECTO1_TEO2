@@ -22,6 +22,14 @@
               <router-link v-if="$store.state.isAuthenticated" class="nav-link active" aria-current="page"
                 to="/MiCuenta">Mi Cuenta</router-link>
             </li>
+            <li class="nav-item">
+              <router-link v-if="$store.state.isAuthenticated" class="nav-link active" aria-current="page"
+                to="/MisTransacciones">Mis Transacciones</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link v-if="$store.state.isAuthenticated" class="nav-link active" aria-current="page"
+                to="/CompraRetiraCreditos">Compra y Retiro</router-link>
+            </li>
             <li class="nav-item dropdown" v-if="$store.state.isAuthenticated && $store.state.role === 'USUARIO'">
               <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Articulos
