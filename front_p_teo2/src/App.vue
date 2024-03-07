@@ -37,7 +37,7 @@
               <ul class="dropdown-menu">
                 <li><router-link to="/MisArticulos" class="dropdown-item">Articulos</router-link></li>
                 <li><router-link to="/NuevoArticulo" class="dropdown-item">Registar Articulo</router-link></li>
-                <li><router-link to="/NuevoArticulo" class="dropdown-item">Crear Publicacion</router-link></li>
+                <li><router-link to="/CrearPublicacion" class="dropdown-item">Crear Publicacion</router-link></li>
               </ul>
             </li>
             <li class="nav-item dropdown" v-if="$store.state.isAuthenticated && $store.state.role === 'ADMIN'">

@@ -1,5 +1,8 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database/database";
+import { Articulo } from "./articulo";
+import { Usuario } from "./usuario";
+import { TipoPublicacion } from "./tipo_publicacion";
 
 export const Publicacion = sequelize.define('publicacion',
     {
@@ -33,6 +36,14 @@ export const Publicacion = sequelize.define('publicacion',
                 key: 'id'
             }
         },
+        isValidate: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
+        f_validacion: {
+            type: DataTypes.DATE
+        },
         created_at: {
             allowNull: false,
             type: DataTypes.DATE
@@ -52,3 +63,5 @@ export const Publicacion = sequelize.define('publicacion',
     tableName: 'publicacion'
 }
 );
+Publicacion.belongsTo(Usuario, { foreignKey: 'id_usuario' });
+Publicacion.belongsTo(TipoPublicacion, { foreignKey: 'id_tipo_publicacion' });

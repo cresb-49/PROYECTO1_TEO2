@@ -12,7 +12,6 @@ import ListaVentasComponent from '../components/ListaVentasComponent.vue';
 import ListaArticulosEntradaComponent from '../components/ListaArticulosEntradaComponent.vue';
 import CambiarEstadoComponent from '../components/CambiarEstadoComponent.vue';
 import VerificarArticuloComponene from '../components/VerificarArticuloComponene.vue';
-import AgregarTarjetaComponent from '../components/AgregarTarjetaComponent.vue'
 import ListaArticulosUsuario from '../components/ListaArticulosUsuario.vue';
 import ModificarArticulo from '../components/ModificarArticulo.vue';
 import ModificarUsuarioComponent from '../components/ModificarUsuarioComponent.vue';
@@ -20,6 +19,7 @@ import ListaUsuariosSistema from '../components/ListaUsuariosSistema.vue';
 import MiCuentaComponent from '../components/MiCuentaComponent.vue';
 import MisTransaccionesComponent from '../components/MisTransaccionesComponent.vue';
 import CompraRetiraCreditosComponent from "@/components/CompraRetiraCreditosComponent.vue";
+import CrearPublicacionComponent from "@/components/CrearPublicacionComponent.vue";
 const routes = [
     {
         path: '/',
@@ -35,6 +35,11 @@ const routes = [
         path: '/MisTransacciones',
         name: 'MisTransaccionesComponent',
         component: MisTransaccionesComponent
+    },
+    {
+        path: '/CrearPublicacion',
+        name: 'CrearPublicacionComponent',
+        component: CrearPublicacionComponent
     },
     {
         path: '/CompraRetiraCreditos',
@@ -103,11 +108,6 @@ const routes = [
         name: 'VerificarArticulo',
         component: VerificarArticuloComponene,
         props: true
-    },
-    {
-        path: '/CreditCard',
-        name: 'CreditCard',
-        component: AgregarTarjetaComponent
     },
     {
         path: '/MisArticulos',

@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { responseAPI } from '../handler/responseAPI';
 import { HttpStatus } from '../enums/httpStatus';
 import { Articulo } from '../models/articulo';
+import { Publicacion } from '../models/publicacion';
 
 export const getArticulosUsuario = async (req: Request, res: Response) => {
     const { tokenPayload } = req;
@@ -14,6 +15,25 @@ export const getArticulosUsuario = async (req: Request, res: Response) => {
             return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
         })
 };
+
+export const getArticulosUsuarioSinPublicar = async (req: Request, res: Response) => {
+    const { tokenPayload } = req;
+    const idUsuario = tokenPayload.usuarioId;
+    Articulo.findAll({
+        where: { id_usuario: idUsuario },
+        include: [{
+            model: Publicacion,
+            required: false, // LEFT JOIN
+        }]
+    })
+        .then(result => {
+            return responseAPI(HttpStatus.OK, res, result, "Productos encontrados con exito");
+        })
+        .catch(error => {
+            console.error('Error al realizar la consulta:', error);
+        });
+};
+
 
 export const getArticulo = async (req: Request, res: Response) => {
 

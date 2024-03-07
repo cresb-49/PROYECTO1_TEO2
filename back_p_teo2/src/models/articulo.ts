@@ -1,5 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database/database";
+import { Publicacion } from "./publicacion";
 
 export const Articulo = sequelize.define('articulo',
     {
@@ -58,3 +59,6 @@ export const Articulo = sequelize.define('articulo',
         tableName: 'articulo'
     }
 );
+
+Articulo.hasOne(Publicacion, { foreignKey: 'id_articulo' });
+Publicacion.belongsTo(Articulo, { foreignKey: 'id_articulo' });

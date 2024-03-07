@@ -33,6 +33,14 @@ module.exports = {
           key: 'id'
         }
       },
+      isValidate: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+      },
+      f_validacion: {
+        type: Sequelize.DATE
+      },
       created_at: {
         allowNull: false,
         type: Sequelize.DATE
