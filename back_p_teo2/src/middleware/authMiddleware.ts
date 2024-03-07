@@ -12,7 +12,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
     let token = req.header('Authorization');
     //Quitamos la palabra Bearer del token y los espacios al inicio y al final
     token = token?.replace('Bearer', '').trim();
-    if (!token) return responseAPI(HttpStatus.UNAUTHORIZED, res, null, 'Acceso denegado\nInicia sesion para continuar');
+    if (!token) return responseAPI(HttpStatus.UNAUTHORIZED, res, null, 'Acceso denegado\nInicia sesion para continuar', 'Acceso denegado\nInicia sesion para continuar');
     try {
         const payload = jwt.verify(token, 'ItR2z9hm3') as TokenPayload;
         req.tokenPayload = payload;

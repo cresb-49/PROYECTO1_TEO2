@@ -40,6 +40,15 @@ app.use('/api', sessionRoutes);
 import cuentaRoutes from './routes/cuenta.routes';
 app.use('/api', cuentaRoutes);
 
+import articuloRoutes from './routes/articulo.routes';
+app.use('/api', articuloRoutes);
+
+import publicacionRoutes from './routes/publicacion.routes';
+app.use('/api', publicacionRoutes);
+
+import categoriaRoutes from './routes/categoria.routes';
+app.use('/api', categoriaRoutes);
+
 //Inicio del servidor
 const PORT: string | undefined = process.env.SERVER_PORT;
 app.listen(PORT, (): void => {
