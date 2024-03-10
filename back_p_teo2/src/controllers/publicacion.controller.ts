@@ -29,6 +29,33 @@ export const getPublicaciones = async (req: Request, res: Response) => {
         })
 };
 
+export const getPublicacion = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    Publicacion.findByPk(id, {
+        include: [
+            {
+                model: Articulo,
+                required: true,
+                include: [
+                    {
+                        model: Category,
+                        required: false
+                    }
+                ]
+            }
+        ]
+    })
+        .then((value: any) => {
+            if (value === null) {
+                return responseAPI(HttpStatus.NOT_FOUND, res, null, "Publicacion no encontrada", "La publicacion no existe");
+            }
+            return responseAPI(HttpStatus.OK, res, value, "Publicacion encontrada con exito");
+        })
+        .catch((reason: any) => {
+            return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
+        })
+}
+
 export const getTipoPublicacion = async (req: Request, res: Response) => {
     TipoPublicacion.findAll()
         .then((value: any[]) => {

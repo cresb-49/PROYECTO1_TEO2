@@ -7,7 +7,7 @@ import CarritoComponent from '../components/CarritoComponent.vue'
 import RegistroAdministradorComponent from '../components/RegistroAdministradorComponent.vue'
 import RegistroEmpleadoComponent from '../components/RegistroEmpleadoComponent.vue'
 import ReportesComponent from '../components/ReportesComponent.vue'
-import VerArticuloComponent from '../components/VerArticuloComponent.vue';
+import VerArticuloComponent from '../components/VerPublicacionComponent.vue';
 import ListaVentasComponent from '../components/ListaVentasComponent.vue';
 import ListaArticulosEntradaComponent from '../components/ListaArticulosEntradaComponent.vue';
 import CambiarEstadoComponent from '../components/CambiarEstadoComponent.vue';
@@ -82,8 +82,8 @@ const routes = [
         component: ReportesComponent
     },
     {
-        path: '/Articulo/:id',
-        name: 'Articulo',
+        path: '/Publicacion/:id',
+        name: 'Publicacion',
         component: VerArticuloComponent,
         props: true
     },

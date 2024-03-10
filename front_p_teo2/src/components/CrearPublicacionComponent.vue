@@ -14,7 +14,7 @@
                 </thead>
                 <tbody>
                     <tr v-for="(articulo, index) in articulos" :key="index">
-                        <td><img :src="imagen" alt="Imagen de {{articulo.nombre}}" style="max-width: 100px;">
+                        <td><img :src="'http://localhost:3000/api/image?articulo=' + articulo.id" alt="Imagen de {{articulo.nombre}}" style="max-width: 100px;">
                         </td>
                         <td>{{ articulo.nombre }}</td>
                         <td><button class="btn btn-primary" @click="crearPublicacion(articulo)">Crear
