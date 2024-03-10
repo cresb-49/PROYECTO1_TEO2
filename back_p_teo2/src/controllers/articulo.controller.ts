@@ -20,11 +20,11 @@ export const getArticulosUsuarioSinPublicar = async (req: Request, res: Response
     const { tokenPayload } = req;
     const idUsuario = tokenPayload.usuarioId;
     Articulo.findAll({
-        where: { id_usuario: idUsuario },
         include: [{
             model: Publicacion,
             required: false, // LEFT JOIN
-        }]
+        }],
+        where: { id_usuario: idUsuario, '$publicacion.id$': null }
     })
         .then(result => {
             return responseAPI(HttpStatus.OK, res, result, "Productos encontrados con exito");
