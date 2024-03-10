@@ -14,7 +14,7 @@ const defaultImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKoAAACqCAAA
  * @returns filename
  */
 export const saveImage = async (imagen: string) => {
-    const filename = `${Date.now()}_imagen`;
+    const filename = `${Date.now()}_imagen.ib64`;
     const filePath = `${uploadPath}/${filename}`;
     console.log(uploadPath);
     console.log(filePath);
