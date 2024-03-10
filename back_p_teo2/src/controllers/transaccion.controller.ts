@@ -4,6 +4,7 @@ import { HttpStatus } from '../enums/httpStatus';
 import { Transaccion } from '../models/transaccion';
 import { Cuenta } from '../models/cuenta';
 import { Usuario } from '../models/usuario';
+import { Op } from 'sequelize';
 
 export const getTransacciones = async (req: Request, res: Response) => {
     Transaccion.findAll()
@@ -18,7 +19,19 @@ export const getTransacciones = async (req: Request, res: Response) => {
 export const getTransaccionesUsuario = async (req: Request, res: Response) => {
     const { tokenPayload } = req;
     let id_usuario = tokenPayload.usuarioId;
-    Transaccion.findAll({ where: { id_usuario: id_usuario } })
+    const usuario: any = await Usuario.findOne({ where: { id: id_usuario }, include: Cuenta });
+    const cuenta_usuario = usuario.cuentum;
+    if (!cuenta_usuario) {
+        return responseAPI(HttpStatus.NOT_FOUND, res, null, 'Cuenta no encontrada');
+    }
+    Transaccion.findAll({
+        where: {
+            [Op.or]: [
+                { id_cuenta_origen: cuenta_usuario.id },
+                { id_cuenta_destino: cuenta_usuario.id }
+            ]
+        }
+    })
         .then((transacciones: any) => {
             return responseAPI(HttpStatus.OK, res, transacciones, 'Transacciones encontradas con exito');
         })
@@ -28,10 +41,11 @@ export const getTransaccionesUsuario = async (req: Request, res: Response) => {
 };
 
 export const buyCreditos = async (req: Request, res: Response) => {
-    const { cantidad } = req.body;
+    let { cantidad } = req.body;
     if (!cantidad) {
         return responseAPI(HttpStatus.BAD_REQUEST, res, null, 'Cantidad de creditos no enviada', 'Cantidad de creditos no enviada');
     }
+    cantidad = parseFloat(cantidad);
     if (cantidad <= 0) {
         return responseAPI(HttpStatus.BAD_REQUEST, res, null, 'La cantidad de creditos debe ser mayor a 0', 'La cantidad de creditos debe ser mayor a 0');
     }
@@ -41,10 +55,14 @@ export const buyCreditos = async (req: Request, res: Response) => {
         const usuario: any = await Usuario.findOne({ where: { id: id_usuario }, include: Cuenta });
         const cuenta_usuario = usuario.cuentum;
         if (cuenta_usuario) {
-            let saldo_retirable = cuenta_usuario.saldo_retirable;
+            let saldo_retirable = parseFloat(cuenta_usuario.saldo_retirable);
             saldo_retirable += cantidad;
-            cuenta_usuario.update({
-                saldo_retirable: saldo_retirable
+            await Cuenta.update({
+                "saldo_retirable": saldo_retirable
+            }, {
+                where: {
+                    id: cuenta_usuario.id
+                }
             });
             //Registramos la transaccion del usuario
             const payload_transaccion = {
@@ -69,10 +87,11 @@ export const buyCreditos = async (req: Request, res: Response) => {
 };
 
 export const retirarCreditos = async (req: Request, res: Response) => {
-    const { cantidad } = req.body;
+    let { cantidad } = req.body;
     if (!cantidad) {
         return responseAPI(HttpStatus.BAD_REQUEST, res, null, 'Cantidad de creditos no enviada', 'Cantidad de creditos no enviada');
     }
+    cantidad = parseFloat(cantidad);
     if (cantidad <= 0) {
         return responseAPI(HttpStatus.BAD_REQUEST, res, null, 'La cantidad de creditos debe ser mayor a 0', 'La cantidad de creditos debe ser mayor a 0');
     }
@@ -82,11 +101,15 @@ export const retirarCreditos = async (req: Request, res: Response) => {
         const usuario: any = await Usuario.findOne({ where: { id: id_usuario }, include: Cuenta });
         const cuenta_usuario = usuario.cuentum;
         if (cuenta_usuario) {
-            let saldo_retirable = cuenta_usuario.saldo_retirable;
+            let saldo_retirable = parseFloat(cuenta_usuario.saldo_retirable);
             if (saldo_retirable > cantidad) {
                 saldo_retirable -= cantidad;
-                cuenta_usuario.update({
+                await Cuenta.update({
                     saldo_retirable: saldo_retirable
+                }, {
+                    where: {
+                        id: cuenta_usuario.id
+                    }
                 });
                 //Registramos la transaccion del usuario
                 const payload_transaccion = {
