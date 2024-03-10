@@ -157,7 +157,7 @@ export default {
                 cantidad: this.cantidad,
                 id_categoria: this.id_categoria,
                 descripcion: this.descripcion,
-                //imagen: this.imagen
+                imagen: this.imagen
             }
             this.axios.post(`articulo`, payload, {
                 headers: {
@@ -193,7 +193,6 @@ export default {
                 let fileReader = new FileReader();
                 fileReader.onload = (FileLoadEvent) => {
                     let result = FileLoadEvent.target.result;
-                    console.log(result);
                     let img = document.createElement("img");
                     img.src = result
                     img.onload = (e) => {
