@@ -63,5 +63,6 @@ export const Articulo = sequelize.define('articulo',
 
 Articulo.hasOne(Publicacion, { foreignKey: 'id_articulo' });
 Publicacion.belongsTo(Articulo, { foreignKey: 'id_articulo' });
+
 Articulo.hasOne(Category, { foreignKey: 'id' });
-Category.belongsTo(Articulo, { foreignKey: 'id_categoria' });
+Category.belongsTo(Articulo, { foreignKey: 'id' });
