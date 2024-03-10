@@ -52,6 +52,9 @@ app.use('/api', categoriaRoutes);
 import transaccionRoutes from './routes/transaccion.routes';
 app.use('/api', transaccionRoutes);
 
+import imageRoutes from './routes/image.routes';
+app.use('/api', imageRoutes);
+
 //Inicio del servidor
 const PORT: string | undefined = process.env.SERVER_PORT;
 app.listen(PORT, (): void => {

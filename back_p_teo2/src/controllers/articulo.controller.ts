@@ -3,6 +3,8 @@ import { responseAPI } from '../handler/responseAPI';
 import { HttpStatus } from '../enums/httpStatus';
 import { Articulo } from '../models/articulo';
 import { Publicacion } from '../models/publicacion';
+import { Image } from '../models/image';
+import { saveImage } from '../middleware/image.midelware';
 
 export const getArticulosUsuario = async (req: Request, res: Response) => {
     const { tokenPayload } = req;
@@ -59,15 +61,30 @@ export const createArticulo = async (req: Request, res: Response) => {
     if (cantidad <= 0) {
         return responseAPI(HttpStatus.BAD_REQUEST, res, null, "La cantidad no puede ser negativa o cero", "La cantidad no puede ser negativa o cero");
     }
-    Articulo.create(payload)
-        .then((value: any) => {
-            return responseAPI(HttpStatus.OK, res, value, "Producto Creado");
-        })
-        .catch((reason: any) => {
-            return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
-        })
 
-
+    saveImage(imagen).then((path_image: any) => {
+        Articulo.create(payload)
+            .then(async (articulo: any) => {
+                Image.create({
+                    id_articulo: articulo.id,
+                    url: path_image,
+                    prioridad: 1
+                })
+                    .then((image: any) => {
+                        return responseAPI(HttpStatus.OK, res, articulo, "Producto Creado");
+                    })
+                    .catch(async (reason: any) => {
+                        //eliminamos el articulo creado
+                        await Articulo.destroy({ where: { id: articulo.id } });
+                        return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
+                    });
+            })
+            .catch((reason: any) => {
+                return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
+            })
+    }).catch((reason: any) => {
+        return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
+    });
 };
 
 export const updateArticulo = async (req: Request, res: Response) => {
