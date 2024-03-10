@@ -6,7 +6,7 @@ module.exports = {
 
     //Codigo para comparacion
     // const isMatch = await bcrypt.compare(plainTextPassword, hashedPasswordFromDatabase);
-    
+
     let usuarios = [
       {
         id: 1,
@@ -14,6 +14,24 @@ module.exports = {
         apellidos: 'admin',
         f_nacimiento: '2022-03-02',
         email: 'admin@admin.com',
+        password: await bcrypt.hash('password', 10),
+        created_at: new Date(),
+        updated_at: new Date(),
+      }, {
+        id: 2,
+        nombres: 'user1',
+        apellidos: 'user1',
+        f_nacimiento: '2022-03-02',
+        email: 'user1@user1.com',
+        password: await bcrypt.hash('password', 10),
+        created_at: new Date(),
+        updated_at: new Date(),
+      },{
+        id: 3,
+        nombres: 'user2',
+        apellidos: 'user2',
+        f_nacimiento: '2022-03-02',
+        email: 'user2@user2.com',
         password: await bcrypt.hash('password', 10),
         created_at: new Date(),
         updated_at: new Date(),
