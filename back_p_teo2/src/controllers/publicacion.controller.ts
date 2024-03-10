@@ -4,9 +4,29 @@ import { HttpStatus } from '../enums/httpStatus';
 import { TipoPublicacion } from '../models/tipo_publicacion';
 import { Articulo } from '../models/articulo';
 import { Publicacion } from '../models/publicacion';
+import { Category } from '../models/category';
 
 export const getPublicaciones = async (req: Request, res: Response) => {
-
+    Publicacion.findAll({
+        include: [
+            {
+                model: Articulo,
+                required: true,
+                include: [
+                    {
+                        model: Category,
+                        required: false
+                    }
+                ]
+            }
+        ]
+    })
+        .then((value: any[]) => {
+            return responseAPI(HttpStatus.OK, res, value, "Publicaciones encontradas con exito");
+        })
+        .catch((reason: any) => {
+            return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
+        })
 };
 
 export const getTipoPublicacion = async (req: Request, res: Response) => {

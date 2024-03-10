@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { responseAPI } from '../handler/responseAPI';
 import { HttpStatus } from '../enums/httpStatus';
-import { Cuenta } from '../models/cuenta';
+import { Acount } from '../models/acount';
 import { Usuario } from '../models/usuario';
 
 
@@ -11,9 +11,9 @@ export const getCuenta = async (req: Request, res: Response) => {
     if (tokenPayload.usuarioId !== idUsuario) {
         return responseAPI(HttpStatus.UNAUTHORIZED, res, null, 'No tienes permisos para ver esta cuenta');
     }
-    const usuario: any = await Usuario.findOne({ where: { id: idUsuario }, include: Cuenta });
+    const usuario: any = await Usuario.findOne({ where: { id: idUsuario }, include: Acount });
     if (usuario) {
-        const cuenta = usuario.cuentum;
+        const cuenta = usuario.acount;
         const data = {
             "nombres": cuenta.nombres,
             "apellidos": cuenta.apellidos,

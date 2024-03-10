@@ -1,7 +1,7 @@
 import { Usuario } from '../models/usuario';
 import { Request, Response } from "express";
 import bcrypt from "bcrypt"
-import { Cuenta } from '../models/cuenta';
+import { Acount } from '../models/acount';
 import { responseAPI } from '../handler/responseAPI';
 import { HttpStatus } from '../enums/httpStatus';
 
@@ -52,7 +52,7 @@ export const createUsuario = async (req: Request, res: Response) => {
             "password": await bcrypt.hash(password, 10),
             "f_nacimiento": f_nacimiento
         };
-        Cuenta.create(nuevaCuenta)
+        Acount.create(nuevaCuenta)
             .then(async (cuenta: any) => {
                 nuevoUsuario.id_cuenta = cuenta.id;
                 Usuario.create(nuevoUsuario)

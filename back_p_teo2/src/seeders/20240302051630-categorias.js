@@ -580,7 +580,7 @@ module.exports = {
       categoria.created_at = new Date();
       categoria.updated_at = new Date();
     });
-    await queryInterface.bulkInsert('categoria', categorias, {});
+    await queryInterface.bulkInsert('category', categorias, {});
   },
 
   async down(queryInterface, Sequelize) {

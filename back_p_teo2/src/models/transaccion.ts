@@ -13,7 +13,7 @@ export const Transaccion = sequelize.define('transaccion',
             type: DataTypes.INTEGER,
             allowNull: true,
             references: {
-                model: 'cuenta',
+                model: 'acount',
                 key: 'id'
             }
         },
@@ -21,7 +21,7 @@ export const Transaccion = sequelize.define('transaccion',
             type: DataTypes.INTEGER,
             allowNull: true,
             references: {
-                model: 'cuenta',
+                model: 'acount',
                 key: 'id'
             }
         },

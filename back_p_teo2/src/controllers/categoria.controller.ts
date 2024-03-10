@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { responseAPI } from '../handler/responseAPI';
 import { HttpStatus } from '../enums/httpStatus';
-import { Categoria } from '../models/categoria';
-import { Sequelize, Op } from 'sequelize';
+import { Category } from '../models/category';
+import { Op } from 'sequelize';
 
 export const getCategorias = async (req: Request, res: Response) => {
     const { nombre } = req.params
@@ -14,7 +14,7 @@ export const getCategorias = async (req: Request, res: Response) => {
     }
     valor = valor.trim();
     if (valor.length === 0) {
-        Categoria.findAll()
+        Category.findAll()
             .then((value: any[]) => {
                 return responseAPI(HttpStatus.OK, res, value, "Categorias encontradas");
             })
@@ -22,7 +22,7 @@ export const getCategorias = async (req: Request, res: Response) => {
                 return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
             })
     } else {
-        Categoria.findAll({
+        Category.findAll({
             where: {
                 nombre: {
                     [Op.like]: `%${nombre}%`

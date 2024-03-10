@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database/database";
 
-export const Cuenta = sequelize.define('cuenta',
+export const Acount = sequelize.define('acount',
     {
         id: {
             allowNull: false,
@@ -38,6 +38,6 @@ export const Cuenta = sequelize.define('cuenta',
         timestamps: true,
         createdAt: 'created_at',
         updatedAt: 'updated_at',
-        tableName: 'cuenta'
+        tableName: 'acount'
     }
 );

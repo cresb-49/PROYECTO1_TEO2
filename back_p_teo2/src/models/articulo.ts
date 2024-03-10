@@ -1,6 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database/database";
 import { Publicacion } from "./publicacion";
+import { Category} from "./category";
 
 export const Articulo = sequelize.define('articulo',
     {
@@ -25,7 +26,7 @@ export const Articulo = sequelize.define('articulo',
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'categoria',
+                model: 'category',
                 key: 'id'
             }
         },
@@ -62,3 +63,5 @@ export const Articulo = sequelize.define('articulo',
 
 Articulo.hasOne(Publicacion, { foreignKey: 'id_articulo' });
 Publicacion.belongsTo(Articulo, { foreignKey: 'id_articulo' });
+Articulo.hasOne(Category, { foreignKey: 'id' });
+Category.belongsTo(Articulo, { foreignKey: 'id_categoria' });

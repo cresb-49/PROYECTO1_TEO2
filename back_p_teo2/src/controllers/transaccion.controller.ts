@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { responseAPI } from '../handler/responseAPI';
 import { HttpStatus } from '../enums/httpStatus';
 import { Transaccion } from '../models/transaccion';
-import { Cuenta } from '../models/cuenta';
+import { Acount } from '../models/acount';
 import { Usuario } from '../models/usuario';
 import { Op } from 'sequelize';
 
@@ -19,8 +19,8 @@ export const getTransacciones = async (req: Request, res: Response) => {
 export const getTransaccionesUsuario = async (req: Request, res: Response) => {
     const { tokenPayload } = req;
     let id_usuario = tokenPayload.usuarioId;
-    const usuario: any = await Usuario.findOne({ where: { id: id_usuario }, include: Cuenta });
-    const cuenta_usuario = usuario.cuentum;
+    const usuario: any = await Usuario.findOne({ where: { id: id_usuario }, include: Acount });
+    const cuenta_usuario = usuario.acount;
     if (!cuenta_usuario) {
         return responseAPI(HttpStatus.NOT_FOUND, res, null, 'Cuenta no encontrada');
     }
@@ -52,12 +52,12 @@ export const buyCreditos = async (req: Request, res: Response) => {
     const { tokenPayload } = req;
     let id_usuario = tokenPayload.usuarioId;
     try {
-        const usuario: any = await Usuario.findOne({ where: { id: id_usuario }, include: Cuenta });
-        const cuenta_usuario = usuario.cuentum;
+        const usuario: any = await Usuario.findOne({ where: { id: id_usuario }, include: Acount });
+        const cuenta_usuario = usuario.acount;
         if (cuenta_usuario) {
             let saldo_retirable = parseFloat(cuenta_usuario.saldo_retirable);
             saldo_retirable += cantidad;
-            await Cuenta.update({
+            await Acount.update({
                 "saldo_retirable": saldo_retirable
             }, {
                 where: {
@@ -98,13 +98,13 @@ export const retirarCreditos = async (req: Request, res: Response) => {
     const { tokenPayload } = req;
     let id_usuario = tokenPayload.usuarioId;
     try {
-        const usuario: any = await Usuario.findOne({ where: { id: id_usuario }, include: Cuenta });
-        const cuenta_usuario = usuario.cuentum;
+        const usuario: any = await Usuario.findOne({ where: { id: id_usuario }, include: Acount });
+        const cuenta_usuario = usuario.acount;
         if (cuenta_usuario) {
             let saldo_retirable = parseFloat(cuenta_usuario.saldo_retirable);
             if (saldo_retirable > cantidad) {
                 saldo_retirable -= cantidad;
-                await Cuenta.update({
+                await Acount.update({
                     saldo_retirable: saldo_retirable
                 }, {
                     where: {

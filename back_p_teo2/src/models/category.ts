@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database/database";
 
-export const Categoria = sequelize.define('categoria',
+export const Category = sequelize.define('category',
     {
         id: {
             allowNull: false,
@@ -21,7 +21,7 @@ export const Categoria = sequelize.define('categoria',
         id_categoria_padre: {
             type: DataTypes.INTEGER,
             references: {
-                model: 'categoria',
+                model: 'category',
                 key: 'id'
             }
         }
@@ -31,6 +31,6 @@ export const Categoria = sequelize.define('categoria',
         createdAt: 'created_at',
         updatedAt: 'updated_at',
         deletedAt: 'deleted_at',
-        tableName: 'categoria'
+        tableName: 'category'
     }
 );
