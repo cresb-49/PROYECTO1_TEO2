@@ -32,7 +32,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Sacar Créditos</h5>
-                            <form @submit.prevent="sacarCreditos">
+                            <form @submit.prevent="retirarCreditos">
                                 <div class="form-group">
                                     <label>Creditos disponibles</label>
                                     <input type="text" class="form-control" v-model="creditosDisponibles" readonly>
@@ -69,17 +69,18 @@ export default {
         }
     },
     mounted() {
-
+        this.infoCuenta();
     },
     methods: {
-        obtenerTransacciones() {
+        infoCuenta() {
             let state = this.$store.state;
-            this.axios.get(`transacciones/${state.id}`, {
+            this.axios.get(`cuenta/${state.id}`, {
                 headers: {
                     Authorization: `Bearer ${state.token}` // Incluye el token en el encabezado Authorization
                 },
             }).then(response => {
-                this.transacciones = response.data.data;
+                let data = response.data.data;
+                this.creditosDisponibles = data.saldo_retirable;
             }).catch(error => {
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
@@ -87,6 +88,48 @@ export default {
                     toast.error(errores[index]);
                 }
             });
+        },
+        comprarCreditos() {
+            let state = this.$store.state;
+            const payload = {
+                cantidad: this.cantidadCompra
+            };
+            this.axios.post('transaccion/comprar-creditos', payload, {
+                headers: {
+                    Authorization: `Bearer ${state.token}` // Incluye el token en el encabezado Authorization
+                },
+            }).then(response => {
+                toast.success(response.data.mensaje);
+                this.infoCuenta();
+                this.cantidadCompra = 0.0;
+            }).catch(error => {
+                toast.error(error.response.data.error);
+                let errores = error.response.data.errores;
+                for (let index = 0; index < errores.length; index++) {
+                    toast.error(errores[index]);
+                }
+            })
+        },
+        retirarCreditos() {
+            let state = this.$store.state;
+            const payload = {
+                cantidad: this.cantidadSacar
+            };
+            this.axios.post('transaccion/retirar-creditos', payload, {
+                headers: {
+                    Authorization: `Bearer ${state.token}` // Incluye el token en el encabezado Authorization
+                },
+            }).then(response => {
+                toast.success(response.data.message);
+                this.infoCuenta();
+                this.cantidadSacar = 0.0;
+            }).catch(error => {
+                toast.error(error.response.data.error);
+                let errores = error.response.data.errores;
+                for (let index = 0; index < errores.length; index++) {
+                    toast.error(errores[index]);
+                }
+            })
         }
     }
 }

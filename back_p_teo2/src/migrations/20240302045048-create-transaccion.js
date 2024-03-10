@@ -19,11 +19,18 @@ module.exports = {
       },
       id_cuenta_destino: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: {
           model: 'cuenta',
           key: 'id'
         }
+      },
+      descripcion: {
+        type: Sequelize.STRING
+      },
+      valor: {
+        type: Sequelize.DOUBLE,
+        allowNull: false
       },
       created_at: {
         allowNull: false,

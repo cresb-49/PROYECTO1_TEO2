@@ -49,6 +49,9 @@ app.use('/api', publicacionRoutes);
 import categoriaRoutes from './routes/categoria.routes';
 app.use('/api', categoriaRoutes);
 
+import transaccionRoutes from './routes/transaccion.routes';
+app.use('/api', transaccionRoutes);
+
 //Inicio del servidor
 const PORT: string | undefined = process.env.SERVER_PORT;
 app.listen(PORT, (): void => {

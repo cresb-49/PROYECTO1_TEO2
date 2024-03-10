@@ -5,21 +5,17 @@
             <thead>
                 <tr>
                     <th>ID Transacción</th>
-                    <th>Nombre Artículo</th>
-                    <th>Valor Artículo</th>
-                    <th>Cantidad Artículo</th>
-                    <th>Valor Total</th>
-                    <th>Créditos Ganados</th>
+                    <th>Valor</th>
+                    <th>Fecha</th>
+                    <th>Descripcion</th>
                 </tr>
             </thead>
             <tbody>
                 <tr v-for="(transaccion, index) in transacciones" :key="index">
                     <td>{{ transaccion.id }}</td>
-                    <td>{{ transaccion.nombre }}</td>
                     <td>{{ transaccion.valor }}</td>
-                    <td>{{ transaccion.cantidad }}</td>
-                    <td>{{ transaccion.valorTotal }}</td>
-                    <td>{{ transaccion.creditosGanados }}</td>
+                    <td>{{ transaccion.fecha }}</td>
+                    <td>{{ transaccion.descripcion }}</td>
                 </tr>
             </tbody>
         </table>
@@ -37,9 +33,16 @@ export default {
     data() {
         return {
             transacciones: [
-                { id: 1, nombre: 'Artículo 1', valor: 10, cantidad: 2, valorTotal: 20, creditosGanados: 5 },
-                { id: 2, nombre: 'Artículo 2', valor: 15, cantidad: 1, valorTotal: 15, creditosGanados: 3 },
-                { id: 3, nombre: 'Artículo 3', valor: 8, cantidad: 3, valorTotal: 24, creditosGanados: 6 }
+                { id: 1, valor: 100, fecha: '2021-10-01', descripcion: 'Compra de créditos' },
+                { id: 2, valor: 200, fecha: '2021-10-02', descripcion: 'Retiro de créditos' },
+                { id: 3, valor: 300, fecha: '2021-10-03', descripcion: 'Compra de créditos' },
+                { id: 4, valor: 400, fecha: '2021-10-04', descripcion: 'Retiro de créditos' },
+                { id: 5, valor: 500, fecha: '2021-10-05', descripcion: 'Compra de créditos' },
+                { id: 6, valor: 600, fecha: '2021-10-06', descripcion: 'Retiro de créditos' },
+                { id: 7, valor: 700, fecha: '2021-10-07', descripcion: 'Compra de créditos' },
+                { id: 8, valor: 800, fecha: '2021-10-08', descripcion: 'Retiro de créditos' },
+                { id: 9, valor: 900, fecha: '2021-10-09', descripcion: 'Compra de créditos' },
+                { id: 10, valor: 1000, fecha: '2021-10-10', descripcion: 'Retiro de créditos' },
             ]
         }
     },

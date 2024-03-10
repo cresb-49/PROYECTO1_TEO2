@@ -19,11 +19,18 @@ export const Transaccion = sequelize.define('transaccion',
         },
         id_cuenta_destino: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
             references: {
                 model: 'cuenta',
                 key: 'id'
             }
+        },
+        descripcion: {
+            type: DataTypes.STRING
+        },
+        valor: {
+            type: DataTypes.DOUBLE,
+            allowNull: false
         },
         created_at: {
             allowNull: false,
