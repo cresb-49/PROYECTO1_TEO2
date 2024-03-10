@@ -66,9 +66,25 @@ export default {
             this.$router.push({ name: 'ModificarArticulo', params: { id: articulo.id } });
         },
         crearPublicacion(articulo) {
-            // Lógica para crear una publicación para el producto con el ID proporcionado
-            this.selectedProduct = articulo;
-            console.log('Crear publicación para el producto con ID:', articulo);
+            let state = this.$store.state;
+            const payload = {
+                "id_articulo": articulo.id,
+            };
+            this.axios.post(`publicacion`, payload, {
+                headers: {
+                    Authorization: `Bearer ${state.token}` // Incluye el token en el encabezado Authorization
+                },
+            }).then(response => {
+                console.log(response.data);
+                toast.success('Publicación creada con éxito');
+                this.obtenerArticulos();
+            }).catch(error => {
+                toast.error(error.response.data.error);
+                let errores = error.response.data.errores;
+                for (let index = 0; index < errores.length; index++) {
+                    toast.error(errores[index]);
+                }
+            });
         },
         quitSelectedProduct() {
             this.selectedProduct = null;

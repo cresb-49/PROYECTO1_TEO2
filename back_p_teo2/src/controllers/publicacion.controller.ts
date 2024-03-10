@@ -27,19 +27,20 @@ export const createPublicacion = async (req: Request, res: Response) => {
     const { tokenPayload } = req;
     const idUsuario = tokenPayload.usuarioId;
     //Obtener el id del articulo
-    const idArticulo = req.params.idArticulo;
+    const { id_articulo } = req.body;
     //Obtenemos el articulo
-    let articulo:any = await Articulo.findByPk(idArticulo);
+    let articulo: any = await Articulo.findByPk(id_articulo);
     // Verificamos que el producto exista y pertenezca al usuario
     if (articulo === null) {
         return responseAPI(HttpStatus.NOT_FOUND, res, null, "Articulo no encontrado", "El articulo no existe");
     }
-    if (articulo.id_usuario !== idUsuario) {
+    console.log(articulo.id_usuario, idUsuario);
+    if (parseInt(articulo.id_usuario) !== parseInt(idUsuario)) {
         return responseAPI(HttpStatus.FORBIDDEN, res, null, "No tienes permiso para realizar esta accion", "El articulo no pertenece al usuario");
     }
     //Creamos la publicacion con el articulo
-    const payload ={
-        id_articulo: idArticulo,
+    const payload = {
+        id_articulo: id_articulo,
         id_tipo_publicacion: 1,
         id_usuario: idUsuario,
         isValidate: true,

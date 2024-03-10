@@ -7,8 +7,9 @@ const router = Router()
 router.get('/publicaciones', getPublicaciones);
 router.get('/publicaciones/tipo', getTipoPublicacion);
 router.get('/publicaciones/IdUsuario', getPublicacionesUsuario)
-router.post('/publicacion/:idArticulo',verifyToken, createPublicacion)
-router.put('/publicacion/IdUsuario', updatePublicacion)
+
+router.post('/publicacion',verifyToken, createPublicacion)
+router.put('/publicacion', updatePublicacion)
 
 
 export default router;
