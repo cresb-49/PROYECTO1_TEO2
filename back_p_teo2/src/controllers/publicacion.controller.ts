@@ -106,3 +106,7 @@ export const createPublicacion = async (req: Request, res: Response) => {
 export const updatePublicacion = async (req: Request, res: Response) => {
 
 };
+
+export const getComentariosPublicacion = async (req: Request, res: Response) => {
+    
+};

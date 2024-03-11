@@ -3,6 +3,7 @@ import sequelize from "../database/database";
 import { Articulo } from "./articulo";
 import { Usuario } from "./usuario";
 import { TipoPublicacion } from "./tipo_publicacion";
+import { Comentario } from "./comentario";
 
 export const Publicacion = sequelize.define('publicacion',
     {
@@ -65,3 +66,6 @@ export const Publicacion = sequelize.define('publicacion',
 );
 Publicacion.belongsTo(Usuario, { foreignKey: 'id_usuario' });
 Publicacion.belongsTo(TipoPublicacion, { foreignKey: 'id_tipo_publicacion' });
+
+Publicacion.hasMany(Comentario, { foreignKey: 'id_publicacion' });
+Comentario.belongsTo(Publicacion, { foreignKey: 'id_publicacion' });

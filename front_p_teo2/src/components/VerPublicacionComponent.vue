@@ -36,9 +36,45 @@
         <div class="mt-4">
             <h6>Comentarios anteriores:</h6>
             <ul class="list-group">
-                <!-- Aquí se agregarán los comentarios dinámicamente -->
-                <li class="list-group-item mt-2 mb-2" v-for="(comment, index) in comments" :key="index">{{ comment }}</li>
+                <!-- Iterar sobre los comentarios -->
+                <li class="list-group-item mt-2 mb-2" v-for="(comment, index) in comments" :key="index">
+                    <!-- Contenido del comentario -->
+                    <p>{{ comment.texto }}</p>
+                    <!-- Mostrar el nombre del usuario y la fecha en letras pequeñas -->
+                    <small class="style-small">
+                        <p>
+                            <strong>{{ comment.usuario.nombres + ' ' + comment.usuario.apellidos }}</strong>
+                            <!-- Nombre del usuario -->
+                            <span class="text-muted"> - {{ formatDate(comment.created_at) }}</span>
+                            <!-- Fecha en letras pequeñas -->
+                        </p>
+                    </small>
+                </li>
             </ul>
+            <div class="d-flex justify-content-center align-items-center">
+                <!-- Botones de paginación -->
+                <div class="mt-3">
+                    <!-- Botón "Anterior" -->
+                    <button class="btn btn-secondary" @click="getComentarios(previousPage)"
+                        :disabled="currentPage === 1">
+                        Anterior
+                    </button>
+                    
+                    <!-- Números de página -->
+                    <button v-for="(pageNumber, index) in totalPages" :key="index"
+                        :class="['btn', 'btn-secondary', { 'btn-info': pageNumber === currentPage }]"
+                        @click="getComentarios(pageNumber)">
+                        {{ pageNumber }}
+                    </button>
+
+                    <!-- Botón "Siguiente" -->
+                    <button class="btn btn-secondary" @click="getComentarios(nextPage)"
+                        :disabled="currentPage === totalPages">
+                        Siguiente
+                    </button>
+                </div>
+            </div>
+
         </div>
     </div>
 </template>
@@ -60,16 +96,16 @@ export default {
                 categoria: ['otros']
             },
             comment: '',
-            comments: [
-                'Este es un comentario de ejemplo.',
-                'Otro comentario aquí.',
-                '¡Estoy probando Vue.js!',
-                '¡Los comentarios son geniales!'
-            ]
+            comments: [],
+            totalPages: 1,
+            currentPage: 1,
+            previousPage: 1,
+            nextPage: 1
         }
     },
     mounted() {
         this.getPublicacion();
+        this.getComentarios();
     },
     methods: {
         getPublicacion() {
@@ -99,13 +135,50 @@ export default {
             });
         },
         submitComment() {
-            // Manejo del envío del comentario
-            // Aquí puedes realizar acciones como enviar el comentario a un servidor, agregarlo a una lista de comentarios, etc.
-            // Por ejemplo, agregar el comentario a la lista de comentarios:
-            this.comments.push(this.comment);
+            let state = this.$store.state;
+            let payload = {
+                id_publicacion: this.$route.params.id,
+                texto: this.comment
+            }
+            this.axios.post(`/comentario/publicacion`, payload, {
+                headers: {
+                    Authorization: `Bearer ${state.token}`
+                }
+            }).then(() => {
+                this.getComentarios(1);
+            }).catch(error => {
+                toast.error(error.response.data.error);
+                let errores = error.response.data.errores;
+                for (let index = 0; index < errores.length; index++) {
+                    toast.error(errores[index]);
+                }
+            });
+        },
+        getComentarios(page = 1) {
+            let state = this.$store.state;
+            this.axios.get(`comentarios/publicacion/${this.$route.params.id}?page=${page}`, {
+                headers: {
+                    Authorization: `Bearer ${state.token}`
+                }
+            }).then(response => {
+                const { data, totalPages, previousPage, nextPage, currentPage } = response.data.data;
+                this.comments = data;
+                this.totalPages = totalPages;
+                this.previousPage = previousPage;
+                this.nextPage = nextPage;
+                this.currentPage = currentPage;
 
-            // Limpiar el campo de comentario después de enviarlo
-            this.comment = '';
+            }).catch(error => {
+                toast.error(error.response.data.error);
+                let errores = error.response.data.errores;
+                for (let index = 0; index < errores.length; index++) {
+                    toast.error(errores[index]);
+                }
+            });
+        },
+        formatDate(date) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+            return new Date(date).toLocaleString('es-ES', options);
         },
         modificarProducto() {
             this.$router.push({ name: 'ModificarArticulo', params: { id: this.articulo._id } });
@@ -118,5 +191,11 @@ export default {
 img {
     height: 500px;
     align-self: center;
+}
+
+.style-small {
+    font-size: 15px;
+    color: grey;
+    /* o cualquier otro color gris que desees */
 }
 </style>

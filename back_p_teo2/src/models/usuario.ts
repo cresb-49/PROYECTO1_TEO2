@@ -1,6 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database/database";
 import { Acount } from "./acount";
+import { Comentario } from "./comentario";
 
 export const Usuario = sequelize.define('usuario',
     {
@@ -56,3 +57,5 @@ export const Usuario = sequelize.define('usuario',
 );
 
 Usuario.belongsTo(Acount, { foreignKey: 'id_cuenta' });
+
+
