@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="mt-4">
         <div class="card">
             <div class="container" style="padding: 20px;">
                 <h2 class="mb-3">Modificar Articulo</h2>

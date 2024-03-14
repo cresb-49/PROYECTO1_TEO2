@@ -11,6 +11,24 @@
             <li style="margin-left: 30px;">{{ cate }}</li>
         </ul>
         <h5 style="margin-top: 20px;"> Valor: Q. {{ articulo.precio }}</h5>
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-6 d-flex justify-content-center align-items-center" @click="changeStateLike(true)">
+                    <button id="likeButton"
+                        :class="['btn', { 'btn-outline-primary': likes.liked === true, 'btn-primary': (likes.liked === null || likes.liked === false) }]">
+                        Me gusta
+                        <span id="likeCount" class="count ml-2">({{ likes.count_like }})</span>
+                    </button>
+                </div>
+                <div class="col-md-6 d-flex justify-content-center align-items-center" @click="changeStateLike(false)">
+                    <button id="dislikeButton"
+                        :class="['btn', { 'btn-outline-danger': likes.liked === false, 'btn-danger': (likes.liked === null || likes.liked === true) }]">
+                        No me gusta
+                        <span id="dislikeCount" class="count ml-2">({{ likes.count_dislike }})</span>
+                    </button>
+                </div>
+            </div>
+        </div>
         <div class="row justify-content-between" style="margin-top: 20px;">
             <button v-if="$store.state.isAuthenticated && articulo.usuario !== $store.state.id" @click="agregarCarrito"
                 class="btn btn-outline-success col" style="margin: 5px;">Agregar al
@@ -59,7 +77,7 @@
                         :disabled="currentPage === 1">
                         Anterior
                     </button>
-                    
+
                     <!-- Números de página -->
                     <button v-for="(pageNumber, index) in totalPages" :key="index"
                         :class="['btn', 'btn-secondary', { 'btn-info': pageNumber === currentPage }]"
@@ -95,6 +113,11 @@ export default {
                 descripcion: 'This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.',
                 categoria: ['otros']
             },
+            likes: {
+                liked: true,
+                count_like: 0,
+                count_dislike: 0
+            },
             comment: '',
             comments: [],
             totalPages: 1,
@@ -106,6 +129,7 @@ export default {
     mounted() {
         this.getPublicacion();
         this.getComentarios();
+        this.getLikeInfo();
     },
     methods: {
         getPublicacion() {
@@ -124,8 +148,6 @@ export default {
                     descripcion: publicacion.articulo.descripcion,
                     categoria: [publicacion.articulo.category.nombre]
                 }
-                console.log(this.articulo.usuario);
-                console.log(this.$store.state.id);
             }).catch(error => {
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
@@ -176,12 +198,102 @@ export default {
                 }
             });
         },
+        getLikeInfo() {
+            let state = this.$store.state;
+            this.axios.get(`likes/publicacion/${this.$route.params.id}`, {
+                headers: {
+                    Authorization: `Bearer ${state.token}`
+                }
+            }).then(response => {
+                console.log(response.data.data);
+                const { likes, dislikes } = response.data.data;
+                this.likes.count_like = likes;
+                this.likes.count_dislike = dislikes;
+            }).catch(error => {
+                toast.error(error.response.data.error);
+                let errores = error.response.data.errores;
+                for (let index = 0; index < errores.length; index++) {
+                    toast.error(errores[index]);
+                }
+            });
+            this.axios.get(`/like/usuario/publicacion/${this.$route.params.id}`, {
+                headers: {
+                    Authorization: `Bearer ${state.token}`
+                }
+            }).then(response => {
+                this.likes.liked = response.data.data;
+            }).catch(error => {
+                toast.error(error.response.data.error);
+                let errores = error.response.data.errores;
+                for (let index = 0; index < errores.length; index++) {
+                    toast.error(errores[index]);
+                }
+            });
+        },
+        changeStateLike(like_status) {
+            let state = this.$store.state;
+            if (this.likes.liked === null) {
+                console.log('creando like');
+                const payload = {
+                    state: like_status,
+                    id_publicacion: this.$route.params.id
+                }
+                this.axios.post(`like/publicacion`, payload, {
+                    headers: {
+                        Authorization: `Bearer ${state.token}`
+                    }
+                }).then(() => {
+                    this.getLikeInfo();
+                }).catch(error => {
+                    toast.error(error.response.data.error);
+                    let errores = error.response.data.errores;
+                    for (let index = 0; index < errores.length; index++) {
+                        toast.error(errores[index]);
+                    }
+                });
+            } else if (this.likes.liked === like_status) {
+                console.log('eliminando like')
+                this.axios.delete(`like/publicacion/${this.$route.params.id}`, {
+                    headers: {
+                        Authorization: `Bearer ${state.token}`
+                    }
+                }).then(() => {
+                    this.getLikeInfo();
+                }).catch(error => {
+                    toast.error(error.response.data.error);
+                    let errores = error.response.data.errores;
+                    for (let index = 0; index < errores.length; index++) {
+                        toast.error(errores[index]);
+                    }
+                });
+            } else {
+                console.log('actualizando like')
+                const payload = {
+                    state: like_status,
+                    id_publicacion: this.$route.params.id
+                }
+                this.axios.put('like/publicacion', payload, {
+                    headers: {
+                        Authorization: `Bearer ${state.token}`
+                    }
+                }).then(() => {
+                    this.getLikeInfo();
+                }).catch(error => {
+                    toast.error(error.response.data.error);
+                    let errores = error.response.data.errores;
+                    for (let index = 0; index < errores.length; index++) {
+                        toast.error(errores[index]);
+                    }
+                });
+            }
+
+        },
         formatDate(date) {
             const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
             return new Date(date).toLocaleString('es-ES', options);
         },
         modificarProducto() {
-            this.$router.push({ name: 'ModificarArticulo', params: { id: this.articulo._id } });
+            this.$router.push({ name: 'ModificarArticulo', params: { id: this.articulo.id } });
         }
     }
 }

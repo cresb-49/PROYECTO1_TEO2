@@ -14,29 +14,23 @@
             <li class="nav-item">
               <router-link class="nav-link active" aria-current="page" to="/">Home</router-link>
             </li>
-            <li class="nav-item">
-              <router-link v-if="$store.state.isAuthenticated && $store.state.role === 'USUARIO'"
-                class="nav-link active" aria-current="page" to="/Seguimiento">Seguimiento</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link v-if="$store.state.isAuthenticated" class="nav-link active" aria-current="page"
-                to="/MiCuenta">Mi Cuenta</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link v-if="$store.state.isAuthenticated" class="nav-link active" aria-current="page"
-                to="/MisTransacciones">Mis Transacciones</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link v-if="$store.state.isAuthenticated" class="nav-link active" aria-current="page"
-                to="/CompraRetiraCreditos">Compra y Retiro</router-link>
+            <li class="nav-item dropdown" v-if="$store.state.isAuthenticated">
+              <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Mi Cuenta
+              </a>
+              <ul class="dropdown-menu">
+                <li><router-link to="/MiCuenta" class="dropdown-item">Configuracion Cuenta</router-link></li>
+                <li><router-link to="/MisTransacciones" class="dropdown-item">Mis Transacciones</router-link></li>
+                <li><router-link to="/CompraRetiraCreditos" class="dropdown-item">Compra y Retiro</router-link></li>
+              </ul>
             </li>
             <li class="nav-item dropdown" v-if="$store.state.isAuthenticated">
               <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Articulos
               </a>
               <ul class="dropdown-menu">
-                <li><router-link to="/MisArticulos" class="dropdown-item">Articulos</router-link></li>
-                <li><router-link to="/NuevoArticulo" class="dropdown-item">Registar Articulo</router-link></li>
+                <li><router-link to="/MisArticulos" class="dropdown-item">Mis Articulos</router-link></li>
+                <li><router-link to="/NuevoArticulo" class="dropdown-item">Crear Articulo</router-link></li>
                 <li><router-link to="/CrearPublicacion" class="dropdown-item">Crear Publicacion</router-link></li>
               </ul>
             </li>
