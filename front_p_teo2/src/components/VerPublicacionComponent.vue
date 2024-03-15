@@ -98,8 +98,13 @@
     </div>
 
     <div class="mt-4 container col-md-8" v-if="buyArticulo === true">
-        <form @submit.prevent="">
+        <form @submit.prevent="generarCompra">
             <fieldset>
+                <div class="form-group mb-4">
+                    <label for="disabledTextInput">Cantidad de Articulos Comprar</label>
+                    <input type="number" id="disabledTextInput" class="form-control" placeholder="Cantidad"
+                        v-model="compra.cantidad_articulo" min="0" :max="articulo.cantidad">
+                </div>
                 <div class="form-group row" v-if="cuenta.saldo_no_retirable > 0 || cuenta.saldo_retirable > 0">
                     <div class="col-md-6">
                         <label for="disabledTextInput">Korns Retirables Disponibles</label>
@@ -111,11 +116,11 @@
                     </div>
                     <div class="col-md-6">
                         <label for="disabledTextInput">Korns Retirables a utilizar</label>
-                        <input type="number" id="disabledTextInput" class="form-control" placeholder="Cantidad"
-                            value="0" min="0" :max="cuenta.saldo_retirable">
+                        <input type="number" id="disabledTextInput" class="form-control" placeholder="Cantidad" min="0"
+                            :max="cuenta.saldo_retirable" v-model="compra.uso_retirable">
                         <label for="disabledTextInput">Korns No Retirables a utilizar</label>
-                        <input type="number" id="disabledTextInput" class="form-control" placeholder="Cantidad"
-                            value="0" min="0" :max="cuenta.saldo_no_retirable">
+                        <input type="number" id="disabledTextInput" class="form-control" placeholder="Cantidad" min="0"
+                            :max="cuenta.saldo_no_retirable" v-model="compra.uso_no_retirable">
                     </div>
                 </div>
                 <div v-if="articulosPublicados.length !== 0">
@@ -194,7 +199,9 @@ export default {
                 count_dislike: 0
             },
             compra: {
-                cantidad: 0,
+                uso_retirable: 0,
+                uso_no_retirable: 0,
+                cantidad_articulo: 0,
                 cantidad_articulo_cambio: 0
             },
             articuloSeleccionado: {
@@ -437,6 +444,34 @@ export default {
                         toast.error(errores[index]);
                     }
                 });
+        },
+        generarCompra() {
+            let state = this.$store.state;
+            let payload = {
+                id_publicacion: this.$route.params.id,
+                cantidad: this.compra.cantidad_articulo,
+                creditos: {
+                    retirables: this.compra.uso_retirable,
+                    no_retirables: this.compra.uso_no_retirable
+                },
+                articulo_cambio: {
+                    id_articulo: this.articuloSeleccionado.id,
+                    cantidad_articulo: this.compra.cantidad_articulo_cambio
+                }
+            }
+            this.axios.post(`compra`, payload, {
+                headers: {
+                    Authorization: `Bearer ${state.token}`
+                }
+            }).then((response) => {
+                console.log(response.data);
+            }).catch(error => {
+                toast.error(error.response.data.error);
+                let errores = error.response.data.errores;
+                for (let index = 0; index < errores.length; index++) {
+                    toast.error(errores[index]);
+                }
+            });
         }
     }
 }

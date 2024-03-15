@@ -61,6 +61,9 @@ app.use('/api', comentarioRoutes);
 import likeRoutes from './routes/like.routes';
 app.use('/api', likeRoutes);
 
+import compraRoutes from './routes/compra.routes';
+app.use('/api', compraRoutes);
+
 //Inicio del servidor
 const PORT: string | undefined = process.env.SERVER_PORT;
 app.listen(PORT, (): void => {
