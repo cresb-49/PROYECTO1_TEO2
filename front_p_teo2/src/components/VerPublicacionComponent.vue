@@ -10,7 +10,8 @@
         <ul class="list-group list-group-flush" v-for="cate in articulo.categoria" v-bind:key="cate">
             <li style="margin-left: 30px;">{{ cate }}</li>
         </ul>
-        <h5 style="margin-top: 20px;"> Valor: Q. {{ articulo.precio }}</h5>
+        <h5 style="margin-top: 20px;"> <strong>Disponibles:</strong> {{ articulo.cantidad }}</h5>
+        <h5 style="margin-top: 20px;"> <strong>Valor:</strong> Q.{{ articulo.precio }}</h5>
         <div class="container mt-4">
             <div class="row">
                 <div class="col-md-6 d-flex justify-content-center align-items-center" @click="changeStateLike(true)">
@@ -30,15 +31,15 @@
             </div>
         </div>
         <div class="row justify-content-between" style="margin-top: 20px;">
-            <button v-if="$store.state.isAuthenticated && articulo.usuario !== $store.state.id" @click="agregarCarrito"
-                class="btn btn-outline-success col" style="margin: 5px;">Agregar al
-                Carrito</button>
+            <button v-if="$store.state.isAuthenticated && articulo.usuario !== $store.state.id"
+                @click="comparArticulo(articulo)" class="btn btn-outline-success col" style="margin: 5px;">{{
+                labelButton }}</button>
             <button v-if="$store.state.isAuthenticated && articulo.usuario === $store.state.id"
                 @click="modificarProducto" class="btn btn-outline-warning col" style="margin: 5px;">Modificar Producto
             </button>
         </div>
     </div>
-    <div class="mt-4">
+    <div class="mt-4" v-if="buyArticulo === false">
         <h5>Comentarios</h5>
 
         <!-- Espacio para escribir comentarios -->
@@ -95,6 +96,74 @@
 
         </div>
     </div>
+
+    <div class="mt-4 container col-md-8" v-if="buyArticulo === true">
+        <form @submit.prevent="">
+            <fieldset>
+                <div class="form-group row" v-if="cuenta.saldo_no_retirable > 0 || cuenta.saldo_retirable > 0">
+                    <div class="col-md-6">
+                        <label for="disabledTextInput">Korns Retirables Disponibles</label>
+                        <input type="number" id="disabledTextInput" class="form-control" placeholder="Cantidad" disabled
+                            v-model="cuenta.saldo_retirable">
+                        <label for="disabledTextInput">Korns No Retirables Disponibles</label>
+                        <input type="number" id="disabledTextInput" class="form-control" placeholder="Cantidad" disabled
+                            v-model="cuenta.saldo_no_retirable">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="disabledTextInput">Korns Retirables a utilizar</label>
+                        <input type="number" id="disabledTextInput" class="form-control" placeholder="Cantidad"
+                            value="0" min="0" :max="cuenta.saldo_retirable">
+                        <label for="disabledTextInput">Korns No Retirables a utilizar</label>
+                        <input type="number" id="disabledTextInput" class="form-control" placeholder="Cantidad"
+                            value="0" min="0" :max="cuenta.saldo_no_retirable">
+                    </div>
+                </div>
+                <div v-if="articulosPublicados.length !== 0">
+                    <div class="form-group mt-4">
+                        <label for="disabledSelect">Articulo de Cambio</label>
+                        <select id="disabledSelect" class="form-control" v-model="articuloSeleccionado.id"
+                            @change="setCantidadSeleccionado">
+                            <option value="-1" selected>Seleccionar Articulo</option>
+                            <option v-for="articulo in articulosPublicados" :key="articulo.id" :value="articulo.id">
+                                {{ articulo.nombre }}</option>
+                        </select>
+                    </div>
+                    <div class="form-group mt-4 row">
+                        <label for="disabledTextInput">Producto Seleccionado</label>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <img :src="'http://localhost:3000/api/image?articulo=' + articuloSeleccionado.id"
+                                    class="imgP img-fluid" alt="imagen producto">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="disabledTextInput">Cantidad Disponible</label>
+                                <input type="number" id="disabledTextInput" class="form-control"
+                                    placeholder="Cantidad del Articulo Disponible" disabled
+                                    v-model="articuloSeleccionado.cantidad">
+                            </div>
+                            <div class="form-group">
+                                <label for="disabledTextInput">Valor Unitario</label>
+                                <input type="number" id="disabledTextInput" class="form-control"
+                                    placeholder="Cantidad del Articulo Disponible" disabled
+                                    v-model="articuloSeleccionado.valor">
+                            </div>
+                            <div class="form-group">
+                                <label for="disabledTextInput">Cantidad del articulo</label>
+                                <input type="number" id="disabledTextInput" class="form-control" placeholder="Cantidad"
+                                    v-model="compra.cantidad_articulo_cambio" :max="articuloSeleccionado.cantidad"
+                                    min="0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">Comprar</button>
+                </div>
+            </fieldset>
+        </form>
+    </div>
 </template>
 
 <script>
@@ -109,27 +178,46 @@ export default {
                 id: 0,
                 usuario: -1,
                 nombre: 'Producto Modelo',
+                cantidad: -1,
                 precio: 100.99,
                 descripcion: 'This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.',
                 categoria: ['otros']
             },
+            cuenta: {
+                saldo_retirable: 0,
+                saldo_no_retirable: 0
+            },
+            articulosPublicados: [],
             likes: {
                 liked: true,
                 count_like: 0,
                 count_dislike: 0
+            },
+            compra: {
+                cantidad: 0,
+                cantidad_articulo_cambio: 0
+            },
+            articuloSeleccionado: {
+                id: 0,
+                cantidad: 0,
+                valor: 0
             },
             comment: '',
             comments: [],
             totalPages: 1,
             currentPage: 1,
             previousPage: 1,
-            nextPage: 1
+            nextPage: 1,
+            buyArticulo: true,
+            labelButton: 'Comprar Articulo',
         }
     },
     mounted() {
         this.getPublicacion();
         this.getComentarios();
         this.getLikeInfo();
+        this.getArticulosPublicadosComprador();
+        this.getCuentaBalance();
     },
     methods: {
         getPublicacion() {
@@ -142,6 +230,7 @@ export default {
                 const publicacion = response.data.data;
                 this.articulo = {
                     id: publicacion.articulo.id,
+                    cantidad: publicacion.articulo.cantidad,
                     usuario: publicacion.articulo.id_usuario,
                     nombre: publicacion.articulo.nombre,
                     precio: publicacion.articulo.valor,
@@ -294,6 +383,60 @@ export default {
         },
         modificarProducto() {
             this.$router.push({ name: 'ModificarArticulo', params: { id: this.articulo.id } });
+        },
+        comparArticulo() {
+            this.buyArticulo = !this.buyArticulo;
+            if (this.buyArticulo) {
+                this.labelButton = 'Ver Articulo';
+            } else {
+                this.labelButton = 'Comprar Articulo';
+            }
+        },
+        getArticulosPublicadosComprador() {
+            let state = this.$store.state;
+            this.axios.get(`articulos/usuario/publicados`, {
+                headers: {
+                    Authorization: `Bearer ${state.token}`
+                }
+            }).then(response => {
+                this.articulosPublicados = response.data.data;
+            }).catch(error => {
+                toast.error(error.response.data.error);
+                let errores = error.response.data.errores;
+                for (let index = 0; index < errores.length; index++) {
+                    toast.error(errores[index]);
+                }
+            });
+        },
+        setCantidadSeleccionado() {
+            let busqueda = this.articulosPublicados.find(articulo => articulo.id === this.articuloSeleccionado.id);
+            if (busqueda) {
+                this.articuloSeleccionado.cantidad = busqueda.cantidad;
+                this.articuloSeleccionado.valor = busqueda.valor;
+            } else {
+                this.articuloSeleccionado.cantidad = 0;
+                this.articuloSeleccionado.valor = 0;
+            }
+        },
+        getCuentaBalance() {
+            let state = this.$store.state;
+            this.axios.get(`cuenta/${state.id}`, {
+                headers: {
+                    Authorization: `Bearer ${state.token}`
+                }
+            })
+                .then(response => {
+                    const { saldo_retirable, saldo_no_retirable } = response.data.data;
+                    this.cuenta.saldo_retirable = parseFloat(saldo_retirable);
+                    this.cuenta.saldo_no_retirable = parseFloat(saldo_no_retirable);
+                })
+                .catch(error => {
+                    toast.error(error.response.data.error);
+                    let errores = error.response.data.errores;
+                    for (let index = 0; index < errores.length; index++) {
+                        toast.error(errores[index]);
+                    }
+                });
         }
     }
 }
@@ -303,6 +446,12 @@ export default {
 img {
     height: 500px;
     align-self: center;
+}
+
+.imgP {
+    margin: 20px;
+    border-radius: 5px;
+    max-height: 150px;
 }
 
 .style-small {
