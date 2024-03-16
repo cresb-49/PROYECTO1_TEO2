@@ -14,6 +14,9 @@ export const getCuenta = async (req: Request, res: Response) => {
     const usuario: any = await Usuario.findOne({ where: { id: idUsuario }, include: Acount });
     if (usuario) {
         const cuenta = usuario.acount;
+        if (!cuenta) {
+            return responseAPI(HttpStatus.NOT_FOUND, res, null, 'Cuenta no encontrada', 'Cuenta no encontrada');
+        }
         const data = {
             "nombres": cuenta.nombres,
             "apellidos": cuenta.apellidos,
