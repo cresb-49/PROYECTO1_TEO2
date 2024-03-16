@@ -36,13 +36,10 @@
             </li>
             <li class="nav-item dropdown" v-if="isAuth && isAdmin">
               <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Empleados
+                Usuarios
               </a>
               <ul class="dropdown-menu">
-                <li><router-link to="/RegistroEmpleado" class="dropdown-item">Registro Empleado Paqueteria</router-link>
-                </li>
-                <li><router-link to="/RegistroAdmin" class="dropdown-item">Registro Adminitrador</router-link></li>
-                <li><router-link to="/Empleados" class="dropdown-item">Modificacion Empleados</router-link></li>
+                <li><router-link to="/RegistroUsuarioRol" class="dropdown-item">Registro Usuario</router-link></li>
               </ul>
             </li>
             <li class="nav-item">

@@ -10,13 +10,13 @@
                     </div>
                     <div class="mb-3">
                         <label for="lastname">Apellidos</label>
-                        <input type="text" class="form-control" id="lastname" placeholder="Ingrese su apellido o apellidos"
-                            v-model="apellidos" required>
+                        <input type="text" class="form-control" id="lastname"
+                            placeholder="Ingrese su apellido o apellidos" v-model="apellidos" required>
                     </div>
                     <div class="mb-3">
                         <label for="birtday">Fecha Nacimiento</label>
-                        <input type="date" class="form-control" id="birtday" placeholder="Ingrese su fecha de nacimiento"
-                            v-model="f_nacimiento" required>
+                        <input type="date" class="form-control" id="birtday"
+                            placeholder="Ingrese su fecha de nacimiento" v-model="f_nacimiento" required>
                     </div>
                     <div class="mb-3">
                         <label for="email">Correo electrónico</label>
@@ -40,7 +40,7 @@
 
     </div>
 </template>
-  
+
 <script>
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css';
@@ -55,7 +55,8 @@ export default {
             f_nacimiento: null,
             email: null,
             password: null,
-            password2: null
+            password2: null,
+            role: 0
         }
     },
     methods: {
@@ -97,4 +98,3 @@ export default {
     border-radius: 0px 0px 5px 5px;
 }
 </style>
-  

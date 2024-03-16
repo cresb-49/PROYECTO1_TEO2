@@ -4,9 +4,7 @@ import VistaArticulosCoponent from '../components/VistaArticulosComponent';
 import NuevoArticuloComponent from '../components/NuevoArticuloComponent.vue'
 import EstadoCompraComponent from '../components/EstadoCompraComponent.vue'
 import CarritoComponent from '../components/CarritoComponent.vue'
-import RegistroAdministradorComponent from '../components/RegistroAdministradorComponent.vue'
-import RegistroEmpleadoComponent from '../components/RegistroEmpleadoComponent.vue'
-import ReportesComponent from '../components/ReportesComponent.vue'
+import RegistroUsuarioRol from '../components/RegistroUsuarioRol.vue'
 import VerArticuloComponent from '../components/VerPublicacionComponent.vue';
 import ListaVentasComponent from '../components/ListaVentasComponent.vue';
 import AceptarPublicacionesEntrantes from '../components/AceptarPublicacionesEntrantes.vue';
@@ -62,24 +60,14 @@ const routes = [
         component: EstadoCompraComponent
     },
     {
-        path: '/RegistroEmpleado',
-        name: 'RegistroEmpleado',
-        component: RegistroEmpleadoComponent
-    },
-    {
-        path: '/RegistroAdmin',
-        name: 'RegistroAdmin',
-        component: RegistroAdministradorComponent
+        path: '/RegistroUsuarioRol',
+        name: 'RegistroUsuarioRol',
+        component: RegistroUsuarioRol
     },
     {
         path: '/Carrito',
         name: 'CarritoCompra',
         component: CarritoComponent
-    },
-    {
-        path: '/Reportes',
-        name: 'Reportes',
-        component: ReportesComponent
     },
     {
         path: '/Publicacion/:id',
