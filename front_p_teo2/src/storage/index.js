@@ -37,8 +37,11 @@ const storage = createStore({
         isAdmin: state => {
             return state.roles.includes(1);
         },
-        isConfirm: state => {
+        isCategory: state => {
             return state.roles.includes(2);
+        },
+        isConfirm: state => {
+            return state.roles.includes(3);
         },
         isAuth: state => {
             return state.isAuthenticated;

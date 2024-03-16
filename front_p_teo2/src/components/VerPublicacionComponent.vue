@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="mt-4">
         <div align="center">
             <img :src="'http://localhost:3000/api/image?articulo=' + articulo.id" alt="Imagen del Articulo"
                 style="max-width: 100%;">

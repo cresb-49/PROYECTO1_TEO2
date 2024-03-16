@@ -47,8 +47,7 @@
             </li>
             <li class="nav-item">
               <router-link v-if="isAuth && isConfirm" class="nav-link active" aria-current="page"
-                to="/AceptarArticulo">Aceptar
-                Producto</router-link>
+                to="/AceptarArticulo">Aceptar Publicacion</router-link>
             </li>
             <li class="nav-item">
               <router-link v-if="isAuth && $store.state.role === 'PAQUETERIA'" class="nav-link active"

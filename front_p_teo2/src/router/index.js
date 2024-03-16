@@ -9,7 +9,7 @@ import RegistroEmpleadoComponent from '../components/RegistroEmpleadoComponent.v
 import ReportesComponent from '../components/ReportesComponent.vue'
 import VerArticuloComponent from '../components/VerPublicacionComponent.vue';
 import ListaVentasComponent from '../components/ListaVentasComponent.vue';
-import ListaArticulosEntradaComponent from '../components/ListaArticulosEntradaComponent.vue';
+import AceptarPublicacionesEntrantes from '../components/AceptarPublicacionesEntrantes.vue';
 import CambiarEstadoComponent from '../components/CambiarEstadoComponent.vue';
 import VerificarArticuloComponene from '../components/VerificarArticuloComponene.vue';
 import ListaArticulosUsuario from '../components/ListaArticulosUsuario.vue';
@@ -90,7 +90,7 @@ const routes = [
     {
         path: '/AceptarArticulo',
         name: 'AceptarArticulo',
-        component: ListaArticulosEntradaComponent
+        component: AceptarPublicacionesEntrantes
     },
     {
         path: '/CambiarEstado',
