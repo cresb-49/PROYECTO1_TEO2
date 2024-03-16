@@ -6,7 +6,7 @@
                 <label for="disabledSelect">Seleccionar Rol</label>
                 <select id="disabledSelect" class="form-control" v-model="rolSeleccionado"
                     @change="setCantidadSeleccionado">
-                    <option value="-1" selected>Seleccionar</option>
+                    <option :value="-1" selected>Seleccionar</option>
                     <option v-for="role in roles" :key="role.id" :value="role.id">
                         {{ role.nombre}}</option>
                 </select>

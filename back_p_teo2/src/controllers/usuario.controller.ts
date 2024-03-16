@@ -4,6 +4,7 @@ import bcrypt from "bcrypt"
 import { Acount } from '../models/acount';
 import { responseAPI } from '../handler/responseAPI';
 import { HttpStatus } from '../enums/httpStatus';
+import { UsuarioRol } from '../models/usuario_rol';
 
 export const getUsuarios = async (req: Request, res: Response) => {
     Usuario.findAll()
@@ -33,7 +34,7 @@ export const getUsuario = async (req: Request, res: Response) => {
 };
 
 export const createUsuario = async (req: Request, res: Response) => {
-    const { nombres, apellidos, email, password, f_nacimiento, password2 } = req.body;
+    const { nombres, apellidos, email, password, f_nacimiento, password2, rol } = req.body;
 
     if (!(password === password2)) {
         responseAPI(HttpStatus.BAD_REQUEST, res, null, "Las contrasenas no coinciden");
@@ -52,19 +53,36 @@ export const createUsuario = async (req: Request, res: Response) => {
             "password": await bcrypt.hash(password, 10),
             "f_nacimiento": f_nacimiento
         };
-        Acount.create(nuevaCuenta)
-            .then(async (cuenta: any) => {
-                nuevoUsuario.id_cuenta = cuenta.id;
-                Usuario.create(nuevoUsuario)
-                    .then((value: any) => {
+
+        if (rol !== undefined && rol === 0) {
+            Acount.create(nuevaCuenta)
+                .then(async (cuenta: any) => {
+                    nuevoUsuario.id_cuenta = cuenta.id;
+                    Usuario.create(nuevoUsuario)
+                        .then((value: any) => {
+                            responseAPI(HttpStatus.OK, res, null, "Usuario creado con exito");
+                        }).catch((reason: any) => {
+                            responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
+                        })
+                })
+                .catch((reason: any) => {
+                    responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
+                });
+        } else {
+            if (rol === undefined) {
+                responseAPI(HttpStatus.BAD_REQUEST, res, null, "El rol no puede estar vacio");
+            }
+            Usuario.create(nuevoUsuario)
+                .then((value: any) => {
+                    UsuarioRol.create({ id_rol: rol, id_usuario: value.id }).then((value: any) => {
                         responseAPI(HttpStatus.OK, res, null, "Usuario creado con exito");
                     }).catch((reason: any) => {
                         responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
-                    })
-            })
-            .catch((reason: any) => {
-                responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
-            });
+                    });
+                }).catch((reason: any) => {
+                    responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
+                });
+        }
     }
 };
 
