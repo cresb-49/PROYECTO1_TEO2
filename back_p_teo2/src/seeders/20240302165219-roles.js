@@ -2,16 +2,16 @@
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  async up(queryInterface, Sequelize) {
     let roles = [
       {
         nombre: 'admin',
       },
       {
-        nombre: 'vendedor',
+        nombre: 'categorias',
       },
       {
-        nombre: 'categorias',
+        nombre: 'confirmador'
       }
     ];
     roles.forEach(roles => {
@@ -22,7 +22,7 @@ module.exports = {
     await queryInterface.bulkInsert('rol', roles, {});
   },
 
-  async down (queryInterface, Sequelize) {
+  async down(queryInterface, Sequelize) {
     /**
      * Add commands to revert seed here.
      *

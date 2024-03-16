@@ -2,12 +2,15 @@
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  async up(queryInterface, Sequelize) {
     let usuario_rol = [
       {
         id_usuario: 1,
         id_rol: 1
-      },{
+      }, {
+        id_usuario: 1,
+        id_rol: 2
+      }, {
         id_usuario: 1,
         id_rol: 3
       }
@@ -15,7 +18,7 @@ module.exports = {
     await queryInterface.bulkInsert('usuario_rol', usuario_rol, {});
   },
 
-  async down (queryInterface, Sequelize) {
+  async down(queryInterface, Sequelize) {
     /**
      * Add commands to revert seed here.
      *
