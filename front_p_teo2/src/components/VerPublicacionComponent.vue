@@ -31,11 +31,11 @@
             </div>
         </div>
         <div class="row justify-content-between" style="margin-top: 20px;">
-            <button v-if="$store.state.isAuthenticated && articulo.usuario !== $store.state.id"
-                @click="comparArticulo(articulo)" class="btn btn-outline-success col" style="margin: 5px;">{{
+            <button v-if="isAuth && articulo.usuario !== idUser" @click="comparArticulo(articulo)"
+                class="btn btn-outline-success col" style="margin: 5px;">{{
                 labelButton }}</button>
-            <button v-if="$store.state.isAuthenticated && articulo.usuario === $store.state.id"
-                @click="modificarProducto" class="btn btn-outline-warning col" style="margin: 5px;">Modificar Producto
+            <button v-if="isAuth && articulo.usuario === idUser" @click="modificarProducto"
+                class="btn btn-outline-warning col" style="margin: 5px;">Modificar Producto
             </button>
         </div>
     </div>
@@ -97,7 +97,7 @@
         </div>
     </div>
 
-    <div class="mt-4 container col-md-8" v-if="buyArticulo === true">
+    <div class="mt-4 container col-md-8" v-if="buyArticulo === true && articulo.usuario !== idUser">
         <form @submit.prevent="generarCompra">
             <fieldset>
                 <div class="form-group mb-4">
@@ -174,9 +174,13 @@
 <script>
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
+import { mapGetters } from 'vuex';
 
 export default {
     name: 'VerPublicacion',
+    computed: {
+        ...mapGetters(['isUser', 'isAdmin', 'isConfirm', 'isAuth', 'idUser']),
+    },
     data() {
         return {
             articulo: {
@@ -215,7 +219,7 @@ export default {
             currentPage: 1,
             previousPage: 1,
             nextPage: 1,
-            buyArticulo: true,
+            buyArticulo: false,
             labelButton: 'Comprar Articulo',
         }
     },
