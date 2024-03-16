@@ -2,6 +2,7 @@ import { DataTypes } from "sequelize";
 import sequelize from "../database/database";
 import { Acount } from "./acount";
 import { Comentario } from "./comentario";
+import { UsuarioRol } from "./usuario_rol";
 
 export const Usuario = sequelize.define('usuario',
     {
@@ -57,5 +58,8 @@ export const Usuario = sequelize.define('usuario',
 );
 
 Usuario.belongsTo(Acount, { foreignKey: 'id_cuenta' });
+
+Usuario.hasMany(UsuarioRol, { foreignKey: 'id_usuario' });
+UsuarioRol.belongsTo(Usuario, { foreignKey: 'id_usuario' });
 
 

@@ -1,6 +1,5 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database/database";
-
 export const Rol = sequelize.define('rol',
     {
         id: {
@@ -16,9 +15,9 @@ export const Rol = sequelize.define('rol',
     },
     {
         timestamps: true,
-        createdAt:'created_at',
-        updatedAt:'updated_at',
-        deletedAt:'deleted_at',
+        createdAt: 'created_at',
+        updatedAt: 'updated_at',
+        deletedAt: 'deleted_at',
         tableName: 'rol'
     }
 );

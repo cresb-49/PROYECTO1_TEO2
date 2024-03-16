@@ -6,6 +6,7 @@ export const UsuarioRol = sequelize.define('usuario_rol',
         id_rol: {
             type: DataTypes.INTEGER,
             allowNull: false,
+            primaryKey: true,
             references: {
                 model: 'rol',
                 key: 'id'
@@ -14,6 +15,7 @@ export const UsuarioRol = sequelize.define('usuario_rol',
         id_usuario: {
             type: DataTypes.INTEGER,
             allowNull: false,
+            primaryKey: true,
             references: {
                 model: 'usuario',
                 key: 'id'

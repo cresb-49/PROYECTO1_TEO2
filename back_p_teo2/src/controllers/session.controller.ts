@@ -13,7 +13,13 @@ export const login = async (req: Request, res: Response) => {
     Usuario.findOne({
         where: {
             email: email
-        }
+        },
+        include: [
+            {
+                model: UsuarioRol,
+                required: false
+            }
+        ]
     })
         .then(async (usuario: any) => {
             if (usuario) {
@@ -42,7 +48,12 @@ export const login = async (req: Request, res: Response) => {
                             f_validez: fecha_validez
                         });
                     }
-                    responseAPI(HttpStatus.OK, res, { token: token, id_usuario: usuario.id }, "Usuario logueado con exito");
+                    console.log(usuario);
+                    let roles = usuario.usuario_rols.map((rol: any) => {
+                        return rol.id_rol;
+                    });
+                    roles.push(0); //El rol 0 indica que es un usuario normal
+                    responseAPI(HttpStatus.OK, res, { token: token, id_usuario: usuario.id, roles: roles }, "Usuario logueado con exito");
                 } else {
                     responseAPI(HttpStatus.BAD_REQUEST, res, null, "Contrasena incorrecta");
                 }
