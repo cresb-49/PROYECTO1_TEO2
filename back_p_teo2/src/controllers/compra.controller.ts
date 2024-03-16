@@ -4,6 +4,9 @@ import { HttpStatus } from '../enums/httpStatus';
 import { Publicacion } from '../models/publicacion';
 import { Articulo } from '../models/articulo';
 import { Category } from '../models/category';
+import { Buy } from '../models/buy';
+import { Usuario } from '../models/usuario';
+import { Acount } from '../models/acount';
 
 
 export const createCompra = async (req: Request, res: Response) => {
@@ -62,5 +65,33 @@ export const createCompra = async (req: Request, res: Response) => {
     } else if (valor_compra < total_creditos) {
         return responseAPI(HttpStatus.BAD_REQUEST, res, null, "Creditos excedentes", "Tienes creditos excedentes para realizar esta compra");
     }
-    return responseAPI(HttpStatus.OK, res, publicacion, "Publicacion encontrada con exito");
+
+    //Validamos que la cuenta del usuario tenga los creditos que va a utilizar
+    let usuario_comprador: any = await Usuario.findByPk(id_usuario, { include: [{ model: Acount, required: false }] });
+    if (usuario_comprador.acount.saldo_retirable < parseFloat(creditos.retirables)) {
+        return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "No tiene los suficientes creditos retirables disponibles", "No tiene los suficientes creditos retirables disponibles");
+    }
+    if (usuario_comprador.acount.saldo_no_retirable < parseFloat(creditos.no_retirables)) {
+        return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "No tiene los suficientes creditos no retirables disponibles", "No tiene los suficientes creditos no retirables disponibles");
+    }
+
+    const payload = {
+        id_usuario_compra: id_usuario,
+        id_usuario_venta: publicacion.id_usuario,
+        id_articulo_venta: publicacion.id_articulo,
+        cantidad_articulo_venta: cantidad,
+        id_articulo_cambio: articulo_intercambiar !== null ? articulo_intercambiar.id : null,
+        cantidad_articulo_cambio: articulo_intercambiar !== null ? articulo_cambio.cantidad_articulo : null,
+        valida: articulo_intercambiar === null ? true : false,
+        valor_venta: valor_compra,
+        validate_at: articulo_intercambiar === null ? new Date() : null
+    };
+
+    Buy.create(payload)
+        .then((buy: any) => {
+            return responseAPI(HttpStatus.CREATED, res, buy, "Compra realizada con exito");
+        })
+        .catch((error: any) => {
+            return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "Error al realizar la compra", error);
+        });
 }

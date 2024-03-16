@@ -134,3 +134,79 @@ export const retirarCreditos = async (req: Request, res: Response) => {
         return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, 'Error al retirar creditos', error.message);
     }
 };
+
+/**
+ * Genera la transaccion entre dos cuentas
+ * @param cantidad 
+ * @param tipo 
+ * @param id_cuenta_origen 
+ * @param id_cuenta_destino 
+ * @param comentario 
+ * @returns Transaccion
+ */
+export const generarTransaccion = async (cantidad: number, tipo: number, id_cuenta_origen: number, id_cuenta_destino: number, comentario: string) => {
+    try {
+        const cuenta_origen: any = await Acount.findByPk(id_cuenta_origen);
+        const cuenta_destino: any = await Acount.findByPk(id_cuenta_destino);
+        if (!cuenta_origen) {
+            throw new Error("Cuenta origen no encontrada");
+        }
+        if (!cuenta_destino) {
+            throw new Error("Cuenta destino no encontrada");
+        }
+        //Tipo 1: Transaccion de saldo retirable
+        if (tipo === 1) {
+            //Validamos que la cantidad sea menor a la cantidad de saldo retirable
+            if (cantidad > cuenta_origen.saldo_retirable) {
+                throw new Error("No tienes suficientes Creditos Retirables");
+            }
+            let nuevo_saldo_retirable = cuenta_origen.saldo_retirable -= cantidad;
+            await Acount.update({
+                saldo_retirable: nuevo_saldo_retirable
+            }, {
+                where: {
+                    id: cuenta_origen.id
+                }
+            });
+            //Registramos la transaccion del usuario
+            const payload_transaccion = {
+                "id_cuenta_origen": cuenta_origen.id,
+                "id_cuenta_destino": cuenta_destino.id,
+                "valor": cantidad,
+                "descripcion": comentario
+            };
+            let transaccion = await Transaccion.create(payload_transaccion);
+            return transaccion;
+        }
+        //Tipo 2: Transaccion de saldo no retirable 
+        else if (tipo === 2) {
+            //Validamos que la cantidad sea menor a la cantidad de saldo no retirable
+            if (cantidad > cuenta_origen.saldo_no_retirable) {
+                throw new Error("No tienes suficientes Creditos No Retirables");
+            }
+            let nuevo_saldo_no_retirable = cuenta_origen.saldo_no_retirable -= cantidad;
+            await Acount.update({
+                saldo_no_retirable: nuevo_saldo_no_retirable
+            }, {
+                where: {
+                    id: cuenta_origen.id
+                }
+            });
+            //Registramos la transaccion del usuario
+            const payload_transaccion = {
+                "id_cuenta_origen": cuenta_origen.id,
+                "id_cuenta_destino": cuenta_destino.id,
+                "valor": cantidad,
+                "descripcion": comentario
+            };
+            let transaccion = await Transaccion.create(payload_transaccion);
+            return transaccion;
+        }
+        //Otro caso: Se lanza un error 
+        else {
+            throw new Error("Tipo de transaccion no valido");
+        }
+    } catch (error) {
+        throw new Error("Error al efectuar la transaccion: " + error.message);
+    }
+};

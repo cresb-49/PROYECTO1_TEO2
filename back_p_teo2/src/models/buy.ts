@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database/database";
 
-export const Compra = sequelize.define('buy',
+export const Buy = sequelize.define('buy',
     {
         id: {
             allowNull: false,
