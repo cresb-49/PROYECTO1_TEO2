@@ -8,6 +8,35 @@ import { Category } from '../models/category';
 
 export const getPublicaciones = async (req: Request, res: Response) => {
     Publicacion.findAll({
+        where: {
+            isValidate: true
+        },
+        include: [
+            {
+                model: Articulo,
+                required: true,
+                include: [
+                    {
+                        model: Category,
+                        required: false
+                    }
+                ]
+            }
+        ]
+    })
+        .then((value: any[]) => {
+            return responseAPI(HttpStatus.OK, res, value, "Publicaciones encontradas con exito");
+        })
+        .catch((reason: any) => {
+            return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
+        })
+};
+
+export const getPublicacionesPorConfirmar = async (req: Request, res: Response) => {
+    Publicacion.findAll({
+        where: {
+            isValidate: false
+        },
         include: [
             {
                 model: Articulo,
@@ -85,12 +114,19 @@ export const createPublicacion = async (req: Request, res: Response) => {
     if (parseInt(articulo.id_usuario) !== parseInt(idUsuario)) {
         return responseAPI(HttpStatus.FORBIDDEN, res, null, "No tienes permiso para realizar esta accion", "El articulo no pertenece al usuario");
     }
+    //Contamos cuantas publicaciones validadas tiene el usuario
+    let publicaciones = await Publicacion.count({
+        where: {
+            id_usuario: idUsuario,
+            isValidate: true
+        }
+    });
     //Creamos la publicacion con el articulo
     const payload = {
         id_articulo: id_articulo,
         id_tipo_publicacion: 1,
         id_usuario: idUsuario,
-        isValidate: true,
+        isValidate: publicaciones >= 3 ? true : false,
         f_validacion: new Date()
     }
     //Guardamos la publicacion
@@ -108,5 +144,21 @@ export const updatePublicacion = async (req: Request, res: Response) => {
 };
 
 export const getComentariosPublicacion = async (req: Request, res: Response) => {
-    
+
+};
+
+export const confirmarPublicacion = async (req: Request, res: Response) => {
+    const { id_publicacion } = req.body;
+    let publicacion = await Publicacion.findByPk(id_publicacion);
+    if (publicacion === null) {
+        return responseAPI(HttpStatus.NOT_FOUND, res, null, "Publicacion no encontrada", "La publicacion no existe");
+    }
+    publicacion.update({
+        isValidate: true,
+        f_validacion: new Date()
+    }).then((value: any) => {
+        return responseAPI(HttpStatus.OK, res, value, "Publicacion confirmada con exito");
+    }).catch((reason: any) => {
+        return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
+    })
 };
