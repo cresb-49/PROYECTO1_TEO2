@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { Op } from 'sequelize';
 import { responseAPI } from '../handler/responseAPI';
 import { HttpStatus } from '../enums/httpStatus';
 import { TipoPublicacion } from '../models/tipo_publicacion';
@@ -7,29 +8,65 @@ import { Publicacion } from '../models/publicacion';
 import { Category } from '../models/category';
 
 export const getPublicaciones = async (req: Request, res: Response) => {
-    Publicacion.findAll({
-        where: {
-            isValidate: true
-        },
-        include: [
-            {
-                model: Articulo,
-                required: true,
-                include: [
-                    {
-                        model: Category,
-                        required: false
-                    }
-                ]
-            }
-        ]
-    })
-        .then((value: any[]) => {
-            return responseAPI(HttpStatus.OK, res, value, "Publicaciones encontradas con exito");
+    //Obtenemos el parametro nombre
+    let { nombre } = req.query;
+    console.log(nombre);
+    //Si nombre solo es un string vacio lo convertimos a null
+    if (nombre !== undefined && nombre !== "" && typeof nombre === "string" && nombre.length !== 0 && nombre.trim() !== "") {
+        //Buscamos por medio de like en el nombre del articulo
+        Publicacion.findAll({
+            where: {
+                isValidate: true
+            },
+            include: [
+                {
+                    model: Articulo,
+                    required: true,
+                    where: {
+                        nombre: {
+                            [Op.like]: `%${nombre}%`
+                        }
+                    },
+                    include: [
+                        {
+                            model: Category,
+                            required: false
+                        }
+                    ]
+                }
+            ]
         })
-        .catch((reason: any) => {
-            return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
+            .then((value: any[]) => {
+                return responseAPI(HttpStatus.OK, res, value, "Publicaciones encontradas con exito");
+            })
+            .catch((reason: any) => {
+                return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
+            })
+    } else {
+        Publicacion.findAll({
+            where: {
+                isValidate: true
+            },
+            include: [
+                {
+                    model: Articulo,
+                    required: true,
+                    include: [
+                        {
+                            model: Category,
+                            required: false,
+                        }
+                    ]
+                }
+            ]
         })
+            .then((value: any[]) => {
+                return responseAPI(HttpStatus.OK, res, value, "Publicaciones encontradas con exito");
+            })
+            .catch((reason: any) => {
+                return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
+            })
+    }
 };
 
 export const getPublicacionesPorConfirmar = async (req: Request, res: Response) => {
