@@ -7,6 +7,7 @@ const storage = createStore({
         isAuthenticated: false,
         token: '',
         id: null,
+        roles: []
     },
     mutations: {
         setAuthenticated(state, value) {
@@ -18,11 +19,35 @@ const storage = createStore({
         setId(state, id) {
             state.id = id;
         },
+        setRoles(state, roles) {
+            state.roles = roles;
+        },
         logout(state) {
             state.isAuthenticated = false;
             state.token = '';
             state.id = null;
+            state.roles = [];
             router.push('/');
+        }
+    },
+    getters: {
+        isUser: state => {
+            return state.roles.includes(0);
+        },
+        isAdmin: state => {
+            return state.roles.includes(1);
+        },
+        isConfirm: state => {
+            return state.roles.includes(2);
+        },
+        isAuth: state => {
+            return state.isAuthenticated;
+        },
+        token: state => {
+            return state.token;
+        },
+        idUser: state => {
+            return state.id;
         }
     },
     plugins: [

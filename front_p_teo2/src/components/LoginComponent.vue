@@ -43,7 +43,7 @@ export default {
             }
             this.axios.post('/login', data)
                 .then(value => {
-                    const { token, id_usuario } = value.data.data;
+                    const { token, id_usuario, roles } = value.data.data;
                     if (token === undefined || id_usuario === undefined) {
                         toast.error('Error al iniciar sesión');
                         return;
@@ -51,9 +51,8 @@ export default {
                         //Reinico de las variables del formulario
                         this.email = null; this.password = null;
                         toast.success('Session iniciada');
-                        //this.axios.defaults.headers.common['Authorization']='Bearer '+data.token;
-                        //localStorage.setItem('token',data.token);
                         this.$store.commit('setAuthenticated', true);
+                        this.$store.commit('setRoles', roles);
                         this.$store.commit('setToken', token);
                         this.$store.commit('setId', id_usuario);
                         //Redireccion al inicio de la pagina
