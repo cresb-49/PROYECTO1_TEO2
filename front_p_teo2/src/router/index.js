@@ -18,6 +18,9 @@ import MiCuentaComponent from '../components/MiCuentaComponent.vue';
 import MisTransaccionesComponent from '../components/MisTransaccionesComponent.vue';
 import CompraRetiraCreditosComponent from "@/components/CompraRetiraCreditosComponent.vue";
 import CrearPublicacionComponent from "@/components/CrearPublicacionComponent.vue";
+import ListaComprasComponent from "@/components/ListaComprasComponent.vue";
+import AceptarIntercambioComponent from "@/components/AceptarIntercambioComponent.vue";
+
 const routes = [
     {
         path: '/',
@@ -81,9 +84,19 @@ const routes = [
         component: AceptarPublicacionesEntrantes
     },
     {
-        path: '/CambiarEstado',
-        name: 'CambiarEstado',
+        path: '/ListaVentas',
+        name: 'ListaVentas',
         component: ListaVentasComponent
+    },
+    {
+        path: '/ListaCompras',
+        name: 'ListaCompras',
+        component: ListaComprasComponent
+    },
+    {
+        path: '/AceptarIntercambio',
+        name: 'AceptarIntercambio',
+        component: AceptarIntercambioComponent
     },
     {
         path: '/ModificarEstado/:id',

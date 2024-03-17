@@ -26,6 +26,16 @@
             </li>
             <li class="nav-item dropdown" v-if="isAuth">
               <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Compras y Ventas
+              </a>
+              <ul class="dropdown-menu">
+                <li><router-link to="/ListaCompras" class="dropdown-item">Compras</router-link></li>
+                <li><router-link to="/ListaVentas" class="dropdown-item">Ventas</router-link></li>
+                <li><router-link to="/AceptarIntercambio" class="dropdown-item">Aceptar Intercambio</router-link></li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown" v-if="isAuth">
+              <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Articulos
               </a>
               <ul class="dropdown-menu">
@@ -45,10 +55,6 @@
             <li class="nav-item">
               <router-link v-if="isAuth && isConfirm" class="nav-link active" aria-current="page"
                 to="/AceptarArticulo">Aceptar Publicacion</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link v-if="isAuth && $store.state.role === 'PAQUETERIA'" class="nav-link active"
-                aria-current="page" to="/CambiarEstado">Cambiar Estado</router-link>
             </li>
           </ul>
           <div style="margin-right: 10px;">

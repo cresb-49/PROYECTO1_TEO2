@@ -27,7 +27,7 @@
 <script>
 // import { toast } from 'vue3-toastify';
 export default {
-    name: 'ListaVentas',
+    name: 'AceptarIntercambioComponent',
     components: {
     },
     data() {
