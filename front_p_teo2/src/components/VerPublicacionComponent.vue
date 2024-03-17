@@ -6,12 +6,12 @@
         </div>
         <h4 style="margin-top: 20px;">{{ articulo.nombre }}</h4>
         <p>{{ articulo.descripcion }}</p>
-        <h5>Categoria</h5>
+        <h5><strong>Categoria</strong></h5>
         <ul class="list-group list-group-flush" v-for="cate in articulo.categoria" v-bind:key="cate">
             <li style="margin-left: 30px;">{{ cate }}</li>
         </ul>
         <h5 style="margin-top: 20px;"> <strong>Disponibles:</strong> {{ articulo.cantidad }}</h5>
-        <h5 style="margin-top: 20px;"> <strong>Valor:</strong> Q.{{ articulo.precio }}</h5>
+        <h5 style="margin-top: 20px;"> <strong>KORNS:</strong> {{ articulo.precio }}</h5>
         <div class="container mt-4">
             <div class="row">
                 <div class="col-md-6 d-flex justify-content-center align-items-center" @click="changeStateLike(true)">
@@ -469,6 +469,7 @@ export default {
                 }
             }).then((response) => {
                 console.log(response.data);
+                toast.success(response.data.mensaje);
             }).catch(error => {
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
