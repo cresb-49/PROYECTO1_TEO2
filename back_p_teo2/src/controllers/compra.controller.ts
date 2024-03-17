@@ -161,17 +161,6 @@ export const getComprasUsuario = async (req: Request, res: Response) => {
         },
         include: [
             {
-                model: Usuario,
-                as: 'usuario_compra',
-                required: true
-
-            },
-            {
-                model: Usuario,
-                as: 'usuario_venta',
-                required: true
-            },
-            {
                 model: Articulo,
                 as: 'articulo_venta',
                 required: true
@@ -180,14 +169,6 @@ export const getComprasUsuario = async (req: Request, res: Response) => {
                 model: Articulo,
                 as: 'articulo_cambio',
                 required: false
-            },
-            {
-                model: BuyTransaccion,
-                required: false,
-                include: [{
-                    model: BuyTransaccion,
-                    required: false
-                }]
             }
         ]
     });
@@ -195,87 +176,33 @@ export const getComprasUsuario = async (req: Request, res: Response) => {
 };
 
 export const getVentasUsuario = async (req: Request, res: Response) => {
-    const tokenPayload: TokenPayload = req.tokenPayload;
-    const id_usuario = tokenPayload.usuarioId;
-    const compras: any = await Buy.findAll({
-        where: {
-            id_usuario_venta: id_usuario,
-            valida: true
-        },
-        include: [
-            {
-                model: Usuario,
-                as: 'usuario_compra',
-                required: true
-
+    try {
+        const tokenPayload: TokenPayload = req.tokenPayload;
+        const id_usuario = tokenPayload.usuarioId;
+        const compras: any = await Buy.findAll({
+            where: {
+                id_usuario_venta: id_usuario,
+                valida: true
             },
-            {
-                model: Usuario,
-                as: 'usuario_venta',
-                required: true
-            },
-            {
-                model: Articulo,
-                as: 'articulo_venta',
-                required: true
-            },
-            {
-                model: Articulo,
-                as: 'articulo_cambio',
-                required: false
-            },
-            {
-                model: BuyTransaccion,
-                required: false,
-                include: [{
-                    model: BuyTransaccion,
+            include: [
+                {
+                    model: Articulo,
+                    as: 'articulo_venta',
+                    required: true
+                },
+                {
+                    model: Articulo,
+                    as: 'articulo_cambio',
                     required: false
-                }]
-            }
-        ]
-    });
-    return responseAPI(HttpStatus.OK, res, compras, "Ventas realizadas por el usuario");
+                }
+            ]
+        });
+        return responseAPI(HttpStatus.OK, res, compras, "Ventas realizadas por el usuario");
+    } catch (error) {
+        return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "Error al obtener las ventas", error.message);
+    }
 };
 
 export const getVentasValidar = async (req: Request, res: Response) => {
-    const tokenPayload: TokenPayload = req.tokenPayload;
-    const id_usuario = tokenPayload.usuarioId;
-    const compras: any = await Buy.findAll({
-        where: {
-            id_usuario_venta: id_usuario,
-            valida: false
-        },
-        include: [
-            {
-                model: Usuario,
-                as: 'usuario_compra',
-                required: true
 
-            },
-            {
-                model: Usuario,
-                as: 'usuario_venta',
-                required: true
-            },
-            {
-                model: Articulo,
-                as: 'articulo_venta',
-                required: true
-            },
-            {
-                model: Articulo,
-                as: 'articulo_cambio',
-                required: false
-            },
-            {
-                model: BuyTransaccion,
-                required: false,
-                include: [{
-                    model: BuyTransaccion,
-                    required: false
-                }]
-            }
-        ]
-    });
-    return responseAPI(HttpStatus.OK, res, compras, "Ventas por validar realizadas por el usuario");
 };

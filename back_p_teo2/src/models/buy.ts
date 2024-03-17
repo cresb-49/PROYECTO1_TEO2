@@ -1,5 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database/database";
+import { Articulo } from "./articulo";
 
 export const Buy = sequelize.define('buy',
     {
