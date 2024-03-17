@@ -9,6 +9,8 @@ import { Usuario } from '../models/usuario';
 import { Acount } from '../models/acount';
 import { generarTransaccion } from './transaccion.controller';
 import { BuyTransaccion } from '../models/buy_transaccion';
+import { resCantidadArticulo } from './articulo.controller';
+import sequelize from '../database/database';
 
 
 export const createCompra = async (req: Request, res: Response) => {
@@ -17,7 +19,7 @@ export const createCompra = async (req: Request, res: Response) => {
     const id_usuario = tokenPayload.usuarioId;
     const creditos_retirables = parseFloat(creditos.retirables);
     const creditos_no_retirables = parseFloat(creditos.no_retirables);
-
+    const t = await sequelize.transaction();
     try {
         //Obtenemos la publicacion con su respectivo articulo
         const publicacion: any = await Publicacion.findByPk(id_publicacion, {
@@ -102,7 +104,9 @@ export const createCompra = async (req: Request, res: Response) => {
             validate_at: articulo_intercambiar === null ? new Date() : null
         };
 
-        const buy: any = await Buy.create(payload);
+        await resCantidadArticulo(publicacion.id_articulo, cantidad);
+
+        const buy: any = await Buy.create(payload, { transaction: t });
         if (buy === null) {
             return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "Error al realizar la compra", "Error al realizar la compra");
         }
@@ -132,14 +136,16 @@ export const createCompra = async (req: Request, res: Response) => {
             }
         }
         //Generamos las relaciones de transacciones con la compra
-        transacciones.forEach(async (trasaccion) => {
+        await Promise.all(transacciones.map(async (transaccion) => {
             await BuyTransaccion.create({
                 id_buy: buy.id,
-                id_transaccion: trasaccion.id
-            });
-        });
+                id_transaccion: transaccion.id
+            }, { transaction: t });
+        }));
+        await t.commit();
         return responseAPI(HttpStatus.CREATED, res, buy, "Compra realizada con exito");
     } catch (error) {
+        await t.rollback();
         return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "Error al realizar la compra", error.message);
     }
 }
