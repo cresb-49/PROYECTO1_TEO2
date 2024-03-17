@@ -95,7 +95,7 @@
                         <label for="formFile" class="form-label">Imagen del articulo</label>
                         <input @change="manejoImagen" class="form-control" id="formFile" type="file">
                     </div>
-                    <img :src="`http://localhost:3000/api/image?articulo=${this.$route.params.id}`" id="imageFile"
+                    <img :src="imagen" id="imageFile"
                         alt="..."><br><br>
                     <button type="submit" class="btn btn-outline-primary">Modificar Articulo</button>
                 </form>
@@ -135,6 +135,7 @@ export default {
     }, mounted() {
         this.getCategorias();
         this.obtenerArticulo();
+        this.getBase64Image();
     }
     ,
     methods: {
@@ -217,6 +218,22 @@ export default {
                 }
                 fileReader.readAsDataURL(file);
             }
+        },
+        getBase64Image() {
+            this.axios.get(`image/b64?articulo=${this.$route.params.id}`, {
+                headers: {
+                    Authorization: `Bearer ${this.token}` // Incluye el token en el encabezado Authorization
+                },
+            }).then(response => {
+                this.imagen = response.data.data;
+            }).catch(error => {
+                console.log(error);
+                toast.error(error.response.data.error);
+                let errores = error.response.data.errores;
+                for (let index = 0; index < errores.length; index++) {
+                    toast.error(errores[index]);
+                }
+            });
         }
     }
 }

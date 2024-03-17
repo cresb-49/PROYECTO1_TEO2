@@ -36,7 +36,6 @@ export const saveImage = async (imagen: string) => {
  */
 export const getImagen = async (req: Request, res: Response) => {
     const { articulo } = req.query;
-    console.log(articulo, '<-- Articulo');
     Image.findOne({
         where: { id_articulo: articulo },
         order: [['prioridad', 'DESC']]
@@ -48,7 +47,6 @@ export const getImagen = async (req: Request, res: Response) => {
                 res.setHeader('Content-Type', 'application/octet-stream');
                 res.send(Buffer.from(value, 'base64'));
             } else {
-                console.log('Envie la imagen por defecto 2');
                 res.setHeader('Content-Type', 'application/octet-stream');
                 res.send(Buffer.from(defaultImage.split(',')[1], 'base64'));
             }
@@ -56,6 +54,26 @@ export const getImagen = async (req: Request, res: Response) => {
         .catch((reason: any) => {
             res.setHeader('Content-Type', 'application/octet-stream');
             res.send(Buffer.from(defaultImage.split(',')[1], 'base64'));
+        });
+}
+
+export const getImagenb64 = async (req: Request, res: Response) => {
+    const { articulo } = req.query;
+    console.log(articulo, '<-- Articulo');
+    Image.findOne({
+        where: { id_articulo: articulo },
+        order: [['prioridad', 'DESC']]
+    })
+        .then(async (image: any) => {
+            if (image) {
+                let value = await readFileImage(image.url);
+                return responseAPI(HttpStatus.OK, res, value, `Imagen del articulo ${articulo} obtenida con exito`);
+            } else {
+                return responseAPI(HttpStatus.BAD_REQUEST, res, defaultImage, `Imagen del articulo ${articulo} no encontrada`);
+            }
+        })
+        .catch((reason: any) => {
+            return responseAPI(HttpStatus.BAD_REQUEST, res, defaultImage, `Imagen del articulo ${articulo} no encontrada`);
         });
 }
 
