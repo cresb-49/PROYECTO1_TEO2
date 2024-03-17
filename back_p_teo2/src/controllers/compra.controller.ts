@@ -154,11 +154,17 @@ export const createCompra = async (req: Request, res: Response) => {
 export const getComprasUsuario = async (req: Request, res: Response) => {
     const tokenPayload: TokenPayload = req.tokenPayload;
     const id_usuario = tokenPayload.usuarioId;
-    const compras: any = await Buy.findAll({
+    const page = req.query.page ? parseInt(req.query.page.toString()) : 1; // Página actual, si no se proporciona, se asume 1
+    const limit = 10; // Comentarios por página
+    const offset = (page - 1) * limit; // Calculo del desplazamiento
+    Buy.findAndCountAll({
         where: {
             id_usuario_compra: id_usuario,
             valida: true
         },
+        order: [['validate_at', 'DESC']],
+        limit: limit,
+        offset: offset,
         include: [
             {
                 model: Articulo,
@@ -171,8 +177,23 @@ export const getComprasUsuario = async (req: Request, res: Response) => {
                 required: false
             }
         ]
-    });
-    return responseAPI(HttpStatus.OK, res, compras, "Compras realizadas por el usuario");
+    })
+        .then((result: any) => {
+            const compras = result.rows;
+            const totalCompras = result.count;
+            const totalPages = Math.ceil(totalCompras / limit); // Total de páginas
+            const payload = {
+                data: compras,
+                totalPages: totalPages,
+                currentPage: page,
+                previousPage: page > 1 ? page - 1 : null,
+                nextPage: page < totalPages ? page + 1 : null
+            }
+            return responseAPI(HttpStatus.OK, res, payload, "Compras realizadas por el usuario");
+        })
+        .catch((error: any) => {
+            return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "Error al obtener las compras", error.message);
+        });
 };
 
 export const getVentasUsuario = async (req: Request, res: Response) => {

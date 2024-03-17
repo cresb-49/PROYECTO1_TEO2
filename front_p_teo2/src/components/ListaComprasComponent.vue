@@ -1,5 +1,6 @@
 <template>
     <div class="mt-4">
+        <h2 class="mb-4">Mis Compras</h2>
         <div v-for="compra in compras" v-bind:key="compra">
             <div class="card mb-3">
                 <div class="card-body">
@@ -21,6 +22,28 @@
                 </div>
             </div>
         </div>
+        <div class="d-flex justify-content-center align-items-center">
+            <!-- Botones de paginación -->
+            <div class="mt-3">
+                <!-- Botón "Anterior" -->
+                <button class="btn btn-secondary" @click="getCompras(previousPage)" :disabled="currentPage === 1">
+                    Anterior
+                </button>
+
+                <!-- Números de página -->
+                <button v-for="(pageNumber, index) in totalPages" :key="index"
+                    :class="['btn', 'btn-secondary', { 'btn-info': pageNumber === currentPage }]"
+                    @click="getCompras(pageNumber)">
+                    {{ pageNumber }}
+                </button>
+
+                <!-- Botón "Siguiente" -->
+                <button class="btn btn-secondary" @click="getCompras(nextPage)"
+                    :disabled="currentPage === totalPages">
+                    Siguiente
+                </button>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -37,7 +60,11 @@ export default {
     },
     data() {
         return {
-            compras: []
+            compras: [],
+            totalPages: 1,
+            currentPage: 1,
+            previousPage: 1,
+            nextPage: 1,
         }
     },
     props: {
@@ -47,15 +74,15 @@ export default {
         this.getCompras();
     },
     methods: {
-        getCompras() {
-            this.axios.get('/compras/usuario', {
+        getCompras(page = 1) {
+            this.axios.get(`/compras/usuario?page=${page}`, {
                 headers: {
                     Authorization: `Bearer ${this.token}` // Incluye el token en el encabezado Authorization
                 },
             })
                 .then(response => {
                     console.log(response.data.data);
-                    this.compras = response.data.data;
+                    this.compras = response.data.data.data;
                 }).catch(error => {
                     toast.error(error.response.data.error);
                     let errores = error.response.data.errores;
