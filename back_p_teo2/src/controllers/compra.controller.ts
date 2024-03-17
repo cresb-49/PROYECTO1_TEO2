@@ -8,6 +8,7 @@ import { Buy } from '../models/buy';
 import { Usuario } from '../models/usuario';
 import { Acount } from '../models/acount';
 import { generarTransaccion } from './transaccion.controller';
+import { BuyTransaccion } from '../models/buy_transaccion';
 
 
 export const createCompra = async (req: Request, res: Response) => {
@@ -20,6 +21,17 @@ export const createCompra = async (req: Request, res: Response) => {
     if (cantidad < 1) {
         return responseAPI(HttpStatus.BAD_REQUEST, res, null, "Cantidad invalida del producto a comprar", "Cantidad invalida del producto a comprar");
     }
+    if (cantidad >= 1) {
+        let publicacion: any = await Publicacion.findByPk(id_publicacion, { include: [{ model: Articulo, required: true, include: [{ model: Category, required: true }] }] });
+        if (publicacion.articulo === null) {
+            return responseAPI(HttpStatus.NOT_FOUND, res, null, "Publicacion no encontrada", "La publicacion no existe");
+        }
+        //Verificamos que la cantidad de compra sea meno o igual a la cantidad de articulos en la publicacion
+        let articulo = publicacion.articulo;
+        if (cantidad > articulo.cantidad) {
+            return responseAPI(HttpStatus.BAD_REQUEST, res, null, "Cantidad invalida del producto a comprar", "Cantidad invalida del producto a comprar");
+        }
+    }
     //Ahora sumamos la cantidad de creditos y valor de producto a comprar
     let total_creditos = 0;
     let articulo_intercambiar = null;
@@ -28,6 +40,10 @@ export const createCompra = async (req: Request, res: Response) => {
         articulo_intercambiar = await Articulo.findByPk(articulo_cambio.id_articulo);
         if (articulo_intercambiar === null) {
             return responseAPI(HttpStatus.NOT_FOUND, res, null, "Articulo de intercambio no existe", "El articulo de intercambio no existe");
+        }
+        //Comprobamos que el articulo de intercambio tenga la cantidad necesaria
+        if (articulo_cambio.cantidad_articulo > articulo_intercambiar.cantidad) {
+            return responseAPI(HttpStatus.BAD_REQUEST, res, null, "Cantidad invalida del producto a intercambiar", "Cantidad invalida del producto a intercambiar");
         }
         total_creditos = total_creditos + (parseFloat(articulo_intercambiar.valor) * parseFloat(articulo_cambio.cantidad_articulo));
     }
@@ -86,24 +102,38 @@ export const createCompra = async (req: Request, res: Response) => {
 
     Buy.create(payload)
         .then(async (buy: any) => {
+            let transacciones = [];
             if (creditos_retirables > 0) {
-                await generarTransaccion(
+                let tr = await generarTransaccion(
                     creditos_retirables,
                     1,
                     usuario_comprador.acount.id,
                     usuario_vendedor.acount.id,
                     `Compra "${buy.id}" de articulo con creditos retirables`
                 );
+                if (tr) {
+                    transacciones.push(tr);
+                }
             }
             if (creditos_no_retirables > 0) {
-                await generarTransaccion(
+                let tr = await generarTransaccion(
                     creditos_no_retirables,
                     2,
                     usuario_comprador.acount.id,
                     usuario_vendedor.acount.id,
                     `Compra "${buy.id}" de articulo con creditos no retirables`
                 );
+                if (tr) {
+                    transacciones.push(tr);
+                }
             }
+            //Generamos las relaciones de transacciones con la compra
+            transacciones.forEach(async (trasaccion) => {
+                await BuyTransaccion.create({
+                    id_buy: buy.id,
+                    id_transaccion: trasaccion.id
+                });
+            });
             return responseAPI(HttpStatus.CREATED, res, buy, "Compra realizada con exito");
         })
         .catch((error: any) => {
