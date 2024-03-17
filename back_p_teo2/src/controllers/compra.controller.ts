@@ -197,31 +197,48 @@ export const getComprasUsuario = async (req: Request, res: Response) => {
 };
 
 export const getVentasUsuario = async (req: Request, res: Response) => {
-    try {
-        const tokenPayload: TokenPayload = req.tokenPayload;
-        const id_usuario = tokenPayload.usuarioId;
-        const compras: any = await Buy.findAll({
-            where: {
-                id_usuario_venta: id_usuario,
-                valida: true
+    const tokenPayload: TokenPayload = req.tokenPayload;
+    const id_usuario = tokenPayload.usuarioId;
+    const page = req.query.page ? parseInt(req.query.page.toString()) : 1; // Página actual, si no se proporciona, se asume 1
+    const limit = 10; // Comentarios por página
+    const offset = (page - 1) * limit; // Calculo del desplazamiento
+    Buy.findAndCountAll({
+        where: {
+            id_usuario_venta: id_usuario,
+            valida: true
+        },
+        order: [['validate_at', 'DESC']],
+        limit: limit,
+        offset: offset,
+        include: [
+            {
+                model: Articulo,
+                as: 'articulo_venta',
+                required: true
             },
-            include: [
-                {
-                    model: Articulo,
-                    as: 'articulo_venta',
-                    required: true
-                },
-                {
-                    model: Articulo,
-                    as: 'articulo_cambio',
-                    required: false
-                }
-            ]
+            {
+                model: Articulo,
+                as: 'articulo_cambio',
+                required: false
+            }
+        ]
+    })
+        .then((result: any) => {
+            const ventas = result.rows;
+            const totalVentas = result.count;
+            const totalPages = Math.ceil(totalVentas / limit); // Total de páginas
+            const payload = {
+                data: ventas,
+                totalPages: totalPages,
+                currentPage: page,
+                previousPage: page > 1 ? page - 1 : null,
+                nextPage: page < totalPages ? page + 1 : null
+            }
+            return responseAPI(HttpStatus.OK, res, payload, "Ventas realizadas por el usuario");
+        })
+        .catch((error: any) => {
+            return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "Error al obtener las ventas", error.message);
         });
-        return responseAPI(HttpStatus.OK, res, compras, "Ventas realizadas por el usuario");
-    } catch (error) {
-        return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "Error al obtener las ventas", error.message);
-    }
 };
 
 export const getVentasValidar = async (req: Request, res: Response) => {

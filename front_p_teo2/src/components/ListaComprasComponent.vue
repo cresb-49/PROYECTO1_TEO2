@@ -81,7 +81,6 @@ export default {
                 },
             })
                 .then(response => {
-                    console.log(response.data.data);
                     this.compras = response.data.data.data;
                 }).catch(error => {
                     toast.error(error.response.data.error);
