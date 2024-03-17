@@ -64,6 +64,9 @@ export const Publicacion = sequelize.define('publicacion',
     tableName: 'publicacion'
 }
 );
+
+Publicacion.belongsTo(Articulo, { foreignKey: 'id_articulo' });
+
 Publicacion.belongsTo(Usuario, { foreignKey: 'id_usuario' });
 Publicacion.belongsTo(TipoPublicacion, { foreignKey: 'id_tipo_publicacion' });
 
