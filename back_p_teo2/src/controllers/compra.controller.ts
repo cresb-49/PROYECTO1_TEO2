@@ -7,17 +7,15 @@ import { Category } from '../models/category';
 import { Buy } from '../models/buy';
 import { Usuario } from '../models/usuario';
 import { Acount } from '../models/acount';
+import { generarTransaccion } from './transaccion.controller';
 
 
 export const createCompra = async (req: Request, res: Response) => {
     const { tokenPayload } = req;
     const { id_publicacion, creditos, articulo_cambio, cantidad } = req.body;
     const id_usuario = tokenPayload.usuarioId;
-    console.log('id_publicacion', id_publicacion);
-    console.log('creditos', creditos);
-    console.log('articulo_cambio', articulo_cambio);
-    console.log('cantidad', cantidad);
-    console.log('id_usuario', id_usuario);
+    const creditos_retirables = parseFloat(creditos.retirables);
+    const creditos_no_retirables = parseFloat(creditos.no_retirables);
 
     if (cantidad < 1) {
         return responseAPI(HttpStatus.BAD_REQUEST, res, null, "Cantidad invalida del producto a comprar", "Cantidad invalida del producto a comprar");
@@ -25,7 +23,7 @@ export const createCompra = async (req: Request, res: Response) => {
     //Ahora sumamos la cantidad de creditos y valor de producto a comprar
     let total_creditos = 0;
     let articulo_intercambiar = null;
-    // articulo_cambio { id_articulo: num, cantidad_articulo: num }
+
     if (articulo_cambio.cantidad_articulo > 0) {
         articulo_intercambiar = await Articulo.findByPk(articulo_cambio.id_articulo);
         if (articulo_intercambiar === null) {
@@ -33,9 +31,8 @@ export const createCompra = async (req: Request, res: Response) => {
         }
         total_creditos = total_creditos + (parseFloat(articulo_intercambiar.valor) * parseFloat(articulo_cambio.cantidad_articulo));
     }
-    // creditos { retirables: num, no_retirables: num }
-    total_creditos = total_creditos + parseFloat(creditos.retirables) + parseFloat(creditos.no_retirables);
-    console.log('total_creditos', total_creditos);
+
+    total_creditos = total_creditos + creditos_retirables + creditos_no_retirables;
 
     //Obtenemos la publicacion con su respectivo articulo
     let publicacion: any = await Publicacion.findByPk(id_publicacion, {
@@ -67,14 +64,14 @@ export const createCompra = async (req: Request, res: Response) => {
     }
 
     //Validamos que la cuenta del usuario tenga los creditos que va a utilizar
-    let usuario_comprador: any = await Usuario.findByPk(id_usuario, { include: [{ model: Acount, required: false }] });
+    const usuario_comprador: any = await Usuario.findByPk(id_usuario, { include: [{ model: Acount, required: false }] });
     if (usuario_comprador.acount.saldo_retirable < parseFloat(creditos.retirables)) {
         return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "No tiene los suficientes creditos retirables disponibles", "No tiene los suficientes creditos retirables disponibles");
     }
     if (usuario_comprador.acount.saldo_no_retirable < parseFloat(creditos.no_retirables)) {
         return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "No tiene los suficientes creditos no retirables disponibles", "No tiene los suficientes creditos no retirables disponibles");
     }
-
+    const usuario_vendedor: any = await Usuario.findByPk(publicacion.id_usuario, { include: [{ model: Acount, required: false }] });
     const payload = {
         id_usuario_compra: id_usuario,
         id_usuario_venta: publicacion.id_usuario,
@@ -88,7 +85,25 @@ export const createCompra = async (req: Request, res: Response) => {
     };
 
     Buy.create(payload)
-        .then((buy: any) => {
+        .then(async (buy: any) => {
+            if (creditos_retirables > 0) {
+                await generarTransaccion(
+                    creditos_retirables,
+                    1,
+                    usuario_comprador.acount.id,
+                    usuario_vendedor.acount.id,
+                    `Compra "${buy.id}" de articulo con creditos retirables`
+                );
+            }
+            if (creditos_no_retirables > 0) {
+                await generarTransaccion(
+                    creditos_no_retirables,
+                    2,
+                    usuario_comprador.acount.id,
+                    usuario_vendedor.acount.id,
+                    `Compra "${buy.id}" de articulo con creditos no retirables`
+                );
+            }
             return responseAPI(HttpStatus.CREATED, res, buy, "Compra realizada con exito");
         })
         .catch((error: any) => {
