@@ -5,6 +5,7 @@ import { Transaccion } from '../models/transaccion';
 import { Acount } from '../models/acount';
 import { Usuario } from '../models/usuario';
 import { Op } from 'sequelize';
+import sequelize from '../database/database';
 
 export const getTransacciones = async (req: Request, res: Response) => {
     Transaccion.findAll()
@@ -145,6 +146,7 @@ export const retirarCreditos = async (req: Request, res: Response) => {
  * @returns Transaccion
  */
 export const generarTransaccion = async (cantidad: number, tipo: number, id_cuenta_origen: number, id_cuenta_destino: number, comentario: string) => {
+    const t = await sequelize.transaction();
     try {
         const cuenta_origen: any = await Acount.findByPk(id_cuenta_origen);
         const cuenta_destino: any = await Acount.findByPk(id_cuenta_destino);
@@ -166,7 +168,8 @@ export const generarTransaccion = async (cantidad: number, tipo: number, id_cuen
             }, {
                 where: {
                     id: cuenta_origen.id
-                }
+                },
+                transaction: t
             });
             //Registramos la transaccion del usuario
             const payload_transaccion = {
@@ -175,7 +178,8 @@ export const generarTransaccion = async (cantidad: number, tipo: number, id_cuen
                 "valor": cantidad,
                 "descripcion": comentario
             };
-            let transaccion = await Transaccion.create(payload_transaccion);
+            let transaccion = await Transaccion.create(payload_transaccion, { transaction: t });
+            await t.commit();
             return transaccion;
         }
         //Tipo 2: Transaccion de saldo no retirable 
@@ -190,7 +194,8 @@ export const generarTransaccion = async (cantidad: number, tipo: number, id_cuen
             }, {
                 where: {
                     id: cuenta_origen.id
-                }
+                },
+                transaction: t
             });
             //Registramos la transaccion del usuario
             const payload_transaccion = {
@@ -199,14 +204,17 @@ export const generarTransaccion = async (cantidad: number, tipo: number, id_cuen
                 "valor": cantidad,
                 "descripcion": comentario
             };
-            let transaccion = await Transaccion.create(payload_transaccion);
+            let transaccion = await Transaccion.create(payload_transaccion, { transaction: t });
+            await t.commit();
             return transaccion;
         }
         //Otro caso: Se lanza un error 
         else {
+            await t.rollback();
             throw new Error("Tipo de transaccion no valido");
         }
     } catch (error) {
+        await t.rollback();
         throw new Error("Error al efectuar la transaccion: " + error.message);
     }
 };
