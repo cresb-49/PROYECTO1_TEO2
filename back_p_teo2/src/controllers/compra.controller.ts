@@ -18,11 +18,30 @@ export const createCompra = async (req: Request, res: Response) => {
     const creditos_retirables = parseFloat(creditos.retirables);
     const creditos_no_retirables = parseFloat(creditos.no_retirables);
 
+    //Obtenemos la publicacion con su respectivo articulo
+    const publicacion: any = await Publicacion.findByPk(id_publicacion, {
+        include: [
+            {
+                model: Articulo,
+                required: true,
+                include: [
+                    {
+                        model: Category,
+                        required: false
+                    }
+                ]
+            }
+        ]
+    });
+
+    if (publicacion === null) {
+        return responseAPI(HttpStatus.NOT_FOUND, res, null, "Publicacion no encontrada", "La publicacion no existe");
+    }
+
     if (cantidad < 1) {
         return responseAPI(HttpStatus.BAD_REQUEST, res, null, "Cantidad invalida del producto a comprar", "Cantidad invalida del producto a comprar");
     }
     if (cantidad >= 1) {
-        let publicacion: any = await Publicacion.findByPk(id_publicacion, { include: [{ model: Articulo, required: true, include: [{ model: Category, required: true }] }] });
         if (publicacion.articulo === null) {
             return responseAPI(HttpStatus.NOT_FOUND, res, null, "Publicacion no encontrada", "La publicacion no existe");
         }
@@ -50,24 +69,6 @@ export const createCompra = async (req: Request, res: Response) => {
 
     total_creditos = total_creditos + creditos_retirables + creditos_no_retirables;
 
-    //Obtenemos la publicacion con su respectivo articulo
-    let publicacion: any = await Publicacion.findByPk(id_publicacion, {
-        include: [
-            {
-                model: Articulo,
-                required: true,
-                include: [
-                    {
-                        model: Category,
-                        required: false
-                    }
-                ]
-            }
-        ]
-    });
-    if (publicacion === null) {
-        return responseAPI(HttpStatus.NOT_FOUND, res, null, "Publicacion no encontrada", "La publicacion no existe");
-    }
     let articulo = publicacion.articulo;
     if (articulo === null) {
         return responseAPI(HttpStatus.NOT_FOUND, res, null, "Articulo no encontrado", "El articulo no existe");
