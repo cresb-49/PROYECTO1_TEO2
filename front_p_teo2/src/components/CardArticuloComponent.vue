@@ -56,7 +56,8 @@ export default {
 .imgP {
   margin: 20px;
   border-radius: 5px;
-  max-height: 400px;
+  max-height: 200px;
+  object-fit: scale-down;
 }
 
 p {
