@@ -80,7 +80,7 @@
                     </button>
 
                     <!-- Números de página -->
-                    <button v-for="(pageNumber, index) in totalPages" :key="index"
+                    <button v-for="(pageNumber, index) in pagesToShow" :key="index"
                         :class="['btn', 'btn-secondary', { 'btn-info': pageNumber === currentPage }]"
                         @click="getComentarios(pageNumber)">
                         {{ pageNumber }}
@@ -219,6 +219,7 @@ export default {
             currentPage: 1,
             previousPage: 1,
             nextPage: 1,
+            pagesToShow: [],
             buyArticulo: false,
             labelButton: 'Comprar Articulo',
         }
@@ -286,13 +287,13 @@ export default {
                     Authorization: `Bearer ${state.token}`
                 }
             }).then(response => {
-                const { data, totalPages, previousPage, nextPage, currentPage } = response.data.data;
+                const { data, totalPages, previousPage, nextPage, currentPage, pagesToShow } = response.data.data;
                 this.comments = data;
                 this.totalPages = totalPages;
                 this.previousPage = previousPage;
                 this.nextPage = nextPage;
                 this.currentPage = currentPage;
-
+                this.pagesToShow = pagesToShow;
             }).catch(error => {
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
