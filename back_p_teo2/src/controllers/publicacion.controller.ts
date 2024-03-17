@@ -55,7 +55,6 @@ export const getPublicaciones = async (req: Request, res: Response) => {
                     nextPage: page < totalPages ? page + 1 : null,
                     pagesToShow: generatePagesToShow(page, totalPages)
                 }
-                console.log(payload);
                 return responseAPI(HttpStatus.OK, res, payload, "Publicaciones encontradas con exito");
             })
             .catch((reason: any) => {
@@ -94,7 +93,6 @@ export const getPublicaciones = async (req: Request, res: Response) => {
                     nextPage: page < totalPages ? page + 1 : null,
                     pagesToShow: generatePagesToShow(page, totalPages)
                 }
-                console.log(payload);
                 return responseAPI(HttpStatus.OK, res, payload, "Publicaciones encontradas con exito");
             })
             .catch((reason: any) => {
