@@ -12,6 +12,7 @@ import { BuyTransaccion } from '../models/buy_transaccion';
 import { resCantidadArticulo } from './articulo.controller';
 import sequelize from '../database/database';
 import { TokenPayload } from '../middleware/authMiddleware';
+import { generatePagesToShow } from '../handler/generatePagesToShow';
 
 
 export const createCompra = async (req: Request, res: Response) => {
@@ -187,7 +188,8 @@ export const getComprasUsuario = async (req: Request, res: Response) => {
                 totalPages: totalPages,
                 currentPage: page,
                 previousPage: page > 1 ? page - 1 : null,
-                nextPage: page < totalPages ? page + 1 : null
+                nextPage: page < totalPages ? page + 1 : null,
+                pagesToShow: generatePagesToShow(page, totalPages)
             }
             return responseAPI(HttpStatus.OK, res, payload, "Compras realizadas por el usuario");
         })
@@ -232,7 +234,8 @@ export const getVentasUsuario = async (req: Request, res: Response) => {
                 totalPages: totalPages,
                 currentPage: page,
                 previousPage: page > 1 ? page - 1 : null,
-                nextPage: page < totalPages ? page + 1 : null
+                nextPage: page < totalPages ? page + 1 : null,
+                pagesToShow: generatePagesToShow(page, totalPages)
             }
             return responseAPI(HttpStatus.OK, res, payload, "Ventas realizadas por el usuario");
         })
