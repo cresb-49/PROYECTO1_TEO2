@@ -3,6 +3,7 @@ import sequelize from "../database/database";
 import { Publicacion } from "./publicacion";
 import { Category } from "./category";
 import { Buy } from "./buy";
+import { Image } from "./image"
 
 export const Articulo = sequelize.define('articulo',
     {
@@ -72,3 +73,6 @@ Articulo.belongsTo(Buy, { foreignKey: 'id', as: 'articulo_venta' });
 Articulo.belongsTo(Buy, { foreignKey: 'id', as: 'articulo_cambio' });
 Buy.belongsTo(Articulo, { foreignKey: 'id_articulo_venta', as: 'articulo_venta' });
 Buy.belongsTo(Articulo, { foreignKey: 'id_articulo_cambio', as: 'articulo_cambio' });
+
+Articulo.hasMany(Image, { foreignKey: 'id_articulo' });
+Image.belongsTo(Articulo, { foreignKey: 'id_articulo' });

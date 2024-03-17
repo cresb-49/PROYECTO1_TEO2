@@ -3,7 +3,7 @@
         <div class="card">
             <div class="container" style="padding: 20px;">
                 <h2 class="mb-3">Modificar Articulo</h2>
-                <form @submit.prevent="generarArticulo">
+                <form @submit.prevent="modificarArticulo">
                     <div class="mb-3">
                         <label for="nombre" class="form-label">Nombre del articulo</label>
                         <input type="text" id="nombre" class="form-control" aria-labelledby="nombreHelpBlock"
@@ -95,8 +95,7 @@
                         <label for="formFile" class="form-label">Imagen del articulo</label>
                         <input @change="manejoImagen" class="form-control" id="formFile" type="file">
                     </div>
-                    <img :src="imagen" id="imageFile"
-                        alt="..."><br><br>
+                    <img :src="imagen" id="imageFile" alt="..."><br><br>
                     <button type="submit" class="btn btn-outline-primary">Modificar Articulo</button>
                 </form>
             </div>
@@ -163,8 +162,31 @@ export default {
         buscarCategorias() {
             this.getCategorias();
         },
-        generarArticulo() {
-
+        modificarArticulo() {
+            this.axios.put(`articulo/${this.$route.params.id}`,
+                {
+                    nombre: this.nombre,
+                    valor: this.precio,
+                    cantidad: this.cantidad,
+                    descripcion: this.descripcion,
+                    id_categoria: this.id_categoria,
+                    imagen: this.imagen
+                },
+                {
+                    headers:
+                    {
+                        Authorization: `Bearer ${this.token}` // Incluye el token en el encabezado Authorization
+                    },
+                }).then(response => {
+                    console.log(response);
+                }).catch(error => {
+                    console.log(error);
+                    toast.error(error.response.data.error);
+                    let errores = error.response.data.errores;
+                    for (let index = 0; index < errores.length; index++) {
+                        toast.error(errores[index]);
+                    }
+                });
         },
         obtenerArticulo() {
             this.axios.get(`articulo/${this.$route.params.id}`, {

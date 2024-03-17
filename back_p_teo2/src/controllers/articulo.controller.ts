@@ -4,7 +4,7 @@ import { HttpStatus } from '../enums/httpStatus';
 import { Articulo } from '../models/articulo';
 import { Publicacion } from '../models/publicacion';
 import { Image } from '../models/image';
-import { saveImage } from '../middleware/image.midelware';
+import { readFileImage, saveImage } from '../middleware/image.midelware';
 import sequelize from '../database/database';
 import { TokenPayload } from '../middleware/authMiddleware';
 import { Category } from '../models/category';
@@ -140,14 +140,7 @@ export const updateArticulo = async (req: Request, res: Response) => {
     const { idArticulo } = req.params;
     const { tokenPayload } = req;
     const idUsuario = tokenPayload.usuarioId;
-    let payload = {
-        nombre: nombre,
-        valor: precio,
-        descripcion: descripcion,
-        id_categoria: id_categoria,
-        id_usuario: idUsuario,
-        cantidad: cantidad
-    }
+    
     //Validamos el precio y la cantidad positiva
     if (precio <= 0) {
         return responseAPI(HttpStatus.BAD_REQUEST, res, null, "El precio no puede ser negativo o cero", "El precio no puede ser negativo o cero");
@@ -155,24 +148,46 @@ export const updateArticulo = async (req: Request, res: Response) => {
     if (cantidad <= 0) {
         return responseAPI(HttpStatus.BAD_REQUEST, res, null, "La cantidad no puede ser negativa o cero", "La cantidad no puede ser negativa o cero");
     }
-    //Buscamos el articulo si existe mediante el id y el id del usuario
-    Articulo.findOne({ where: { id: idArticulo, id_usuario: idUsuario } })
-        .then((articulo: any) => {
-            if (articulo) {
-                Articulo.update(payload, { where: { id: idArticulo } })
-                    .then((value: any) => {
-                        return responseAPI(HttpStatus.OK, res, value, "Producto Actualizado");
-                    })
-                    .catch((reason: any) => {
-                        return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
-                    })
-            } else {
-                return responseAPI(HttpStatus.NOT_FOUND, res, null, "Producto no encontrado", "Producto no encontrado");
-            }
-        })
-        .catch((reason: any) => {
-            return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
-        })
+    let articulo_original: any = await Articulo.findByPk(idArticulo, { include: [{ model: Image, required: false }] });
+    let base64Articulo = await readFileImage(articulo_original.images[0].url);
+    let payloadActulizacion = {}
+    // let payload = {
+    //     nombre: nombre,
+    //     valor: precio,
+    //     descripcion: descripcion,
+    //     id_categoria: id_categoria,
+    //     id_usuario: idUsuario,
+    //     cantidad: cantidad
+    // }
+    if (nombre){
+        if(nombre !== articulo_original.nombre){
+            payloadActulizacion['nombre'] = nombre;
+        }
+    }
+    if(precio){
+        if(precio !== articulo_original.valor){
+            payloadActulizacion['valor'] = precio;
+        }
+    }
+    if (cantidad){
+        if(cantidad !== articulo_original.cantidad){
+            payloadActulizacion['cantidad'] = cantidad;
+        }
+    }
+    if (descripcion){
+        if(descripcion !== articulo_original.descripcion){
+            payloadActulizacion['descripcion'] = descripcion;
+        }
+    }
+    if(id_categoria){
+        if(id_categoria !== articulo_original.id_categoria){
+            payloadActulizacion['id_categoria'] = id_categoria;
+        }
+    }
+    if (base64Articulo !== imagen) {
+        console.log('Se actualiza la imagen');
+    }
+    console.log('Payload de actualizacion:', payloadActulizacion);
 };
 
 export const resCantidadArticulo = async (id_articulo: number, cantidad_restar: number) => {
