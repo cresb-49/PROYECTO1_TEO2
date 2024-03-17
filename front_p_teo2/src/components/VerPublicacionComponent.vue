@@ -224,13 +224,16 @@ export default {
         }
     },
     mounted() {
-        this.getPublicacion();
-        this.getComentarios();
-        this.getLikeInfo();
-        this.getArticulosPublicadosComprador();
-        this.getCuentaBalance();
+        this.parametrosVista();
     },
     methods: {
+        parametrosVista() {
+            this.getPublicacion();
+            this.getComentarios();
+            this.getLikeInfo();
+            this.getArticulosPublicadosComprador();
+            this.getCuentaBalance();
+        },
         getPublicacion() {
             let state = this.$store.state;
             this.axios.get(`publicacion/${this.$route.params.id}`, {
@@ -468,8 +471,8 @@ export default {
                     Authorization: `Bearer ${state.token}`
                 }
             }).then((response) => {
-                console.log(response.data);
                 toast.success(response.data.mensaje);
+                this.parametrosVista();
             }).catch(error => {
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
