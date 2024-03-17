@@ -6,18 +6,25 @@ import { TipoPublicacion } from '../models/tipo_publicacion';
 import { Articulo } from '../models/articulo';
 import { Publicacion } from '../models/publicacion';
 import { Category } from '../models/category';
+import { generatePagesToShow } from '../handler/generatePagesToShow';
 
 export const getPublicaciones = async (req: Request, res: Response) => {
     //Obtenemos el parametro nombre
     let { nombre } = req.query;
-    console.log(nombre);
+    const page: number = req.query.page ? parseInt(req.query.page.toString()) : 1; // Página actual, si no se proporciona, se asume 1
+    const limit: number = 20; // Comentarios por página
+    const offset: number = (page - 1) * limit; // Calculo del desplazamiento
     //Si nombre solo es un string vacio lo convertimos a null
     if (nombre !== undefined && nombre !== "" && typeof nombre === "string" && nombre.length !== 0 && nombre.trim() !== "") {
         //Buscamos por medio de like en el nombre del articulo
-        Publicacion.findAll({
+        console.log('con nombre');
+        Publicacion.findAndCountAll({
             where: {
                 isValidate: true
             },
+            order: [['created_at', 'DESC']],
+            limit: limit,
+            offset: offset,
             include: [
                 {
                     model: Articulo,
@@ -36,17 +43,32 @@ export const getPublicaciones = async (req: Request, res: Response) => {
                 }
             ]
         })
-            .then((value: any[]) => {
-                return responseAPI(HttpStatus.OK, res, value, "Publicaciones encontradas con exito");
+            .then((value: any) => {
+                const publicaciones = value.rows;
+                const totalItems = value.count;
+                const totalPages = Math.ceil(totalItems / limit);
+                const payload = {
+                    data: publicaciones,
+                    totalPages: totalPages,
+                    currentPage: page,
+                    previousPage: page > 1 ? page - 1 : null,
+                    nextPage: page < totalPages ? page + 1 : null,
+                    pagesToShow: generatePagesToShow(page, totalPages)
+                }
+                console.log(payload);
+                return responseAPI(HttpStatus.OK, res, payload, "Publicaciones encontradas con exito");
             })
             .catch((reason: any) => {
                 return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
             })
     } else {
-        Publicacion.findAll({
+        Publicacion.findAndCountAll({
             where: {
                 isValidate: true
             },
+            order: [['created_at', 'DESC']],
+            limit: limit,
+            offset: offset,
             include: [
                 {
                     model: Articulo,
@@ -60,8 +82,20 @@ export const getPublicaciones = async (req: Request, res: Response) => {
                 }
             ]
         })
-            .then((value: any[]) => {
-                return responseAPI(HttpStatus.OK, res, value, "Publicaciones encontradas con exito");
+            .then((value: any) => {
+                const publicaciones = value.rows;
+                const totalItems = value.count;
+                const totalPages = Math.ceil(totalItems / limit);
+                const payload = {
+                    data: publicaciones,
+                    totalPages: totalPages,
+                    currentPage: page,
+                    previousPage: page > 1 ? page - 1 : null,
+                    nextPage: page < totalPages ? page + 1 : null,
+                    pagesToShow: generatePagesToShow(page, totalPages)
+                }
+                console.log(payload);
+                return responseAPI(HttpStatus.OK, res, payload, "Publicaciones encontradas con exito");
             })
             .catch((reason: any) => {
                 return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
