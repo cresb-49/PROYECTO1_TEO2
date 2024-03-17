@@ -63,16 +63,15 @@ export const Articulo = sequelize.define('articulo',
     }
 );
 
-Articulo.hasOne(Publicacion, { foreignKey: 'id_articulo' });
-Publicacion.belongsTo(Articulo, { foreignKey: 'id_articulo' });
-
-Articulo.hasOne(Category, { foreignKey: 'id' });
-Category.belongsTo(Articulo, { foreignKey: 'id' });
+// Articulo.hasOne(Publicacion, { foreignKey: 'id_articulo' });
+// Publicacion.belongsTo(Articulo, { foreignKey: 'id_articulo' });
 
 Articulo.belongsTo(Buy, { foreignKey: 'id', as: 'articulo_venta' });
 Articulo.belongsTo(Buy, { foreignKey: 'id', as: 'articulo_cambio' });
 Buy.belongsTo(Articulo, { foreignKey: 'id_articulo_venta', as: 'articulo_venta' });
 Buy.belongsTo(Articulo, { foreignKey: 'id_articulo_cambio', as: 'articulo_cambio' });
+
+Articulo.belongsTo(Category, { foreignKey: 'id_categoria' });
 
 Articulo.hasMany(Image, { foreignKey: 'id_articulo' });
 Image.belongsTo(Articulo, { foreignKey: 'id_articulo' });
