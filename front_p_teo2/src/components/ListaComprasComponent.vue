@@ -31,7 +31,7 @@
                 </button>
 
                 <!-- Números de página -->
-                <button v-for="(pageNumber, index) in totalPages" :key="index"
+                <button v-for="(pageNumber, index) in pagesToShow" :key="index"
                     :class="['btn', 'btn-secondary', { 'btn-info': pageNumber === currentPage }]"
                     @click="getCompras(pageNumber)">
                     {{ pageNumber }}
@@ -65,6 +65,7 @@ export default {
             currentPage: 1,
             previousPage: 1,
             nextPage: 1,
+            pagesToShow: []
         }
     },
     props: {
@@ -82,6 +83,11 @@ export default {
             })
                 .then(response => {
                     this.compras = response.data.data.data;
+                    this.totalPages = response.data.data.totalPages;
+                    this.currentPage = response.data.data.currentPage;
+                    this.previousPage = response.data.data.previousPage;
+                    this.nextPage = response.data.data.nextPage;
+                    this.pagesToShow = response.data.data.pagesToShow;
                 }).catch(error => {
                     toast.error(error.response.data.error);
                     let errores = error.response.data.errores;
