@@ -3,6 +3,7 @@ import { responseAPI } from '../handler/responseAPI';
 import { HttpStatus } from '../enums/httpStatus';
 import { Comentario } from '../models/comentario';
 import { Usuario } from '../models/usuario';
+import { generatePagesToShow } from '../handler/generatePagesToShow';
 
 export const getComentarrios = async (req: Request, res: Response) => {
     Comentario.findAll()
@@ -42,7 +43,8 @@ export const getComentariosPublicacion = async (req: Request, res: Response) => 
                 totalPages: totalPages,
                 currentPage: page,
                 previousPage: page > 1 ? page - 1 : null,
-                nextPage: page < totalPages ? page + 1 : null
+                nextPage: page < totalPages ? page + 1 : null,
+                pagesToShow: generatePagesToShow(page, totalPages)
             }
             return responseAPI(HttpStatus.OK, res, payload, 'Comentarios encontrados con éxito');
         })
