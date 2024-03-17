@@ -7,8 +7,8 @@ const router = Router()
 router.get('/articulos/usuario', verifyToken, getArticulosUsuario);
 router.get('/articulos/usuario/sin-publicar', verifyToken, getArticulosUsuarioSinPublicar);
 router.get('/articulos/usuario/publicados', verifyToken, getArticulosPublicados);
-router.get('/acticulo', verifyToken, getArticulo)
 router.post('/articulo', verifyToken, createArticulo)
+router.get('/articulo/:idArticulo', verifyToken, getArticulo)
 router.put('/articulo/:idArticulo', verifyToken, updateArticulo)
 
 

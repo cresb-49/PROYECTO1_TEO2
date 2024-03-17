@@ -6,6 +6,8 @@ import { Publicacion } from '../models/publicacion';
 import { Image } from '../models/image';
 import { saveImage } from '../middleware/image.midelware';
 import sequelize from '../database/database';
+import { TokenPayload } from '../middleware/authMiddleware';
+import { Category } from '../models/category';
 
 export const getArticulosUsuario = async (req: Request, res: Response) => {
     const { tokenPayload } = req;
@@ -57,7 +59,34 @@ export const getArticulosPublicados = async (req: Request, res: Response) => {
 
 
 export const getArticulo = async (req: Request, res: Response) => {
-
+    const { idArticulo } = req.params;
+    const tokenPayload: TokenPayload = req.tokenPayload;
+    const id_usuario: number = parseInt(tokenPayload.usuarioId);
+    Articulo.findByPk(idArticulo, {
+        include: [
+            {
+                model: Category,
+                required: true
+            }
+        ]
+    })
+        .then((articulo: any) => {
+            if (articulo) {
+                if (!articulo) {
+                    return responseAPI(HttpStatus.NOT_FOUND, res, null, "Producto no encontrado", "Producto no encontrado");
+                }
+                if (articulo.id_usuario === id_usuario) {
+                    return responseAPI(HttpStatus.OK, res, articulo, "Producto encontrado con exito");
+                } else {
+                    return responseAPI(HttpStatus.FORBIDDEN, res, null, "No tienes permisos para ver este producto", "No tienes permisos para ver este producto");
+                }
+            } else {
+                return responseAPI(HttpStatus.NOT_FOUND, res, null, "Producto no encontrado", "Producto no encontrado");
+            }
+        })
+        .catch((reason: any) => {
+            return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
+        });
 };
 
 export const createArticulo = async (req: Request, res: Response) => {
