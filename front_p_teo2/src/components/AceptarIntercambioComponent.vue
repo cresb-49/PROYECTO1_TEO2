@@ -2,56 +2,71 @@
     <div class="mt-4">
         <h3>Aceptar Oferta de Intercambio</h3>
         <div v-for="d in data" v-bind:key="d">
-            <h5><small>{{ d }}</small></h5>
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5><small>{{ d.id }}</small></h5>
-                    <div class="row">
-                        <div class="col-5">
-                            <div class="row">
-                                <div class="col-3">
-                                    <img :src="'http://localhost:3000/api/image?articulo=' + d.id_articulo_venta"
-                                        class="img-fluid" alt="Imagen del producto">
+                    <h5><small>Identificacion de Compra: {{ d.id }}</small></h5>
+                    <div class="mt-4">
+                        <div class="row">
+                            <div class="col-5">
+                                <div class="row">
+                                    <div class="col-3">
+                                        <img :src="'http://localhost:3000/api/image?articulo=' + d.id_articulo_venta"
+                                            class="img-fluid" alt="Imagen del producto">
+                                    </div>
+                                    <div class="col-9">
+                                        <h5 class="card-title"><strong>Nombre:</strong> {{ d.articulo_venta.nombre }}</h5>
+                                        <p class="card-text"><strong>Cantidad:</strong> <small> {{ d.cantidad_articulo_venta
+                                                }}</small></p>
+                                        <p class="card-text"><strong>KORNS:</strong> <small> {{ d.valor_venta }}</small></p>
+                                        <p class="card-text"><strong>Fecha:</strong> <small> {{ formatDate(d.updated_at)
+                                                }}</small></p>
+                                    </div>
                                 </div>
-                                <div class="col-9">
-                                    <h5 class="card-title"><strong>Nombre:</strong> {{ d.articulo_venta.nombre }}</h5>
-                                    <p class="card-text"><strong>Cantidad:</strong> <small> {{ d.cantidad_articulo_venta
-                                            }}</small></p>
-                                    <p class="card-text"><strong>KORNS:</strong> <small> {{ d.valor_venta }}</small></p>
-                                    <p class="card-text"><strong>Fecha:</strong> <small> {{ formatDate(d.updated_at)
-                                            }}</small></p>
+                            </div>
+                            <div class="col-1">
+                                <h5><strong>Por</strong></h5>
+                            </div>
+                            <div class="col-5">
+                                <div class="row">
+                                    <div class="col-3">
+                                        <img :src="'http://localhost:3000/api/image?articulo=' + d.id_articulo_cambio"
+                                            class="img-fluid" alt="Imagen del producto">
+                                    </div>
+                                    <div class="col-9">
+                                        <h5 class="card-title">
+                                            <strong>Nombre:</strong> {{ d.articulo_cambio.nombre }}
+                                        </h5>
+                                        <p class="card-text">
+                                            <strong>Cantidad:</strong> <small> {{ d.cantidad_articulo_cambio }}</small>
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>Valor Unitario: </strong>
+                                            <small>{{ d.articulo_cambio.valor }}</small>
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>Creditos Retirables: </strong>
+                                            <small> {{ d.creditos_retirables_usados }}</small>
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>Creditos No Retirables: </strong>
+                                            <small> {{ d.creditos_no_retirables_usados }}</small>
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>SUMA TOTAL KORNS:</strong> <small> {{ sumatoriaKorns(d) }}</small>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <button @click="verificarArticulo(d.venta)" class="btn btn-success float-right mt-4">Aceptar Intercambio</button>
+                                </div>
+                                <div class="col-6">
+                                    <button @click="verificarArticulo(d.venta)" class="btn btn-danger float-right mt-4">Rechazar Intercambio</button>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-1">
-                            <h5><small>Por</small></h5>
-                        </div>
-                        <div class="col-5">
-                            <div class="row">
-                                <div class="col-3">
-                                    <img :src="'http://localhost:3000/api/image?articulo=' + d.id_articulo_cambio"
-                                        class="img-fluid" alt="Imagen del producto">
-                                </div>
-                                <div class="col-9">
-                                    <h5 class="card-title"><strong>Nombre:</strong> {{ d.articulo_cambio.nombre }}</h5>
-                                    <p class="card-text"><strong>Cantidad:</strong> <small> {{
-            d.cantidad_articulo_cambio
-        }}</small></p>
-                                    <p class="card-text"><strong>Valor Unitario:</strong> <small> {{
-                d.articulo_cambio.valor }}</small></p>
-                                    <p class="card-text"><strong>Creditos Retirables:</strong> <small> {{ 0 }}</small>
-                                    </p>
-                                    <p class="card-text"><strong>Creditos No Retirables:</strong> <small> {{ 0 }}</small>
-                                    </p>
-                                    <p class="card-text"><strong>SUMA TOTAL KORNS:</strong> <small> {{
-                                            d.cantidad_articulo_cambio * d.articulo_cambio.valor }}</small></p>
-                                </div>
-                            </div>
-                        </div>
-                        <button @click="verificarArticulo(d.venta)" class="btn btn-primary float-right mt-4">Modificar
-                            Estado</button>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -111,6 +126,9 @@ export default {
             const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
             return new Date(date).toLocaleString('es-ES', options);
         },
+        sumatoriaKorns(d) {
+            return parseFloat(d.cantidad_articulo_cambio) * parseFloat(d.articulo_cambio.valor) + parseFloat(d.creditos_retirables_usados) + parseFloat(d.creditos_no_retirables_usados);
+        }
     }
 }
 </script>
