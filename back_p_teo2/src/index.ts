@@ -61,7 +61,7 @@ app.use('/api', comentarioRoutes);
 import likeRoutes from './routes/like.routes';
 app.use('/api', likeRoutes);
 
-import compraRoutes from './routes/compra.routes';
+import compraRoutes from './routes/buy.routes';
 app.use('/api', compraRoutes);
 
 import rolRoutes from './routes/rol.routes';
