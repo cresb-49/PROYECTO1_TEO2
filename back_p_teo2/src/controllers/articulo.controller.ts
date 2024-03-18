@@ -139,8 +139,14 @@ export const updateArticulo = async (req: Request, res: Response) => {
     const { nombre, precio, cantidad, id_categoria, descripcion, imagen } = req.body;
     const { idArticulo } = req.params;
     const { tokenPayload } = req;
-    const idUsuario = tokenPayload.usuarioId;
-    
+    const idUsuario: number = parseInt(tokenPayload.usuarioId);
+    let articulo_original: any = await Articulo.findByPk(idArticulo, { include: [{ model: Image, required: false }] });
+    if (!articulo_original) {
+        return responseAPI(HttpStatus.NOT_FOUND, res, null, "Producto no encontrado", "Producto no encontrado");
+    }
+    if (articulo_original.id_usuario !== idUsuario) {
+        return responseAPI(HttpStatus.FORBIDDEN, res, null, "No tienes permisos para modificar este producto", "No tienes permisos para modificar este producto");
+    }
     //Validamos el precio y la cantidad positiva
     if (precio <= 0) {
         return responseAPI(HttpStatus.BAD_REQUEST, res, null, "El precio no puede ser negativo o cero", "El precio no puede ser negativo o cero");
@@ -148,46 +154,53 @@ export const updateArticulo = async (req: Request, res: Response) => {
     if (cantidad <= 0) {
         return responseAPI(HttpStatus.BAD_REQUEST, res, null, "La cantidad no puede ser negativa o cero", "La cantidad no puede ser negativa o cero");
     }
-    let articulo_original: any = await Articulo.findByPk(idArticulo, { include: [{ model: Image, required: false }] });
     let base64Articulo = await readFileImage(articulo_original.images[0].url);
     let payloadActulizacion = {}
-    // let payload = {
-    //     nombre: nombre,
-    //     valor: precio,
-    //     descripcion: descripcion,
-    //     id_categoria: id_categoria,
-    //     id_usuario: idUsuario,
-    //     cantidad: cantidad
-    // }
-    if (nombre){
-        if(nombre !== articulo_original.nombre){
+    if (nombre) {
+        if (nombre !== articulo_original.nombre) {
             payloadActulizacion['nombre'] = nombre;
         }
     }
-    if(precio){
-        if(precio !== articulo_original.valor){
+    if (precio) {
+        if (precio !== articulo_original.valor) {
             payloadActulizacion['valor'] = precio;
         }
     }
-    if (cantidad){
-        if(cantidad !== articulo_original.cantidad){
+    if (cantidad) {
+        if (cantidad !== articulo_original.cantidad) {
             payloadActulizacion['cantidad'] = cantidad;
         }
     }
-    if (descripcion){
-        if(descripcion !== articulo_original.descripcion){
+    if (descripcion) {
+        if (descripcion !== articulo_original.descripcion) {
             payloadActulizacion['descripcion'] = descripcion;
         }
     }
-    if(id_categoria){
-        if(id_categoria !== articulo_original.id_categoria){
+    if (id_categoria) {
+        if (id_categoria !== articulo_original.id_categoria) {
             payloadActulizacion['id_categoria'] = id_categoria;
         }
     }
+    let banderaImagen = false;
     if (base64Articulo !== imagen) {
-        console.log('Se actualiza la imagen');
+        banderaImagen = true;
     }
-    console.log('Payload de actualizacion:', payloadActulizacion);
+    if (Object.keys(payloadActulizacion).length === 0 && banderaImagen === false) {
+        return responseAPI(HttpStatus.NOT_MODIFIED, res, null, "No se realizo ninguna actualizacion", "No se realizo ninguna actualizacion");
+    } else {
+        Articulo.update(payloadActulizacion, { where: { id: idArticulo } })
+            .then(async (articulo: any) => {
+                if (banderaImagen) {
+                    let path_image = await saveImage(imagen);
+                    let id_imagen = articulo_original.images[0].id;
+                    await Image.update({ url: path_image }, { where: { id: id_imagen } });
+                }
+                return responseAPI(HttpStatus.OK, res, articulo, "Producto actualizado con exito");
+            })
+            .catch((reason: any) => {
+                return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
+            });
+    }
 };
 
 export const resCantidadArticulo = async (id_articulo: number, cantidad_restar: number) => {
