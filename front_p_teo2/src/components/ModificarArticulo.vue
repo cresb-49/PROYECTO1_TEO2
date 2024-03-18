@@ -178,13 +178,19 @@ export default {
                         Authorization: `Bearer ${this.token}` // Incluye el token en el encabezado Authorization
                     },
                 }).then(response => {
-                    console.log(response);
+                    const data = response.data;
+                    toast.success(data.mensaje);
+                    this.obtenerArticulo();
                 }).catch(error => {
-                    console.log(error);
-                    toast.error(error.response.data.error);
-                    let errores = error.response.data.errores;
-                    for (let index = 0; index < errores.length; index++) {
-                        toast.error(errores[index]);
+                    console.log(error.response.status)
+                    if (error.response.status === 304) {
+                        toast.info("No se realizaron cambios");
+                    }else{
+                        toast.error(error.response.data.error);
+                        let errores = error.response.data.errores;
+                        for (let index = 0; index < errores.length; index++) {
+                            toast.error(errores[index]);
+                        }
                     }
                 });
         },
