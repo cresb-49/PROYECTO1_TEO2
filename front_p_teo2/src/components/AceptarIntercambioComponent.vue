@@ -4,7 +4,7 @@
         <div v-for="d in data" v-bind:key="d">
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5><small>Identificacion de Compra: {{ d.id }}</small></h5>
+                    <h5><small>Identificacion de Compra #{{ d.id }}</small></h5>
                     <div class="mt-4">
                         <div class="row">
                             <div class="col-5">
@@ -14,10 +14,13 @@
                                             class="img-fluid" alt="Imagen del producto">
                                     </div>
                                     <div class="col-9">
-                                        <h5 class="card-title"><strong>Nombre:</strong> {{ d.articulo_venta.nombre }}</h5>
-                                        <p class="card-text"><strong>Cantidad:</strong> <small> {{ d.cantidad_articulo_venta
-                                                }}</small></p>
-                                        <p class="card-text"><strong>KORNS:</strong> <small> {{ d.valor_venta }}</small></p>
+                                        <h5 class="card-title"><strong>Nombre:</strong> {{ d.articulo_venta.nombre }}
+                                        </h5>
+                                        <p class="card-text"><strong>Cantidad:</strong> <small> {{
+            d.cantidad_articulo_venta
+        }}</small></p>
+                                        <p class="card-text"><strong>KORNS:</strong> <small> {{ d.valor_venta }}</small>
+                                        </p>
                                         <p class="card-text"><strong>Fecha:</strong> <small> {{ formatDate(d.updated_at)
                                                 }}</small></p>
                                     </div>
@@ -59,10 +62,12 @@
                             </div>
                             <div class="row">
                                 <div class="col-6">
-                                    <button @click="verificarArticulo(d.venta)" class="btn btn-success float-right mt-4">Aceptar Intercambio</button>
+                                    <button @click="cambioIntercambio(true, d)"
+                                        class="btn btn-success float-right mt-4">Aceptar Intercambio</button>
                                 </div>
                                 <div class="col-6">
-                                    <button @click="verificarArticulo(d.venta)" class="btn btn-danger float-right mt-4">Rechazar Intercambio</button>
+                                    <button @click="cambioIntercambio(false,d)"
+                                        class="btn btn-danger float-right mt-4">Rechazar Intercambio</button>
                                 </div>
                             </div>
                         </div>
@@ -128,6 +133,45 @@ export default {
         },
         sumatoriaKorns(d) {
             return parseFloat(d.cantidad_articulo_cambio) * parseFloat(d.articulo_cambio.valor) + parseFloat(d.creditos_retirables_usados) + parseFloat(d.creditos_no_retirables_usados);
+        },
+        cambioIntercambio(estado, compra) {
+            let state = this.$store.state;
+            console.log(estado, compra.id);
+            if (estado) {
+                this.axios.put('ventas/aceptar-intercambio/' + compra.id, {}, {
+                    headers: {
+                        Authorization: `Bearer ${state.token}`
+                    }
+                })
+                    .then(response => {
+                        toast.success(response.data.mensaje);
+                        this.getVentasValidar();
+                    })
+                    .catch(error => {
+                        toast.error(error.response.data.error);
+                        let errores = error.response.data.errores;
+                        for (let index = 0; index < errores.length; index++) {
+                            toast.error(errores[index]);
+                        }
+                    });
+            } else {
+                this.axios.put('ventas/rechazar-intercambio/' + compra.id, {}, {
+                    headers: {
+                        Authorization: `Bearer ${state.token}`
+                    }
+                })
+                    .then(response => {
+                        toast.success(response.data.mensaje);
+                        this.getVentasValidar();
+                    })
+                    .catch(error => {
+                        toast.error(error.response.data.error);
+                        let errores = error.response.data.errores;
+                        for (let index = 0; index < errores.length; index++) {
+                            toast.error(errores[index]);
+                        }
+                    });
+            }
         }
     }
 }
