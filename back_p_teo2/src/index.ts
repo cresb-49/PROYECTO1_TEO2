@@ -10,8 +10,8 @@ import cors from 'cors'
 
 const app: Application = express();
 // Implementacion de body parser
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 //Uso de CORS
 // const allowedOrigins = ['http://localhost:1420','https://tauri.localhost']
@@ -22,7 +22,7 @@ const corsOptions = {
     credentials: true,
     optionSuccessStatus: 200,
     exposedHeaders: 'Content-Disposition',
-}
+};
 app.use(cors(corsOptions));
 
 // app.use((req, res, next) => {
