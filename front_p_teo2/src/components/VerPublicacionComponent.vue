@@ -272,6 +272,7 @@ export default {
                 }
             }).then(() => {
                 this.getComentarios(1);
+                this.comment = '';
             }).catch(error => {
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
