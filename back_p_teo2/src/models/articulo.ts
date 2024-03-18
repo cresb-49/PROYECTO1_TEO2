@@ -63,8 +63,8 @@ export const Articulo = sequelize.define('articulo',
     }
 );
 
-// Articulo.hasOne(Publicacion, { foreignKey: 'id_articulo' });
-// Publicacion.belongsTo(Articulo, { foreignKey: 'id_articulo' });
+Articulo.hasOne(Publicacion, { foreignKey: 'id_articulo' });
+Publicacion.belongsTo(Articulo, { foreignKey: 'id_articulo' });
 
 Articulo.belongsTo(Buy, { foreignKey: 'id', as: 'articulo_venta' });
 Articulo.belongsTo(Buy, { foreignKey: 'id', as: 'articulo_cambio' });
