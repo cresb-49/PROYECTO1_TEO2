@@ -35,6 +35,26 @@ module.exports = {
         password: await bcrypt.hash('password', 10),
         created_at: new Date(),
         updated_at: new Date(),
+      },{
+        id: 4,
+        nombres: 'Carlos',
+        apellidos: 'Pac',
+        f_nacimiento: '1999-04-09',
+        email: 'carlosbpac@gmail.com',
+        password: await bcrypt.hash('12345', 10),
+        id_cuenta: 1,
+        created_at: new Date(),
+        updated_at: new Date(),
+      },{
+        id: 5,
+        nombres: 'Carlos',
+        apellidos: 'Pac',
+        f_nacimiento: '1999-04-09',
+        email: 'carlospac49@gmail.com',
+        password: await bcrypt.hash('12345', 10),
+        id_cuenta: 2,
+        created_at: new Date(),
+        updated_at: new Date(),
       }
     ];
     await queryInterface.bulkInsert('usuario', usuarios, {});
