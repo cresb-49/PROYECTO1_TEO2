@@ -59,7 +59,13 @@
           </ul>
           <div style="margin-right: 10px;">
             <ul class="navbar-nav my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
-              <router-link to="/Carrito" v-if="isAuth && isUser" class="btn btn-outline-success material-icons"><span
+              <router-link to="/Chat" v-if="isAuth && isUser" class="btn btn-outline-success material-icons"><span
+                  class="">chat</span></router-link>
+            </ul>
+          </div>
+          <div style="margin-right: 10px;">
+            <ul class="navbar-nav my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
+              <router-link to="/Carrito" v-if="isAuth && isUser && false" class="btn btn-outline-success material-icons"><span
                   class="">shopping_cart</span></router-link>
             </ul>
           </div>

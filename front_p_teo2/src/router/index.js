@@ -20,6 +20,8 @@ import CompraRetiraCreditosComponent from "@/components/CompraRetiraCreditosComp
 import CrearPublicacionComponent from "@/components/CrearPublicacionComponent.vue";
 import ListaComprasComponent from "@/components/ListaComprasComponent.vue";
 import AceptarIntercambioComponent from "@/components/AceptarIntercambioComponent.vue";
+import ChatComponent from "@/components/ChatComponent.vue"
+
 
 const routes = [
     {
@@ -131,6 +133,11 @@ const routes = [
         path: '/Empleados',
         name: 'ListaEmpleados',
         component: ListaUsuariosSistema
+    },
+    {
+        path: '/Chat',
+        name: 'Chat',
+        component: ChatComponent
     }
 ];
 

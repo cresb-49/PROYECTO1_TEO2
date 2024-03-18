@@ -3,6 +3,7 @@ import sequelize from "../database/database";
 import { Acount } from "./acount";
 import { Comentario } from "./comentario";
 import { UsuarioRol } from "./usuario_rol";
+import { Message } from "./message";
 
 export const Usuario = sequelize.define('usuario',
     {
@@ -62,4 +63,9 @@ Usuario.belongsTo(Acount, { foreignKey: 'id_cuenta' });
 Usuario.hasMany(UsuarioRol, { foreignKey: 'id_usuario' });
 UsuarioRol.belongsTo(Usuario, { foreignKey: 'id_usuario' });
 
+Usuario.belongsTo(Message, { foreignKey: 'id_usuario_1', as: 'usuario1' })
+Usuario.belongsTo(Message, { foreignKey: 'id_usuario_2', as: 'usuario2' })
+
+Message.belongsTo(Usuario, { foreignKey: 'id', as: 'usuario1' })
+Message.belongsTo(Usuario, { foreignKey: 'id', as: 'usuario2' })
 
