@@ -182,7 +182,6 @@ export default {
                     toast.success(data.mensaje);
                     this.obtenerArticulo();
                 }).catch(error => {
-                    console.log(error.response.status)
                     if (error.response.status === 304) {
                         toast.info("No se realizaron cambios");
                     }else{
