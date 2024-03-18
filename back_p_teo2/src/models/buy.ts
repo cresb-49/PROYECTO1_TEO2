@@ -59,6 +59,21 @@ export const Buy = sequelize.define('buy',
             type: DataTypes.DECIMAL(8, 2),
             allowNull: false,
         },
+        creditos_retirables_usados: {
+            type: DataTypes.DECIMAL(8, 2),
+            allowNull: false,
+            defaultValue: 0
+        },
+        creditos_no_retirables_usados: {
+            type: DataTypes.DECIMAL(8, 2),
+            allowNull: false,
+            defaultValue: 0
+        },
+        creditos_generados: {
+            type: DataTypes.DECIMAL(8, 2),
+            allowNull: false,
+            defaultValue: 0,
+        },
         validate_at: {
             allowNull: true,
             type: DataTypes.DATE

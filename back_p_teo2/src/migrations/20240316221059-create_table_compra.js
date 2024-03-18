@@ -59,6 +59,21 @@ module.exports = {
         type: Sequelize.DECIMAL(8, 2),
         allowNull: false,
       },
+      creditos_retirables_usados: {
+        type: Sequelize.DECIMAL(8, 2),
+        allowNull: false,
+        defaultValue: 0
+      },
+      creditos_no_retirables_usados: {
+        type: Sequelize.DECIMAL(8, 2),
+        allowNull: false,
+        defaultValue: 0
+      },
+      creditos_generados: {
+        type: Sequelize.DECIMAL(8, 2),
+        allowNull: false,
+        defaultValue: 0,
+      },
       validate_at: {
         allowNull: true,
         type: Sequelize.DATE

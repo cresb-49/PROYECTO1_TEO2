@@ -94,6 +94,7 @@ export const createCompra = async (req: Request, res: Response) => {
             return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "No tiene los suficientes creditos no retirables disponibles", "No tiene los suficientes creditos no retirables disponibles");
         }
         const usuario_vendedor: any = await Usuario.findByPk(publicacion.id_usuario, { include: [{ model: Acount, required: false }] });
+
         const payload = {
             id_usuario_compra: id_usuario,
             id_usuario_venta: publicacion.id_usuario,
@@ -103,6 +104,9 @@ export const createCompra = async (req: Request, res: Response) => {
             cantidad_articulo_cambio: articulo_intercambiar !== null ? articulo_cambio.cantidad_articulo : null,
             valida: articulo_intercambiar === null ? true : false,
             valor_venta: valor_compra,
+            creditos_retirables_usados: creditos_retirables ?? 0,
+            creditos_no_retirables_usados: creditos_no_retirables ?? 0,
+            creditos_generados: 0, //TODO: Por implementar
             validate_at: articulo_intercambiar === null ? new Date() : null
         };
 
@@ -140,12 +144,14 @@ export const createCompra = async (req: Request, res: Response) => {
             }
         }
         //Generamos las relaciones de transacciones con la compra
-        await Promise.all(transacciones.map(async (transaccion) => {
-            await BuyTransaccion.create({
-                id_buy: buy.id,
-                id_transaccion: transaccion.id
-            }, { transaction: t });
-        }));
+        if (transacciones.length > 0) {
+            await Promise.all(transacciones.map(async (transaccion) => {
+                await BuyTransaccion.create({
+                    id_buy: buy.id,
+                    id_transaccion: transaccion.id
+                }, { transaction: t });
+            }));
+        }
         await t.commit();
         return responseAPI(HttpStatus.CREATED, res, buy, "Compra realizada con exito");
     } catch (error) {
@@ -153,6 +159,14 @@ export const createCompra = async (req: Request, res: Response) => {
         return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "Error al realizar la compra", error.message);
     }
 }
+
+const validarCompra = async (req: Request, res: Response) => {
+
+};
+
+const rechazarCompra = async (req: Request, res: Response) => {
+
+};
 
 export const getComprasUsuario = async (req: Request, res: Response) => {
     const tokenPayload: TokenPayload = req.tokenPayload;
