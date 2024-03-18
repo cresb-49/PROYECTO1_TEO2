@@ -1,6 +1,6 @@
 import { verifyToken } from '../middleware/authMiddleware';
 import { Router } from 'express';
-import { createCompra, getComprasUsuario, getVentasUsuario } from '../controllers/compra.controller';
+import { createCompra, getComprasUsuario, getVentasUsuario } from '../controllers/buy.controller';
 const router = Router();
 
 router.post('/compra', verifyToken, createCompra);

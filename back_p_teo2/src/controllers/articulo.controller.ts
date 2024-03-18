@@ -203,25 +203,29 @@ export const updateArticulo = async (req: Request, res: Response) => {
     }
 };
 
-export const resCantidadArticulo = async (id_articulo: number, cantidad_restar: number) => {
-    const t = await sequelize.transaction();
-    try {
-        const articulo: any = await Articulo.findByPk(id_articulo);
-        if (!articulo) {
-            throw new Error("Articulo no encontrado");
+export const resCantidadArticulo = async (id_articulo: number | null, cantidad_restar: number | null) => {
+    if (id_articulo !== null && cantidad_restar !== null) {
+        const t = await sequelize.transaction();
+        try {
+            const articulo: any = await Articulo.findByPk(id_articulo);
+            if (!articulo) {
+                throw new Error("Articulo no encontrado");
+            }
+            if (articulo.cantidad <= cantidad_restar) {
+                throw new Error("Cantidad invalida del producto a comprar");
+            }
+            let cantidad = articulo.cantidad - cantidad_restar;
+            await Articulo.update(
+                { cantidad: cantidad },
+                { where: { id: id_articulo }, transaction: t }
+            );
+            await t.commit();
+            return await Articulo.findByPk(id_articulo);
+        } catch (error) {
+            await t.rollback();
+            throw error;
         }
-        if (articulo.cantidad <= cantidad_restar) {
-            throw new Error("Cantidad invalida del producto a comprar");
-        }
-        let cantidad = articulo.cantidad - cantidad_restar;
-        await Articulo.update(
-            { cantidad: cantidad },
-            { where: { id: id_articulo }, transaction: t }
-        );
-        await t.commit();
-        return await Articulo.findByPk(id_articulo);
-    } catch (error) {
-        await t.rollback();
-        throw error;
+    } else {
+        console.log('Se envio null en alguno de los parametros');
     }
 };

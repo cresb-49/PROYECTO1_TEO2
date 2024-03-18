@@ -107,6 +107,8 @@ export const createCompra = async (req: Request, res: Response) => {
         };
 
         await resCantidadArticulo(publicacion.id_articulo, cantidad);
+        await resCantidadArticulo(payload.id_articulo_cambio, payload.cantidad_articulo_cambio);
+        
 
         const buy: any = await Buy.create(payload, { transaction: t });
         if (buy === null) {
