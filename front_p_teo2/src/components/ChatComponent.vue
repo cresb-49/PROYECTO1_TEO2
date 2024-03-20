@@ -192,7 +192,8 @@ export default {
     },
     data() {
         return {
-            chats: []
+            chats: [],
+            contactos: [],
         }
     },
     mounted() {
@@ -201,6 +202,16 @@ export default {
     methods: {
         getChatsDisponibles() {
             console.log(this.token);
+            this.axios.get('', {
+                headers: {
+                    Authorization: `Bearer ${this.token}`
+                }
+            }).then(response => {
+                console.log(response.data);
+                this.chats = response.data;
+            }).catch(error => {
+                console.log(error);
+            });
         }
     }
 }
