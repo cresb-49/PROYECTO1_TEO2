@@ -184,7 +184,7 @@ export const createPublicacion = async (req: Request, res: Response) => {
         return responseAPI(HttpStatus.FORBIDDEN, res, null, "No tienes permiso para realizar esta accion", "El articulo no pertenece al usuario");
     }
     //Contamos cuantas publicaciones validadas tiene el usuario
-    let publicaciones = await Publicacion.count({
+    let publicaciones: number = await Publicacion.count({
         where: {
             id_usuario: idUsuario,
             isValidate: true
@@ -195,7 +195,7 @@ export const createPublicacion = async (req: Request, res: Response) => {
         id_articulo: id_articulo,
         id_tipo_publicacion: 1,
         id_usuario: idUsuario,
-        isValidate: publicaciones >= 3 ? true : false,
+        isValidate: publicaciones >= 3,
         f_validacion: new Date()
     }
     //Guardamos la publicacion
@@ -206,14 +206,6 @@ export const createPublicacion = async (req: Request, res: Response) => {
         .catch((reason: any) => {
             return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
         })
-};
-
-export const updatePublicacion = async (req: Request, res: Response) => {
-
-};
-
-export const getComentariosPublicacion = async (req: Request, res: Response) => {
-
 };
 
 export const confirmarPublicacion = async (req: Request, res: Response) => {
@@ -230,4 +222,12 @@ export const confirmarPublicacion = async (req: Request, res: Response) => {
     }).catch((reason: any) => {
         return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
     })
+};
+
+export const getPublicacionesReportadas = async (req: Request, res: Response) => {
+
+};
+
+export const updatePublicacion = async (req: Request, res: Response) => {
+
 };
