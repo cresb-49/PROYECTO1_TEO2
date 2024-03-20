@@ -5,6 +5,7 @@ import { Acount } from '../models/acount';
 import { responseAPI } from '../handler/responseAPI';
 import { HttpStatus } from '../enums/httpStatus';
 import { UsuarioRol } from '../models/usuario_rol';
+import { Op } from 'sequelize';
 
 export const getUsuarios = async (req: Request, res: Response) => {
     Usuario.findAll()
@@ -151,4 +152,26 @@ export const updateUsuarioPassword = async (req: Request, res: Response) => {
 
 export const deleteUsuario = async (req: Request, res: Response) => {
 
+};
+
+export const buscarContacto = async (req: Request, res: Response) => {
+    const { email_name } = req.body;
+    //Buscamos el usuario por email o por nombre mediante like
+    //Hacemos un group by para que no se repitan los usuarios
+    Usuario.findAll({
+        where: {
+            [Op.or]: [
+                { email: { [Op.like]: `%${email_name}%` } },
+                { nombres: { [Op.like]: `%${email_name}%` } }
+            ]
+        },
+        attributes: ['id', 'nombres', 'apellidos', 'email'],
+        group: ['id']
+    })
+        .then((usuarios: any) => {
+            return responseAPI(HttpStatus.OK, res, usuarios, 'Usuarios encontrados con exito');
+        })
+        .catch((error: any) => {
+            return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, 'Error al obtener usuarios', error.message);
+        });
 };
