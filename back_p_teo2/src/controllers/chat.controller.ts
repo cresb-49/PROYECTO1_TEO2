@@ -2,11 +2,11 @@ import { Request, Response } from 'express';
 import { Op } from 'sequelize';
 import { responseAPI } from '../handler/responseAPI';
 import { HttpStatus } from '../enums/httpStatus';
-import { TipoPublicacion } from '../models/tipo_publicacion';
 import { generatePagesToShow } from '../handler/generatePagesToShow';
 import { Chat } from '../models/chat';
 import { Message } from '../models/message';
 import { TokenPayload } from '../middleware/authMiddleware';
+import { Usuario } from '../models/usuario';
 //Tanto el Router como el controller tambien manejan la logica de los mensajes de los chats
 
 export const getChatsUsuario = async (req: Request, res: Response) => {
@@ -23,6 +23,20 @@ export const getChatsUsuario = async (req: Request, res: Response) => {
                 { id_usuario_2: id_usuario }
             ]
         },
+        include: [
+            {
+                model: Usuario,
+                as: 'usuario_1',
+                required: true,
+                attributes: ['id', 'nombres', 'apellidos', 'email']
+            },
+            {
+                model: Usuario,
+                as: 'usuario_2',
+                required: true,
+                attributes: ['id', 'nombres', 'apellidos', 'email']
+            }
+        ],
         group: ['id_usuario_1', 'id_usuario_2']
     })
         .then((chats: any) => {

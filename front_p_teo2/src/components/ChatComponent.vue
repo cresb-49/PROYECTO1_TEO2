@@ -28,7 +28,7 @@
                             @click="abrirChat(chat)">
                             <!-- <img class="contacts-list-img" src="dist/img/user1-128x128.jpg" alt="User Avatar"> -->
                             <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Count Dracula</h5>
+                                <h5 class="mb-1">{{ nombreMostrar(chat) }}</h5>
                                 <small>{{ formatDate(chat.updated_at) }}</small>
                                 <!-- <small>2/28/2015</small> -->
                             </div>
@@ -183,7 +183,7 @@ import { toast } from 'bootstrap';
 export default {
     name: 'ChatComponent',
     computed: {
-        ...mapGetters(['isUser', 'isAdmin', 'isConfirm', 'isAuth', 'token']),
+        ...mapGetters(['isUser', 'isAdmin', 'isConfirm', 'isAuth', 'token', 'idUser']),
     },
     data() {
         return {
@@ -205,6 +205,7 @@ export default {
             }).then(response => {
                 const data = response.data.data;
                 this.chats = data;
+                console.log(data);
             }).catch(error => {
                 console.log(error.response);
                 toast.error(error.response.data.error);
@@ -272,6 +273,13 @@ export default {
             const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
             return new Date(date).toLocaleString('es-ES', options);
         },
+        nombreMostrar(chat) {
+            if (chat.id_usuario_1 === this.idUser) {
+                return chat.usuario_2.nombres + " " + chat.usuario_2.apellidos;
+            } else {
+                return chat.usuario_1.nombres + " " + chat.usuario_1.apellidos;
+            }
+        }
     }
 }
 </script>
