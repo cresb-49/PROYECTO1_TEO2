@@ -5,59 +5,38 @@
             <div class="col-4">
                 <div class="direct-chat-contacts" style="max-height: 665px; overflow-y: auto;">
                     <div class="input-group mb-3">
-                        <input type="text" id="searchInput" class="form-control" placeholder="Buscar contacto...">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Buscar contacto..." v-model="email_name">
                         <div class="input-group-append">
-                            <button class="btn btn-outline-primary" type="button" id="searchButton">Buscar</button>
+                            <button class="btn btn-outline-primary" type="button" id="searchButton"
+                                @click="buscarContactos">Buscar</button>
                         </div>
                     </div>
-                    <div class="list-group">
+
+                    <div style="flex: auto;" class="mb-2">
+                        <button type="button" class="btn btn-primary" @click="verChats = true">Chats</button>
+                        <button type="button" class="btn btn-primary" @click="verChats = false">Contactos</button>
+                    </div>
+
+                    <div class="list-group" v-if="verChats">
                         <a href="#" class="list-group-item list-group-item-action">
                             <!-- <img class="contacts-list-img" src="dist/img/user1-128x128.jpg" alt="User Avatar"> -->
                             <div class="d-flex w-100 justify-content-between">
                                 <h5 class="mb-1">Count Dracula</h5>
                                 <small>2/28/2015</small>
                             </div>
-                            <p class="mb-1">How have you been? I was...</p>
+                            <!-- <p class="mb-1">How have you been? I was...</p> -->
                         </a>
-
-                        <a href="#" class="list-group-item list-group-item-action">
+                    </div>
+                    <div class="list-group" v-else>
+                        <a class="list-group-item list-group-item-action" v-for="contacto in contactos" v-bind:key="contacto" @click="crearChat(contacto)">
+                            <!-- <img class="contacts-list-img" src="dist/img/user1-128x128.jpg" alt="User Avatar"> -->
                             <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Sarah Doe</h5>
-                                <small>2/23/2015</small>
+                                <!-- <h5 class="mb-1">Usuaro Contacto</h5> -->
+                                <h5 class="mb-1">{{ contacto.nombres }} {{ contacto.apellidos }}</h5>
+                                <!-- <small>2/28/2015</small> -->
                             </div>
-                            <p class="mb-1">I will be waiting for...</p>
-                        </a>
-
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Nadia Jolie</h5>
-                                <small>2/20/2015</small>
-                            </div>
-                            <p class="mb-1">I'll call you back at...</p>
-                        </a>
-
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Nora S. Vans</h5>
-                                <small>2/10/2015</small>
-                            </div>
-                            <p class="mb-1">Where is your new...</p>
-                        </a>
-
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">John K.</h5>
-                                <small>1/27/2015</small>
-                            </div>
-                            <p class="mb-1">Can I take a look at...</p>
-                        </a>
-
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Kenneth M.</h5>
-                                <small>1/4/2015</small>
-                            </div>
-                            <p class="mb-1">Never mind I found...</p>
+                            <!-- <p class="mb-1">How have you been? I was...</p> -->
+                            <p class="mb-1">{{ contacto.email }}</p>
                         </a>
                     </div>
                 </div>
@@ -197,6 +176,8 @@ export default {
         return {
             chats: [],
             contactos: [],
+            verChats: true,
+            email_name: ""
         }
     },
     mounted() {
@@ -219,6 +200,39 @@ export default {
                     toast.error(errores[index]);
                 }
             });
+        },
+        buscarContactos() {
+            this.axios.post('chat/contacto',
+                {
+                    email_name: this.email_name
+                },
+                {
+                    headers:
+                    {
+                        Authorization: `Bearer ${this.token}`
+                    }
+                }).then(response => {
+                    let data = response.data.data
+                    console.log(response);
+                    console.log(data);
+                    if(data.length > 0){
+                        this.verChats = false;
+                        this.contactos = data;
+                    }else{
+                        this.verChats = true;
+                        this.contactos = [];
+                    }
+                }).catch(error => {
+                    console.log(error.response);
+                    toast.error(error.response.data.error);
+                    let errores = error.response.data.errores;
+                    for (let index = 0; index < errores.length; index++) {
+                        toast.error(errores[index]);
+                    }
+                });
+        },
+        crearChat(usuario){
+            console.log(usuario);
         }
     }
 }

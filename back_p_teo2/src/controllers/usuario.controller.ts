@@ -156,6 +156,11 @@ export const deleteUsuario = async (req: Request, res: Response) => {
 
 export const buscarContacto = async (req: Request, res: Response) => {
     const { email_name } = req.body;
+    let nombre: string = email_name;
+    let bandera: boolean = nombre !== undefined && nombre !== "" && typeof nombre === "string" && nombre.length !== 0 && nombre.trim() !== "";
+    if (!bandera) {
+        return responseAPI(HttpStatus.OK, res, [], "El campo de busqueda no puede estar vacio");
+    }
     //Buscamos el usuario por email o por nombre mediante like
     //Hacemos un group by para que no se repitan los usuarios
     Usuario.findAll({
