@@ -183,8 +183,11 @@
         </div>
     </div>
 </template>
+
 <script>
 import { mapGetters } from 'vuex';
+import { toast } from 'bootstrap';
+
 export default {
     name: 'ChatComponent',
     computed: {
@@ -202,15 +205,19 @@ export default {
     methods: {
         getChatsDisponibles() {
             console.log(this.token);
-            this.axios.get('', {
+            this.axios.get('chats', {
                 headers: {
                     Authorization: `Bearer ${this.token}`
                 }
             }).then(response => {
-                console.log(response.data);
-                this.chats = response.data;
+                console.log(response);
             }).catch(error => {
-                console.log(error);
+                console.log(error.response);
+                toast.error(error.response.data.error);
+                let errores = error.response.data.errores;
+                for (let index = 0; index < errores.length; index++) {
+                    toast.error(errores[index]);
+                }
             });
         }
     }
