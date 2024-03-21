@@ -37,23 +37,27 @@ export const getChat = async (req: Request, res: Response) => {
     //Obtenemos el id del usuario del token
     const tokenPayload: TokenPayload = req.tokenPayload;
     const id_usuario_1 = tokenPayload.usuarioId;
+    console.log(id_usuario_1);
     //Obtenemos el id del usuario2
     const { id_usuario_2 } = req.body;
     //Creamos el chat si no existe ya la conversacion entre los dos usuarios
-    Chat.findOrCreate({
+    let chat = await Chat.findOne({
         where: {
             [Op.or]: [
                 { id_usuario_1, id_usuario_2 },
                 { id_usuario_1: id_usuario_2, id_usuario_2: id_usuario_1 }
             ]
         }
-    })
-        .then((chat: any) => {
-            return responseAPI(HttpStatus.CREATED, res, chat, 'Chat creado con exito');
-        })
-        .catch((error: any) => {
-            return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, 'Error al crear chat', error.message);
+    });
+    if (!chat) {
+        chat = await Chat.create({
+            id_usuario_1,
+            id_usuario_2
         });
+        return responseAPI(HttpStatus.OK, res, chat, 'Chat encontrado con exito');
+    } else {
+        return responseAPI(HttpStatus.OK, res, chat, 'Chat encontrado con exito');
+    }
 };
 
 export const getMensajesChat = async (req: Request, res: Response) => {
