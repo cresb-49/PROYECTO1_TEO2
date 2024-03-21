@@ -10,19 +10,20 @@ import { TokenPayload } from '../middleware/authMiddleware';
 //Tanto el Router como el controller tambien manejan la logica de los mensajes de los chats
 
 export const getChatsUsuario = async (req: Request, res: Response) => {
+    console.log('getChatsUsuario');
     //Obtenemos el id del usuario del token
     const tokenPayload: TokenPayload = req.tokenPayload;
     const id_usuario = tokenPayload.usuarioId;
-    //Obtenemos los chats del usuario tanto si esta en la columna id_usuario1 o id_usuario2
+    //Obtenemos los chats del usuario tanto si esta en la columna id_usuario_1 o id_usuario_2
     //Hacemos un group by para que no se repitan los chats
     Chat.findAll({
         where: {
             [Op.or]: [
-                { id_usuario1: id_usuario },
-                { id_usuario2: id_usuario }
+                { id_usuario_1: id_usuario },
+                { id_usuario_2: id_usuario }
             ]
         },
-        group: ['id_usuario1', 'id_usuario2']
+        group: ['id_usuario_1', 'id_usuario_2']
     })
         .then((chats: any) => {
             return responseAPI(HttpStatus.OK, res, chats, 'Chats encontrados con exito');
@@ -35,15 +36,15 @@ export const getChatsUsuario = async (req: Request, res: Response) => {
 export const getChat = async (req: Request, res: Response) => {
     //Obtenemos el id del usuario del token
     const tokenPayload: TokenPayload = req.tokenPayload;
-    const id_usuario1 = tokenPayload.usuarioId;
+    const id_usuario_1 = tokenPayload.usuarioId;
     //Obtenemos el id del usuario2
-    const { id_usuario2 } = req.body;
+    const { id_usuario_2 } = req.body;
     //Creamos el chat si no existe ya la conversacion entre los dos usuarios
     Chat.findOrCreate({
         where: {
             [Op.or]: [
-                { id_usuario1, id_usuario2 },
-                { id_usuario1: id_usuario2, id_usuario2: id_usuario1 }
+                { id_usuario_1, id_usuario_2 },
+                { id_usuario_1: id_usuario_2, id_usuario_2: id_usuario_1 }
             ]
         }
     })
@@ -61,9 +62,9 @@ export const getMensajesChat = async (req: Request, res: Response) => {
     const id_usuario = tokenPayload.usuarioId;
     //Obtenemos el id del chat
     const { id_chat } = req.body;
-    //Verificamos que el usuario pertenezca al chat tanto en el id_usuario1 o id_usuario2
+    //Verificamos que el usuario pertenezca al chat tanto en el id_usuario_1 o id_usuario_2
     const chat: any = await Chat.findByPk(id_chat);
-    if (!(chat.id_usuario1 === id_usuario || chat.id_usuario2 === id_usuario)) {
+    if (!(chat.id_usuario_1 === id_usuario || chat.id_usuario_2 === id_usuario)) {
         return responseAPI(HttpStatus.NOT_FOUND, res, null, 'Not Found', 'Not Found');
     }
     //Obtenemos los mensajes del chat
@@ -86,9 +87,9 @@ export const eliminarChat = async (req: Request, res: Response) => {
     const id_usuario = tokenPayload.usuarioId;
     //Obtenemos el id del chat
     const { id_chat } = req.body;
-    //Verificamos que el usuario pertenezca al chat tanto en el id_usuario1 o id_usuario2
+    //Verificamos que el usuario pertenezca al chat tanto en el id_usuario_1 o id_usuario_2
     const chat: any = await Chat.findByPk(id_chat);
-    if (!(chat.id_usuario1 === id_usuario || chat.id_usuario2 === id_usuario)) {
+    if (!(chat.id_usuario_1 === id_usuario || chat.id_usuario_2 === id_usuario)) {
         return responseAPI(HttpStatus.NOT_FOUND, res, null, 'Not Found', 'Not Found');
     }
     //Eliminamos el chat
