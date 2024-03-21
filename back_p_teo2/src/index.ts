@@ -67,6 +67,9 @@ app.use('/api', compraRoutes);
 import rolRoutes from './routes/rol.routes';
 app.use('/api', rolRoutes);
 
+import chatRoutes from './routes/chat.routes';
+app.use('/api', chatRoutes);
+
 //Inicio del servidor
 const PORT: string | undefined = process.env.SERVER_PORT;
 app.listen(PORT, (): void => {
