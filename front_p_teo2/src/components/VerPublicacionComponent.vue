@@ -255,8 +255,8 @@ export default {
             }).catch(error => {
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
-                for (let index = 0; index < errores.length; index++) {
-                    toast.error(errores[index]);
+                for (const element of errores) {
+                    toast.error(element);
                 }
             });
         },
@@ -276,8 +276,8 @@ export default {
             }).catch(error => {
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
-                for (let index = 0; index < errores.length; index++) {
-                    toast.error(errores[index]);
+                for (const element of errores) {
+                    toast.error(element);
                 }
             });
         },
@@ -298,8 +298,8 @@ export default {
             }).catch(error => {
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
-                for (let index = 0; index < errores.length; index++) {
-                    toast.error(errores[index]);
+                for (const element of errores) {
+                    toast.error(element);
                 }
             });
         },
@@ -317,8 +317,8 @@ export default {
             }).catch(error => {
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
-                for (let index = 0; index < errores.length; index++) {
-                    toast.error(errores[index]);
+                for (const element of errores) {
+                    toast.error(element);
                 }
             });
             this.axios.get(`/like/usuario/publicacion/${this.$route.params.id}`, {
@@ -330,8 +330,8 @@ export default {
             }).catch(error => {
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
-                for (let index = 0; index < errores.length; index++) {
-                    toast.error(errores[index]);
+                for (const element of errores) {
+                    toast.error(element);
                 }
             });
         },
@@ -352,8 +352,8 @@ export default {
                 }).catch(error => {
                     toast.error(error.response.data.error);
                     let errores = error.response.data.errores;
-                    for (let index = 0; index < errores.length; index++) {
-                        toast.error(errores[index]);
+                    for (const element of errores) {
+                        toast.error(element);
                     }
                 });
             } else if (this.likes.liked === like_status) {
@@ -367,8 +367,8 @@ export default {
                 }).catch(error => {
                     toast.error(error.response.data.error);
                     let errores = error.response.data.errores;
-                    for (let index = 0; index < errores.length; index++) {
-                        toast.error(errores[index]);
+                    for (const element of errores) {
+                        toast.error(element);
                     }
                 });
             } else {
@@ -386,8 +386,8 @@ export default {
                 }).catch(error => {
                     toast.error(error.response.data.error);
                     let errores = error.response.data.errores;
-                    for (let index = 0; index < errores.length; index++) {
-                        toast.error(errores[index]);
+                    for (const element of errores) {
+                        toast.error(element);
                     }
                 });
             }
@@ -419,8 +419,8 @@ export default {
             }).catch(error => {
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
-                for (let index = 0; index < errores.length; index++) {
-                    toast.error(errores[index]);
+                for (const element of errores) {
+                    toast.error(element);
                 }
             });
         },
@@ -449,8 +449,8 @@ export default {
                 .catch(error => {
                     toast.error(error.response.data.error);
                     let errores = error.response.data.errores;
-                    for (let index = 0; index < errores.length; index++) {
-                        toast.error(errores[index]);
+                    for (const element of errores) {
+                        toast.error(element);
                     }
                 });
         },
@@ -478,8 +478,8 @@ export default {
             }).catch(error => {
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
-                for (let index = 0; index < errores.length; index++) {
-                    toast.error(errores[index]);
+                for (const element of errores) {
+                    toast.error(element);
                 }
             });
         }
