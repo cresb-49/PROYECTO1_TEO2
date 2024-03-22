@@ -10,6 +10,14 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      id_chat: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'chat',
+          key: 'id'
+        }
+      },
       id_usuario: {
         type: Sequelize.INTEGER,
         allowNull: false,

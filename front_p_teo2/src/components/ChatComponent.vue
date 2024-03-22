@@ -60,111 +60,34 @@
                         <h3 class="card-title">Chat de Sarah Bullock </h3>
                     </div>
                     <!-- /.card-header -->
-                    <div class="card-body" style="max-height: 550px; overflow-y: auto;">
+                    <div class="card-body" style="max-height: 550px; height: 550px; overflow-y: auto;">
                         <!-- Conversations are loaded here -->
                         <div class="d-flex flex-column">
-                            <div class="message-bubble message-bubble-right">
-                                <div>
-                                    Mensaje del usuario
+                            <template v-for="message in current_chat.messages" v-bind:key="message">
+                                <div class="message-bubble"
+                                    :class="message.id_usuario === current_chat.current_user.id ? 'message-bubble-right' : 'message-bubble-left'">
+                                    <div>
+                                        {{ message.text }}
+                                    </div>
+                                    <span class="float-right">
+                                        <small style="font-size: 13px;">
+                                            {{ formatDate(message.created_at) }}
+                                        </small>
+                                    </span>
                                 </div>
-                                <span class="float-right">
-                                    <small style="font-size: 13px;">
-                                        23 Jan 6:10 pm
-                                    </small>
-                                </span>
-                            </div>
-                            <div class="message-bubble message-bubble-left">
-                                <div>
-                                    Mensaje del otro usuario
-                                </div>
-                                <span class="float-right">
-                                    <small style="font-size: 13px;">
-                                        23 Jan 6:10 pm
-                                    </small>
-                                </span>
-                            </div>
-                            <div class="message-bubble message-bubble-right">
-                                <div>
-                                    Otro mensaje del usuario
-                                </div>
-                                <span class="float-right">
-                                    <small style="font-size: 13px;">
-                                        23 Jan 6:10 pm
-                                    </small>
-                                </span>
-                            </div>
-                            <div class="message-bubble message-bubble-left">
-                                <div>
-                                    Mensaje del otro usuario
-                                </div>
-                                <span class="float-right">
-                                    <small style="font-size: 13px;">
-                                        23 Jan 6:10 pm
-                                    </small>
-                                </span>
-                            </div>
-                            <div class="message-bubble message-bubble-right">
-                                <div>
-                                    Otro mensaje del usuario
-                                </div>
-                                <span class="float-right">
-                                    <small style="font-size: 13px;">
-                                        23 Jan 6:10 pm
-                                    </small>
-                                </span>
-                            </div>
-                            <div class="message-bubble message-bubble-left">
-                                <div>
-                                    Mensaje del otro usuario
-                                </div>
-                                <span class="float-right">
-                                    <small style="font-size: 13px;">
-                                        23 Jan 6:10 pm
-                                    </small>
-                                </span>
-                            </div>
-                            <div class="message-bubble message-bubble-right">
-                                <div>
-                                    Otro mensaje del usuario
-                                </div>
-                                <span class="float-right">
-                                    <small style="font-size: 13px;">
-                                        23 Jan 6:10 pm
-                                    </small>
-                                </span>
-                            </div>
-                            <div class="message-bubble message-bubble-left">
-                                <div>
-                                    Mensaje del otro usuario
-                                </div>
-                                <span class="float-right">
-                                    <small style="font-size: 13px;">
-                                        23 Jan 6:10 pm
-                                    </small>
-                                </span>
-                            </div>
-                            <div class="message-bubble message-bubble-right">
-                                <div>
-                                    Otro mensaje del usuario
-                                </div>
-                                <span class="float-right">
-                                    <small style="font-size: 13px;">
-                                        23 Jan 6:10 pm
-                                    </small>
-                                </span>
-                            </div>
-
+                            </template>
                         </div>
                         <!--/.direct-chat-messages-->
                         <!-- /.direct-chat-pane -->
                     </div>
                     <!-- /.card-body -->
                     <div class="card-footer">
-                        <form action="#" method="post">
+                        <form @submit.prevent="sendMessage">
                             <div class="input-group">
-                                <input type="text" name="message" placeholder="Type Message ..." class="form-control">
+                                <input type="text" name="message" placeholder="Type Message ..." class="form-control"
+                                    v-model="message_send">
                                 <span class="input-group-append">
-                                    <button type="button" class="btn btn-outline-primary">Send</button>
+                                    <button type="submit" class="btn btn-outline-primary">Send</button>
                                 </span>
                             </div>
                         </form>
@@ -190,7 +113,22 @@ export default {
             chats: [],
             contactos: [],
             verChats: true,
-            email_name: ""
+            email_name: "",
+            message_send: "",
+            current_chat: {
+                id: -1,
+                current_user: {
+                    id: -1,
+                    nombres: "",
+                    apellidos: ""
+                },
+                other_user: {
+                    id: -1,
+                    nombres: "",
+                    apellidos: ""
+                },
+                messages: []
+            }
         }
     },
     mounted() {
@@ -268,6 +206,47 @@ export default {
         },
         abrirChat(chat) {
             console.log(chat);
+            this.current_chat.id = chat.id;
+            if (chat.id_usuario_1 === this.idUser) {
+                this.current_chat.current_user = {
+                    id: chat.usuario_1.id,
+                    nombres: chat.usuario_1.nombres,
+                    apellidos: chat.usuario_1.apellidos
+                };
+                this.current_chat.other_user = {
+                    id: chat.usuario_2.id,
+                    nombres: chat.usuario_2.nombres,
+                    apellidos: chat.usuario_2.apellidos
+                };
+            } else {
+                this.current_chat.current_user = {
+                    id: chat.usuario_2.id,
+                    nombres: chat.usuario_2.nombres,
+                    apellidos: chat.usuario_2.apellidos
+                };
+                this.current_chat.other_user = {
+                    id: chat.usuario_1.id,
+                    nombres: chat.usuario_1.nombres,
+                    apellidos: chat.usuario_1.apellidos
+                };
+            }
+            this.axios.post('chat/mensajes', {
+                id_chat: chat.id
+            }, {
+                headers: {
+                    Authorization: `Bearer ${this.token}`
+                }
+            }).then(response => {
+                console.log(response);
+                this.current_chat.messages = response.data.data;
+            }).catch(error => {
+                console.log(error.response);
+                toast.error(error.response.data.error);
+                let errores = error.response.data.errores;
+                for (let error of errores) {
+                    toast.error(error);
+                }
+            });
         },
         formatDate(date) {
             const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
@@ -279,6 +258,28 @@ export default {
             } else {
                 return chat.usuario_1.nombres + " " + chat.usuario_1.apellidos;
             }
+        },
+        sendMessage() {
+            let message = this.message_send;
+            this.message_send = "";
+            this.axios.post('chat/send', {
+                id_chat: this.current_chat.id,
+                mensaje: message
+            }, {
+                headers: {
+                    Authorization: `Bearer ${this.token}`
+                }
+            }).then(response => {
+                console.log(response);
+                this.current_chat.messages.push(response.data.data);
+            }).catch(error => {
+                console.log(error.response);
+                toast.error(error.response.data.error);
+                let errores = error.response.data.errores;
+                for (let error of errores) {
+                    toast.error(error);
+                }
+            });
         }
     }
 }

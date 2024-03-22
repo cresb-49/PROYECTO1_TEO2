@@ -1,6 +1,5 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database/database";
-import { Chat } from "./chat";
 
 export const Message = sequelize.define('message',
     {
@@ -9,6 +8,14 @@ export const Message = sequelize.define('message',
             autoIncrement: true,
             primaryKey: true,
             type: DataTypes.INTEGER
+        },
+        id_chat: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: 'chat',
+                key: 'id'
+            }
         },
         id_usuario: {
             type: DataTypes.INTEGER,
