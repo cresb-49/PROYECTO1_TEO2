@@ -101,7 +101,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import { toast } from 'bootstrap';
+import { toast } from 'vue3-toastify';
 
 export default {
     name: 'ChatComponent',
