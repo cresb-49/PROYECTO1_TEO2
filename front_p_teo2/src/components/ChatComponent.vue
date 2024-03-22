@@ -57,7 +57,8 @@
             <div class="col-8">
                 <div class="card direct-chat direct-chat-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Chat de Sarah Bullock </h3>
+                        <!-- <h3 class="card-title">Chat de Sarah Bullock </h3> -->
+                        <h3 class="card-title"> Mensaje Directo con {{ current_chat.other_user.nombres + " " + current_chat.other_user.apellidos }}</h3>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body" style="max-height: 550px; height: 550px; overflow-y: auto;">
@@ -207,6 +208,7 @@ export default {
         abrirChat(chat) {
             console.log(chat);
             this.current_chat.id = chat.id;
+            this.current_chat.chat = chat;
             if (chat.id_usuario_1 === this.idUser) {
                 this.current_chat.current_user = {
                     id: chat.usuario_1.id,
