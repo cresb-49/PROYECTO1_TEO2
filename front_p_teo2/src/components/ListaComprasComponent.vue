@@ -7,7 +7,7 @@
                     <div class="row">
                         <div class="col-3">
                             <img :src="'http://localhost:3000/api/image?articulo=' + compra.id_articulo_venta"
-                                class="img-fluid" alt="Imagen del producto">
+                                class="img-fluid" alt="Producto">
                         </div>
                         <div class="col-9">
                             <h5 class="card-title"><strong>Nombre:</strong> {{ compra.articulo_venta.nombre }}</h5>
