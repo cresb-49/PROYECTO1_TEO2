@@ -70,30 +70,24 @@
                     </small>
                 </li>
             </ul>
-            <div class="d-flex justify-content-center align-items-center">
-                <!-- Botones de paginación -->
-                <div class="mt-3">
-                    <!-- Botón "Anterior" -->
-                    <button class="btn btn-secondary" @click="getComentarios(previousPage)"
-                        :disabled="currentPage === 1">
-                        Anterior
-                    </button>
-
-                    <!-- Números de página -->
-                    <button v-for="(pageNumber, index) in pagesToShow" :key="index"
-                        :class="['btn', 'btn-secondary', { 'btn-info': pageNumber === currentPage }]"
-                        @click="getComentarios(pageNumber)">
-                        {{ pageNumber }}
-                    </button>
-
-                    <!-- Botón "Siguiente" -->
-                    <button class="btn btn-secondary" @click="getComentarios(nextPage)"
-                        :disabled="currentPage === totalPages">
-                        Siguiente
-                    </button>
-                </div>
+            <div class="d-flex justify-content-center align-items-center mt-4">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                        <li :class="['page-item', { 'disabled': currentPage === 1 }]">
+                            <button class="page-link" @click="getComentarios(previousPage)"
+                                :disabled="currentPage === 1">Anterior</button>
+                        </li>
+                        <li :class="['page-item', { 'active': pageNumber === currentPage }]"
+                            v-for="(pageNumber, index) in pagesToShow" :key="index">
+                            <button class="page-link" @click="getComentarios(pageNumber)">{{ pageNumber }}</button>
+                        </li>
+                        <li :class="['page-item', { 'disabled': currentPage === totalPages }]">
+                            <button class="page-link" @click="getComentarios(nextPage)"
+                                :disabled="currentPage === totalPages">Siguiente</button>
+                        </li>
+                    </ul>
+                </nav>
             </div>
-
         </div>
     </div>
 

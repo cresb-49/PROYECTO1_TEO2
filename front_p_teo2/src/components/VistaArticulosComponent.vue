@@ -20,26 +20,23 @@
                 </template>
             </div>
         </div>
-        <div class="d-flex justify-content-center align-items-center">
-            <!-- Botones de paginación -->
-            <div class="mt-3">
-                <!-- Botón "Anterior" -->
-                <button class="btn btn-secondary" @click="navegacion(previousPage)" :disabled="currentPage === 1">
-                    Anterior
-                </button>
-
-                <!-- Números de página -->
-                <button v-for="(pageNumber, index) in pagesToShow" :key="index"
-                    :class="['btn', 'btn-secondary', { 'btn-info': pageNumber === currentPage }]"
-                    @click="navegacion(pageNumber)">
-                    {{ pageNumber }}
-                </button>
-
-                <!-- Botón "Siguiente" -->
-                <button class="btn btn-secondary" @click="navegacion(nextPage)" :disabled="currentPage === totalPages">
-                    Siguiente
-                </button>
-            </div>
+        <div class="d-flex justify-content-center align-items-center mt-4">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    <li :class="['page-item', { 'disabled': currentPage === 1 }]">
+                        <button class="page-link" @click="navegacion(previousPage)"
+                            :disabled="currentPage === 1">Anterior</button>
+                    </li>
+                    <li :class="['page-item', { 'active': pageNumber === currentPage }]"
+                        v-for="(pageNumber, index) in pagesToShow" :key="index">
+                        <button class="page-link" @click="navegacion(pageNumber)">{{ pageNumber }}</button>
+                    </li>
+                    <li :class="['page-item', { 'disabled': currentPage === totalPages }]">
+                        <button class="page-link" @click="navegacion(nextPage)"
+                            :disabled="currentPage === totalPages">Siguiente</button>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 </template>
@@ -84,8 +81,8 @@ export default {
             }).catch(error => {
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
-                for (let index = 0; index < errores.length; index++) {
-                    toast.error(errores[index]);
+                for (const element of errores) {
+                    toast.error(element);
                 }
             });
         },
@@ -104,8 +101,8 @@ export default {
             }).catch(error => {
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
-                for (let index = 0; index < errores.length; index++) {
-                    toast.error(errores[index]);
+                for (const element of errores) {
+                    toast.error(element);
                 }
             });
         },
