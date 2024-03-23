@@ -1,4 +1,4 @@
-# ecomercegt
+# MayaMartekGT
 
 ## Project setup
 ```
