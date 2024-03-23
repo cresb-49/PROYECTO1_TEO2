@@ -1,5 +1,5 @@
 <template>
-  
+
   <div id="contenedorHeader">
     <nav class="navbar navbar-expand-lg">
       <div class="container-fluid">
@@ -20,12 +20,18 @@
                 Mi Cuenta
               </a>
               <ul class="dropdown-menu">
-                <li><router-link to="/MiCuenta" class="dropdown-item">Configuracion Cuenta</router-link></li>
-                <li><router-link to="/MisTransacciones" class="dropdown-item">Mis Transacciones</router-link></li>
-                <li><router-link to="/CompraRetiraCreditos" class="dropdown-item">Compra y Retiro</router-link></li>
+                <li>
+                  <router-link to="/MiCuenta" class="dropdown-item">Configuracion Cuenta</router-link>
+                </li>
+                <li v-if="!isAdmin">
+                  <router-link to="/MisTransacciones" class="dropdown-item">Mis Transacciones</router-link>
+                </li>
+                <li v-if="!isAdmin">
+                  <router-link to="/CompraRetiraCreditos" class="dropdown-item">Compra y Retiro</router-link>
+                </li>
               </ul>
             </li>
-            <li class="nav-item dropdown" v-if="isAuth">
+            <li class="nav-item dropdown" v-if="isAuth && !isAdmin">
               <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Compras y Ventas
               </a>
@@ -35,7 +41,7 @@
                 <li><router-link to="/AceptarIntercambio" class="dropdown-item">Aceptar Intercambio</router-link></li>
               </ul>
             </li>
-            <li class="nav-item dropdown" v-if="isAuth">
+            <li class="nav-item dropdown" v-if="isAuth && !isAdmin">
               <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Articulos
               </a>
@@ -53,9 +59,14 @@
                 <li><router-link to="/RegistroUsuarioRol" class="dropdown-item">Registro Usuario</router-link></li>
               </ul>
             </li>
-            <li class="nav-item">
-              <router-link v-if="isAuth && isConfirm" class="nav-link active" aria-current="page"
-                to="/AceptarArticulo">Aceptar Publicacion</router-link>
+            <li class="nav-item dropdown" v-if="isAuth && isAdmin">
+              <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Publicaciones
+              </a>
+              <ul class="dropdown-menu">
+                <li><router-link to="/AceptarArticulo" class="dropdown-item">Aceptar Publicacion</router-link></li>
+                <li><router-link to="/ReportesPublicacion" class="dropdown-item">Reportes de Publicacion</router-link></li>
+              </ul>
             </li>
           </ul>
           <div style="margin-right: 10px;">
@@ -66,8 +77,8 @@
           </div>
           <div style="margin-right: 10px;">
             <ul class="navbar-nav my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
-              <router-link to="/Carrito" v-if="isAuth && isUser && false" class="btn btn-outline-success material-icons"><span
-                  class="">shopping_cart</span></router-link>
+              <router-link to="/Carrito" v-if="isAuth && isUser && false"
+                class="btn btn-outline-success material-icons"><span class="">shopping_cart</span></router-link>
             </ul>
           </div>
           <div>

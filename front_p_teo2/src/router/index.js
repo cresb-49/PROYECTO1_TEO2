@@ -21,7 +21,7 @@ import CrearPublicacionComponent from "@/components/CrearPublicacionComponent.vu
 import ListaComprasComponent from "@/components/ListaComprasComponent.vue";
 import AceptarIntercambioComponent from "@/components/AceptarIntercambioComponent.vue";
 import ChatComponent from "@/components/ChatComponent.vue"
-
+import ReportesPublicacionComponent from "@/components/ReportesPublicacionComponent.vue";
 
 const routes = [
     {
@@ -138,6 +138,11 @@ const routes = [
         path: '/Chat',
         name: 'Chat',
         component: ChatComponent
+    },
+    {
+        path: '/ReportesPublicacion',
+        name: 'ReportesPublicacion',
+        component: ReportesPublicacionComponent
     }
 ];
 
