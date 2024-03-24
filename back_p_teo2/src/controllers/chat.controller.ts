@@ -60,7 +60,7 @@ export const getChat = async (req: Request, res: Response) => {
     return responseAPI(HttpStatus.OK, res, chat, 'Chat encontrado con exito');
 };
 
-export const findOrCreateChat = async (id_usuario_1: number, id_usuario_2: number) => {
+export const findOrCreateChat = async (id_usuario_1: number, id_usuario_2: number, t = null) => {
     //Creamos el chat si no existe ya la conversacion entre los dos usuarios
     let chat = await Chat.findOne({
         where: {
@@ -71,10 +71,20 @@ export const findOrCreateChat = async (id_usuario_1: number, id_usuario_2: numbe
         }
     });
     if (!chat) {
-        chat = await Chat.create({
-            id_usuario_1,
-            id_usuario_2
-        });
+        if (t) {
+            chat = await Chat.create(
+                {
+                    id_usuario_1,
+                    id_usuario_2
+                },
+                { transaction: t }
+            );
+        } else {
+            chat = await Chat.create({
+                id_usuario_1,
+                id_usuario_2
+            });
+        }
         return chat;
     } else {
         return chat;
@@ -153,15 +163,28 @@ export const sendMessageChat = async (req: Request, res: Response) => {
     }
 }
 
-export const sendMessageOnChat = async (id_usuario: number, id_chat: number | string, mensaje: string) => {
+export const sendMessageOnChat = async (id_usuario: number, id_chat: number | string, mensaje: string, t = null) => {
     //Creamos el mensaje
     try {
-        let message = await Message.create(
-            {
-                id_chat: id_chat,
-                id_usuario: id_usuario,
-                text: mensaje
-            });
+        let message = null;
+        if (t) {
+            message = await Message.create(
+                {
+                    id_chat: id_chat,
+                    id_usuario: id_usuario,
+                    text: mensaje
+                },
+                { transaction: t }
+            );
+        } else {
+            message = await Message.create(
+                {
+                    id_chat: id_chat,
+                    id_usuario: id_usuario,
+                    text: mensaje
+                }
+            );
+        }
         return message;
     } catch (error) {
         throw error;

@@ -74,7 +74,7 @@
                             <template v-for="message in current_chat.messages" v-bind:key="message">
                                 <div class="message-bubble"
                                     :class="message.id_usuario === current_chat.current_user.id ? 'message-bubble-right' : 'message-bubble-left'">
-                                    <div>
+                                    <div style="white-space: pre-wrap;">
                                         {{ message.text }}
                                     </div>
                                     <span class="float-right">

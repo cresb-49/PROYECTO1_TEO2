@@ -13,6 +13,7 @@ import { resCantidadArticulo } from './articulo.controller';
 import sequelize from '../database/database';
 import { TokenPayload } from '../middleware/authMiddleware';
 import { generatePagesToShow } from '../handler/generatePagesToShow';
+import { findOrCreateChat, sendMessageOnChat } from './chat.controller';
 
 
 export const createCompra = async (req: Request, res: Response) => {
@@ -200,7 +201,7 @@ export const validarCompra = async (req: Request, res: Response) => {
         const usuario_comprador: any = await Usuario.findByPk(compra.id_usuario_compra, { include: [{ model: Acount, required: false }] });
         const usuario_vendedor: any = await Usuario.findByPk(compra.id_usuario_venta, { include: [{ model: Acount, required: false }] });
         //Verificamos que el usuario comprador tenga los creditos necesarios
-        if ( parseFloat(compra.creditos_retirables_usados) > parseFloat(usuario_comprador.acount.saldo_retirable)) {
+        if (parseFloat(compra.creditos_retirables_usados) > parseFloat(usuario_comprador.acount.saldo_retirable)) {
             await t.rollback();
             return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "No tiene los suficientes creditos retirables disponibles", "No tiene los suficientes creditos retirables disponibles");
         } else {
@@ -265,6 +266,14 @@ export const validarCompra = async (req: Request, res: Response) => {
         };
         //Actuliaza el estado de la compra
         await compra.update(payload, { transaction: t });
+        //Le enviamos un mensaje al usuario comprador que la compra fue validada
+        let chat: any = await findOrCreateChat(usuario_comprador.id, usuario_vendedor.id, t);
+        await sendMessageOnChat(
+            usuario_vendedor.id,
+            chat.id,
+            `El intercambio entre el artículo "${articulo_venta.nombre}" (cantidad: ${compra.cantidad_articulo_venta}) POR el artículo "${articulo_cambio.nombre}" (cantidad: ${compra.cantidad_articulo_cambio}) se ha validado con éxito.\nUso de KORNS:\n- Retirables: KOR. ${compra.creditos_retirables_usados}\n- No Retirables: KOR. ${compra.creditos_no_retirables_usados}`,
+            t
+        );
         await t.commit();
         return responseAPI(HttpStatus.OK, res, compra, "Compra validada con exito");
     } catch (error) {
@@ -304,6 +313,14 @@ export const rechazarCompra = async (req: Request, res: Response) => {
         }
         //Eliminamos la compra
         await compra.destroy({ transaction: t });
+        //Le enviamos un mensaje al usuario comprador que la compra fue recachazada
+        let chat: any = await findOrCreateChat(compra.id_usuario_compra, compra.id_usuario_venta, t);
+        await sendMessageOnChat(
+            compra.id_usuario_venta,
+            chat.id,
+            `El intercambio entre el artículo "${articulo_venta.nombre}" POR el artículo "${producto_cambio.nombre}" se ha rechazado.`,
+            t
+        );
         await t.commit();
         return responseAPI(HttpStatus.OK, res, compra, "Compra rechazada con exito");
     } catch (error) {
