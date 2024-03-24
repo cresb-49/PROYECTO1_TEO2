@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { Op } from 'sequelize';
-import { responseAPI } from '../handler/responseAPI';
+import { responseAPI, responsePaginateAPI } from '../handler/responseAPI';
 import { HttpStatus } from '../enums/httpStatus';
 import { TipoPublicacion } from '../models/tipo_publicacion';
 import { Articulo } from '../models/articulo';
@@ -253,6 +253,38 @@ export const reportarPublicacion = async (req: Request, res: Response) => {
 
 export const getPublicacionesReportadas = async (req: Request, res: Response) => {
 
+    const page: number = req.query.page ? parseInt(req.query.page.toString()) : 1; // Página actual, si no se proporciona, se asume 1
+    const limit: number = 20; // Comentarios por página
+    const offset: number = (page - 1) * limit; // Calculo del desplazamiento
+
+    Publicacion.findAndCountAll(
+        {
+            where: {
+                isValidate: true,
+                isReported: true
+            },
+            order: [['f_reporte', 'DESC']],
+            limit: limit,
+            offset: offset,
+            include: [
+                {
+                    model: Articulo,
+                    required: true,
+                    include: [
+                        {
+                            model: Category,
+                            required: false
+                        }
+                    ]
+                }
+            ]
+        })
+        .then((value: any) => {
+            return responsePaginateAPI(HttpStatus.OK, { res, req }, value, "Publicaciones encontradas con exito");
+        })
+        .catch((reason: any) => {
+            return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
+        })
 };
 
 export const updatePublicacion = async (req: Request, res: Response) => {
