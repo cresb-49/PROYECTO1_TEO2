@@ -279,7 +279,7 @@ export const getPublicacionesReportadas = async (req: Request, res: Response) =>
                 },
                 {
                     model: Report,
-                    required: true
+                    required: false
                 }
             ]
         })
@@ -291,6 +291,60 @@ export const getPublicacionesReportadas = async (req: Request, res: Response) =>
         })
 };
 
-export const updatePublicacion = async (req: Request, res: Response) => {
+export const rechazarReportes = async (req: Request, res: Response) => {
+    const { id_publicacion } = req.body;
+    let publicacion = await Publicacion.findByPk(id_publicacion);
+    if (publicacion === null) {
+        return responseAPI(HttpStatus.NOT_FOUND, res, null, "Publicacion no encontrada", "La publicacion no existe");
+    }
+    publicacion.update({
+        isReported: false,
+        f_reporte: null
+    }).then(async (value: any) => {
+        //Eliminamos todos los reportes de la publicacion
+        let cantidad: number = await Report.destroy({
+            where: {
+                id_publicacion: id_publicacion
+            }
+        });
+        return responseAPI(HttpStatus.OK, res, value, "Se han rechazado " + cantidad + " reportes de la publicacion");
+    }).catch((reason: any) => {
+        return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
+    })
+};
+
+export const eliminarReporte = async (req: Request, res: Response) => {
+    const { idReporte } = req.params;
+    let reporte: any = await Report.findByPk(idReporte);
+    if (reporte === null) {
+        return responseAPI(HttpStatus.NOT_FOUND, res, null, "Reporte no encontrado", "El reporte no existe");
+    }
+    //Obtenemos el id de la publicacion
+    const id_publicacion = reporte.id_publicacion;
+    //Obtenemos la publicacion
+    let publicacion = await Publicacion.findByPk(id_publicacion);
+    reporte.destroy()
+        .then(async (value: any) => {
+            //Contamos cuantos reportes tiene la publicacion
+            let cantidad: number = await Report.count({
+                where: {
+                    id_publicacion: id_publicacion
+                }
+            });
+            //Si la cantidad es 0, eliminamos el estado de reportado de la publicacion
+            if (cantidad === 0 && publicacion !== null) {
+                await publicacion.update({
+                    isReported: false,
+                    f_reporte: null
+                });
+            }
+            return responseAPI(HttpStatus.OK, res, value, "Reporte No." + idReporte + " eliminado con exito");
+        })
+        .catch((reason: any) => {
+            return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
+        })
+};
+
+export const banearPublicacion = async (req: Request, res: Response) => {
 
 };

@@ -5,13 +5,22 @@
             <div class="card mb-3" v-for="(publicacion, index1) in publicaciones" v-bind:key="publicacion">
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-3">
-                            <img :src="'http://localhost:3000/api/image?articulo=' + publicacion.id_articulo"
-                                class="img-fluid" alt="Producto">
+                        <div class="col-3 d-flex justify-content-center align-items-center">
+                            <div class="col">
+                                <div class="row">
+                                    <img :src="'http://localhost:3000/api/image?articulo=' + publicacion.id_articulo"
+                                        class="img-fluid" alt="Producto">
+                                </div>
+                                <div class="row">
+                                    <RouterLink :to="{ name: 'Publicacion', params: { id: publicacion.id } }"
+                                        class="btn btn-sm btn-link">
+                                        Ir al producto</RouterLink>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-6">
+                        <div class="col-7">
                             <div style="max-height: 300px; overflow-y: auto;">
-                                <div class="accordion accordion-flush" id="accordionFlushExample">
+                                <div class="accordion accordion-flush border" id="accordionFlushExample">
                                     <div class="accordion-item" v-for="(reporte, index) in publicacion.reports"
                                         v-bind:key="reporte">
                                         <h2 class="accordion-header" id="flush-headingOne">
@@ -20,7 +29,7 @@
                                                 :data-bs-target="'#flush-collapse-' + index1 + '-' + index"
                                                 aria-expanded="false"
                                                 :aria-controls="'flush-collapse-' + index1 + '-' + index">
-                                                Reporte  No.{{ reporte.id }}
+                                                Reporte No.{{ reporte.id }}
                                             </button>
                                         </h2>
                                         <div :id="'flush-collapse-' + index1 + '-' + index"
@@ -30,15 +39,30 @@
                                             <div class="accordion-body">
                                                 <p>
                                                     <small>
-                                                        {{reporte.comentario}}
+                                                        {{ reporte.comentario }}
                                                     </small>
                                                 </p>
+                                                <button class="btn btn-sm btn-danger"
+                                                    @click="eliminarReporte(reporte)">Eliminar Reporte</button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <div class="col-2 d-flex justify-content-center align-items-center">
+                            <div class="col">
+                                <div class="row mb-4">
+                                    <button class="btn btn-danger">Banear Publicacion</button>
+
+                                </div>
+                                <div class="row">
+                                    <button class="btn btn-primary">Rechazar Reportes</button>
+
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -112,7 +136,24 @@ export default {
                     toast.error(element);
                 }
             });
-        }
+        },
+        eliminarReporte(reporte) {
+            console.log(reporte);
+            this.axios.delete('/reporte/' + reporte.id, {
+                headers: {
+                    Authorization: `Bearer ${this.token}`
+                }
+            }).then(response => {
+                toast.success(response.data.mensaje);
+                this.getPublicacionesReportadas();
+            }).catch(error => {
+                toast.error(error.response.data.error);
+                let errores = error.response.data.errores;
+                for (const element of errores) {
+                    toast.error(element);
+                }
+            });
+        },
     }
 }
 </script>
