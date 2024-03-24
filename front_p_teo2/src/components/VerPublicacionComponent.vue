@@ -5,7 +5,8 @@
                 style="max-width: 100%;">
         </div>
         <!-- Button trigger modal -->
-        <button type="button" class="btn btn-sm btn-link" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        <button type="button" class="btn btn-sm btn-link" data-bs-toggle="modal" data-bs-target="#exampleModal"
+            v-if="isAuth && idUser != articulo.usuario">
             Reportar Producto
         </button>
         <h4 style="margin-top: 20px;">{{ articulo.nombre }}</h4>
@@ -201,7 +202,7 @@ import { mapGetters } from 'vuex';
 export default {
     name: 'VerPublicacion',
     computed: {
-        ...mapGetters(['isUser', 'isAdmin', 'isConfirm', 'isAuth', 'idUser']),
+        ...mapGetters(['isUser', 'isAdmin', 'isConfirm', 'isAuth', 'token', 'idUser']),
     },
     data() {
         return {
