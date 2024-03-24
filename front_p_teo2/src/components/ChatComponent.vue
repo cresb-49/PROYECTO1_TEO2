@@ -27,9 +27,15 @@
                         <a class="list-group-item list-group-item-action" v-for="chat in chats" v-bind:key="chat"
                             @click="abrirChat(chat)">
                             <!-- <img class="contacts-list-img" src="dist/img/user1-128x128.jpg" alt="User Avatar"> -->
-                            <div class="d-flex w-100 justify-content-between">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
                                 <h5 class="mb-1">{{ nombreMostrar(chat) }}</h5>
                                 <small>{{ formatDate(chat.updated_at) }}</small>
+                                <button class="btn btn btn-outline-danger material-icons"
+                                    @click.stop="eliminarChat(chat)">
+                                    <small>
+                                        <span>delete</span>
+                                    </small>
+                                </button>
                                 <!-- <small>2/28/2015</small> -->
                             </div>
                             <!-- <p class="mb-1">How have you been? I was...</p> -->
@@ -58,7 +64,8 @@
                 <div class="card direct-chat direct-chat-primary">
                     <div class="card-header">
                         <!-- <h3 class="card-title">Chat de Sarah Bullock </h3> -->
-                        <h3 class="card-title"> Mensaje Directo con {{ current_chat.other_user.nombres + " " + current_chat.other_user.apellidos }}</h3>
+                        <h3 class="card-title"> Mensaje Directo con {{ current_chat.other_user.nombres + " " +
+                        current_chat.other_user.apellidos }}</h3>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body" style="max-height: 550px; height: 550px; overflow-y: auto;">
@@ -98,16 +105,21 @@
             </div>
         </div>
     </div>
+    <Dialog :show="dialog.show" :cancel="closeDialog" :tittle="dialog.title" :description="dialog.description"
+        :confirm="dialog.action" />
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
 import { toast } from 'vue3-toastify';
-
+import Dialog from '@/components/Dialog.vue'
 export default {
     name: 'ChatComponent',
     computed: {
         ...mapGetters(['isUser', 'isAdmin', 'isConfirm', 'isAuth', 'token', 'idUser']),
+    },
+    components: {
+        Dialog
     },
     data() {
         return {
@@ -129,6 +141,13 @@ export default {
                     apellidos: ""
                 },
                 messages: []
+            },
+            dialog: {
+                show: false,
+                title: "Eliminar Chat",
+                description: "¿Está seguro que desea eliminar el chat?",
+                action: null
+
             }
         }
     },
@@ -144,7 +163,20 @@ export default {
             }).then(response => {
                 const data = response.data.data;
                 this.chats = data;
-                console.log(data);
+                this.current_chat = {
+                    id: -1,
+                    current_user: {
+                        id: -1,
+                        nombres: "",
+                        apellidos: ""
+                    },
+                    other_user: {
+                        id: -1,
+                        nombres: "",
+                        apellidos: ""
+                    },
+                    messages: []
+                }
             }).catch(error => {
                 console.log(error.response);
                 toast.error(error.response.data.error);
@@ -282,7 +314,33 @@ export default {
                     toast.error(error);
                 }
             });
+        },
+        eliminarChat(chat) {
+            this.dialog.show = true;
+            this.dialog.action = () => this.deleteChat(chat);
+        },
+        closeDialog() {
+            this.dialog.show = false;
+            this.dialog.action = null;
+        },
+        deleteChat(chat) {
+            this.axios.delete('chat/' + chat.id, {
+                headers: {
+                    Authorization: `Bearer ${this.token}`
+                }
+            }).then(() => {
+                this.dialog.show = false;
+                this.getChatsDisponibles();
+            }).catch(error => {
+                console.log(error.response);
+                toast.error(error.response.data.error);
+                let errores = error.response.data.errores;
+                for (let error of errores) {
+                    toast.error(error);
+                }
+            });
         }
+
     }
 }
 </script>

@@ -7,6 +7,7 @@ import { Chat } from '../models/chat';
 import { Message } from '../models/message';
 import { TokenPayload } from '../middleware/authMiddleware';
 import { Usuario } from '../models/usuario';
+import sequelize from '../database/database';
 //Tanto el Router como el controller tambien manejan la logica de los mensajes de los chats
 
 export const getChatsUsuario = async (req: Request, res: Response) => {
@@ -154,37 +155,49 @@ export const sendMessageChat = async (req: Request, res: Response) => {
 
 export const sendMessageOnChat = async (id_usuario: number, id_chat: number | string, mensaje: string) => {
     //Creamos el mensaje
-    Message.create(
-        {
-            id_chat: id_chat,
-            id_usuario: id_usuario,
-            text: mensaje
-        })
-        .then((mensaje: any) => {
-            return mensaje;
-        })
-        .catch((error: any) => {
-            throw error;
-        });
+    try {
+        let message = await Message.create(
+            {
+                id_chat: id_chat,
+                id_usuario: id_usuario,
+                text: mensaje
+            });
+        return message;
+    } catch (error) {
+        throw error;
+    }
 };
 
-export const eliminarChat = async (req: Request, res: Response) => {
+export const deleteChatById = async (req: Request, res: Response) => {
     //Obtenemos el id del usuario del token
     const tokenPayload: TokenPayload = req.tokenPayload;
-    const id_usuario = tokenPayload.usuarioId;
+    const id_usuario: number = parseInt(tokenPayload.usuarioId);
     //Obtenemos el id del chat
-    const { id_chat } = req.body;
+    const { idChat } = req.params;
     //Verificamos que el usuario pertenezca al chat tanto en el id_usuario_1 o id_usuario_2
-    const chat: any = await Chat.findByPk(id_chat);
+    const chat: any = await Chat.findByPk(idChat);
     if (!(chat.id_usuario_1 === id_usuario || chat.id_usuario_2 === id_usuario)) {
         return responseAPI(HttpStatus.NOT_FOUND, res, null, 'Not Found', 'Not Found');
     }
-    //Eliminamos el chat
-    chat.destroy()
-        .then((chat: any) => {
-            return responseAPI(HttpStatus.OK, res, chat, 'Chat eliminado con exito');
-        })
-        .catch((error: any) => {
-            return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, 'Error al eliminar chat', error.message);
+    //Iniciamos una transaccion
+    const t = await sequelize.transaction();
+    try {
+        //Eliminamos todos los mensajes asociados al chat
+        let cantidadMensajes = await Message.destroy({
+            where: {
+                id_chat: idChat
+            },
+            transaction: t
         });
+        //Eliminamos el chat
+        await chat.destroy({ transaction: t });
+        // Hacemos commit
+        await t.commit();
+        return responseAPI(HttpStatus.OK, res, null, 'Chat eliminado con exito, con ' + cantidadMensajes + ' mensajes eliminados');
+    }
+    catch (error) {
+        // Hacemos rollback
+        await t.rollback();
+        return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, 'Error al eliminar chat', error.message);
+    }
 };
