@@ -12,7 +12,7 @@
                         <div class="col-6">
                             <div style="max-height: 300px; overflow-y: auto;">
                                 <div class="accordion accordion-flush" id="accordionFlushExample">
-                                    <div class="accordion-item" v-for="(reporte, index) in publicaciones"
+                                    <div class="accordion-item" v-for="(reporte, index) in publicacion.reports"
                                         v-bind:key="reporte">
                                         <h2 class="accordion-header" id="flush-headingOne">
                                             <button class="accordion-button collapsed" type="button"
@@ -20,34 +20,20 @@
                                                 :data-bs-target="'#flush-collapse-' + index1 + '-' + index"
                                                 aria-expanded="false"
                                                 :aria-controls="'flush-collapse-' + index1 + '-' + index">
-                                                Accordion Item #1
+                                                Reporte  No.{{ reporte.id }}
                                             </button>
                                         </h2>
                                         <div :id="'flush-collapse-' + index1 + '-' + index"
                                             class="accordion-collapse collapse"
                                             :aria-labelledby="'flush-heading-' + index1 + '-' + index"
                                             data-bs-parent="#accordionFlushExample">
-                                            <div class="accordion-body">Placeholder content for this accordion, which is
-                                                intended to demonstrate the <code>.accordion-flush</code> class. This is
-                                                the
-                                                first item's accordion body.</div>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-item">
-                                        <h2 class="accordion-header" id="flush-headingTwo">
-                                            <button class="accordion-button collapsed" type="button"
-                                                data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo"
-                                                aria-expanded="false" aria-controls="flush-collapseTwo">
-                                                Accordion Item #2
-                                            </button>
-                                        </h2>
-                                        <div id="flush-collapseTwo" class="accordion-collapse collapse"
-                                            aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushExample">
-                                            <div class="accordion-body">Placeholder content for this accordion, which is
-                                                intended to demonstrate the <code>.accordion-flush</code> class. This is
-                                                the
-                                                second item's accordion body. Let's imagine this being filled with some
-                                                actual content.</div>
+                                            <div class="accordion-body">
+                                                <p>
+                                                    <small>
+                                                        {{reporte.comentario}}
+                                                    </small>
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

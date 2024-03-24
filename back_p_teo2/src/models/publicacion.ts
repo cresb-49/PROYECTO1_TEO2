@@ -1,6 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../database/database";
 import { Articulo } from "./articulo";
+import { Report } from "./report";
 import { Usuario } from "./usuario";
 import { TipoPublicacion } from "./tipo_publicacion";
 import { Comentario } from "./comentario";
@@ -81,3 +82,6 @@ Publicacion.belongsTo(TipoPublicacion, { foreignKey: 'id_tipo_publicacion' });
 
 Publicacion.hasMany(Comentario, { foreignKey: 'id_publicacion' });
 Comentario.belongsTo(Publicacion, { foreignKey: 'id_publicacion' });
+
+Publicacion.hasMany(Report, { foreignKey: 'id_publicacion' });
+Report.belongsTo(Publicacion, { foreignKey: 'id_publicacion' });

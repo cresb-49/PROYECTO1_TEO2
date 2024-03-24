@@ -276,6 +276,10 @@ export const getPublicacionesReportadas = async (req: Request, res: Response) =>
                             required: false
                         }
                     ]
+                },
+                {
+                    model: Report,
+                    required: true
                 }
             ]
         })
