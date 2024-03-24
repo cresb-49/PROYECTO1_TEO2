@@ -4,6 +4,10 @@
             <img :src="'http://localhost:3000/api/image?articulo=' + articulo.id" alt="Imagen del Articulo"
                 style="max-width: 100%;">
         </div>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-sm btn-link" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Reportar Producto
+        </button>
         <h4 style="margin-top: 20px;">{{ articulo.nombre }}</h4>
         <p>{{ articulo.descripcion }}</p>
         <h5><strong>Categoria</strong></h5>
@@ -163,6 +167,30 @@
             </fieldset>
         </form>
     </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <form @submit.prevent="reportarProducto">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Reportar Producto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <textarea v-model="reporte.texto" class="form-control" id="commentInput"
+                                rows="10"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Enviar Reporte</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
 </template>
 
 <script>
@@ -177,6 +205,9 @@ export default {
     },
     data() {
         return {
+            reporte: {
+                texto: ""
+            },
             articulo: {
                 id: 0,
                 usuario: -1,
@@ -469,6 +500,31 @@ export default {
             }).then((response) => {
                 toast.success(response.data.mensaje);
                 this.parametrosVista();
+            }).catch(error => {
+                toast.error(error.response.data.error);
+                let errores = error.response.data.errores;
+                for (const element of errores) {
+                    toast.error(element);
+                }
+            });
+        },
+        reportarProducto() {
+            let state = this.$store.state;
+            console.log(state);
+            this.axios.post(
+                'publicacion/reportar',
+                {
+                    id_publicacion: this.$route.params.id,
+                    comentario: this.reporte.texto
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${state.token}`
+                    }
+                }
+            ).then(response => {
+                this.reporte.texto = "";
+                toast.success(response.data.mensaje)
             }).catch(error => {
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;

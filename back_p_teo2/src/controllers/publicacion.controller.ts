@@ -6,6 +6,7 @@ import { TipoPublicacion } from '../models/tipo_publicacion';
 import { Articulo } from '../models/articulo';
 import { Publicacion } from '../models/publicacion';
 import { Category } from '../models/category';
+import { Report } from '../models/report';
 import { generatePagesToShow } from '../handler/generatePagesToShow';
 
 export const getPublicaciones = async (req: Request, res: Response) => {
@@ -222,6 +223,21 @@ export const confirmarPublicacion = async (req: Request, res: Response) => {
     }).catch((reason: any) => {
         return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
     })
+};
+
+export const reportarPublicacion = async (req: Request, res: Response) => {
+    const { tokenPayload } = req;
+    const id_usuario = tokenPayload.usuarioId;
+    const { id_publicacion, comentario } = req.body;
+    Report.create({
+        id_usuario: id_usuario,
+        id_publicacion: id_publicacion,
+        comentario: comentario
+    }).then((value: any) => {
+        return responseAPI(HttpStatus.CREATED, res, value, "Publicacion reportada con exito");
+    }).catch((reason: any) => {
+        return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
+    });
 };
 
 export const getPublicacionesReportadas = async (req: Request, res: Response) => {

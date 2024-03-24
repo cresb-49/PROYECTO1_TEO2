@@ -1,7 +1,7 @@
 import { verifyToken } from "../middleware/authMiddleware";
 import { isConfirm } from "../middleware/roles.middelware";
 import { Router } from 'express';
-import { getPublicaciones, getPublicacionesUsuario, createPublicacion, updatePublicacion, getTipoPublicacion, getPublicacion, getPublicacionesPorConfirmar, confirmarPublicacion } from "../controllers/publicacion.controller";
+import { getPublicaciones, getPublicacionesUsuario, createPublicacion, updatePublicacion, getTipoPublicacion, getPublicacion, getPublicacionesPorConfirmar, confirmarPublicacion, reportarPublicacion } from "../controllers/publicacion.controller";
 
 const router = Router()
 
@@ -14,6 +14,7 @@ router.get('/publicacion/:id', getPublicacion);
 
 router.post('/publicacion', verifyToken, createPublicacion)
 router.post('/publicacion/confirmar', verifyToken, isConfirm, confirmarPublicacion)
+router.post('/publicacion/reportar', verifyToken, reportarPublicacion)
 router.put('/publicacion', updatePublicacion)
 
 
