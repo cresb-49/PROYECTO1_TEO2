@@ -50,10 +50,16 @@ export const getChatsUsuario = async (req: Request, res: Response) => {
 export const getChat = async (req: Request, res: Response) => {
     //Obtenemos el id del usuario del token
     const tokenPayload: TokenPayload = req.tokenPayload;
-    const id_usuario_1 = tokenPayload.usuarioId;
-    console.log(id_usuario_1);
+    const id_usuario_1: number = parseInt(tokenPayload.usuarioId);
     //Obtenemos el id del usuario2
-    const { id_usuario_2 } = req.body;
+    let { id_usuario_2 } = req.body;
+    id_usuario_2 = parseInt(id_usuario_2);
+    //Creamos el chat si no existe ya la conversacion entre los dos usuarios
+    let chat = await findOrCreateChat(id_usuario_1, id_usuario_2);
+    return responseAPI(HttpStatus.OK, res, chat, 'Chat encontrado con exito');
+};
+
+export const findOrCreateChat = async (id_usuario_1: number, id_usuario_2: number) => {
     //Creamos el chat si no existe ya la conversacion entre los dos usuarios
     let chat = await Chat.findOne({
         where: {
@@ -68,9 +74,9 @@ export const getChat = async (req: Request, res: Response) => {
             id_usuario_1,
             id_usuario_2
         });
-        return responseAPI(HttpStatus.OK, res, chat, 'Chat encontrado con exito');
+        return chat;
     } else {
-        return responseAPI(HttpStatus.OK, res, chat, 'Chat encontrado con exito');
+        return chat;
     }
 };
 
@@ -138,6 +144,16 @@ export const sendMessageChat = async (req: Request, res: Response) => {
         return responseAPI(HttpStatus.NOT_FOUND, res, null, 'Not Found', 'Not Found');
     }
     //Creamos el mensaje
+    try {
+        let message = await sendMessageOnChat(id_usuario, id_chat, mensaje);
+        return responseAPI(HttpStatus.OK, res, message, 'Mensaje enviado con exito');
+    } catch (error) {
+        return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, 'Error al enviar mensaje', error.message);
+    }
+}
+
+export const sendMessageOnChat = async (id_usuario: number, id_chat: number | string, mensaje: string) => {
+    //Creamos el mensaje
     Message.create(
         {
             id_chat: id_chat,
@@ -145,13 +161,12 @@ export const sendMessageChat = async (req: Request, res: Response) => {
             text: mensaje
         })
         .then((mensaje: any) => {
-            return responseAPI(HttpStatus.OK, res, mensaje, 'Mensaje enviado con exito');
+            return mensaje;
         })
         .catch((error: any) => {
-            return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, 'Error al enviar mensaje', error.message);
+            throw error;
         });
-
-}
+};
 
 export const eliminarChat = async (req: Request, res: Response) => {
     //Obtenemos el id del usuario del token

@@ -53,11 +53,13 @@
                         <div class="col-2 d-flex justify-content-center align-items-center">
                             <div class="col">
                                 <div class="row mb-4">
-                                    <button class="btn btn-danger">Banear Publicacion</button>
+                                    <button class="btn btn-danger" @click="banearPublicacion(publicacion)">Banear
+                                        Publicacion</button>
 
                                 </div>
                                 <div class="row">
-                                    <button class="btn btn-primary">Rechazar Reportes</button>
+                                    <button class="btn btn-primary" @click="rechazarReportes(publicacion)">Rechazar
+                                        Reportes</button>
 
                                 </div>
                             </div>
@@ -138,7 +140,6 @@ export default {
             });
         },
         eliminarReporte(reporte) {
-            console.log(reporte);
             this.axios.delete('/reporte/' + reporte.id, {
                 headers: {
                     Authorization: `Bearer ${this.token}`
@@ -154,6 +155,46 @@ export default {
                 }
             });
         },
+        rechazarReportes(publicacion) {
+            this.axios.post('/publicacion/rechazar-reportes',
+                {
+                    id_publicacion: publicacion.id
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${this.token}`
+                    }
+                }).then(response => {
+                    toast.success(response.data.mensaje);
+                    this.getPublicacionesReportadas();
+                }).catch(error => {
+                    toast.error(error.response.data.error);
+                    let errores = error.response.data.errores;
+                    for (const element of errores) {
+                        toast.error(element);
+                    }
+                });
+        },
+        banearPublicacion(publicacion) {
+            this.axios.post('/publicacion/banear',
+                {
+                    id_publicacion: publicacion.id
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${this.token}`
+                    }
+                }).then(response => {
+                    toast.success(response.data.mensaje);
+                    this.getPublicacionesReportadas();
+                }).catch(error => {
+                    toast.error(error.response.data.error);
+                    let errores = error.response.data.errores;
+                    for (const element of errores) {
+                        toast.error(element);
+                    }
+                });
+        }
     }
 }
 </script>

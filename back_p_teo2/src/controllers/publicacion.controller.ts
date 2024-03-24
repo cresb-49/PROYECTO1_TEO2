@@ -8,6 +8,7 @@ import { Publicacion } from '../models/publicacion';
 import { Category } from '../models/category';
 import { Report } from '../models/report';
 import { generatePagesToShow } from '../handler/generatePagesToShow';
+import { findOrCreateChat, sendMessageOnChat } from './chat.controller';
 
 export const getPublicaciones = async (req: Request, res: Response) => {
     //Obtenemos el parametro nombre
@@ -346,5 +347,35 @@ export const eliminarReporte = async (req: Request, res: Response) => {
 };
 
 export const banearPublicacion = async (req: Request, res: Response) => {
-
+    const { id_publicacion } = req.body;
+    let publicacion: any = await Publicacion.findByPk(id_publicacion, { include: [{ model: Articulo, required: true }] });
+    if (publicacion === null) {
+        return responseAPI(HttpStatus.NOT_FOUND, res, null, "Publicacion no encontrada", "La publicacion no existe");
+    }
+    //Recuperamos el id de la persona que publico la publicacion
+    const id_usuario_2: number = parseInt(publicacion.id_usuario);
+    //Obtenemos el id del usuario del JWT
+    const { tokenPayload } = req;
+    const id_usuario_1: number = parseInt(tokenPayload.usuarioId);
+    Publicacion.destroy({
+        where: {
+            id: id_publicacion
+        }
+    }).then(async (value: any) => {
+        let chat: any = await findOrCreateChat(id_usuario_1, id_usuario_2);
+        //Enviamos un mensaje al chat
+        // await sendMessageOnChat(
+        //     id_usuario_1,
+        //     chat.id,
+        //     `Tu publicacion del producto "${publicacion.articulo.nombre}" identificada con el id ${publicacion.id} ha sido baneada de la plataforma por multiples reportes. Si deseas apelar a esta decision, puedes hacerlo por medio de este chat.`
+        // );
+        await sendMessageOnChat(
+            id_usuario_1,
+            chat.id,
+            `Tu publicacion del producto "${publicacion.articulo.nombre}" identificada con el id ${publicacion.id} ha sido baneada de la plataforma por multiples reportes.`
+        );
+        return responseAPI(HttpStatus.OK, res, value, "Publicacion baneada con exito");
+    }).catch((reason: any) => {
+        return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
+    });
 };
