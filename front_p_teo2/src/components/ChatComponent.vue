@@ -328,8 +328,9 @@ export default {
                 headers: {
                     Authorization: `Bearer ${this.token}`
                 }
-            }).then(() => {
+            }).then((response) => {
                 this.dialog.show = false;
+                toast.success(response.data.mensaje);
                 this.getChatsDisponibles();
             }).catch(error => {
                 console.log(error.response);
