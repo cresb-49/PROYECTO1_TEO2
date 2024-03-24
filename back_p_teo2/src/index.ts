@@ -13,10 +13,6 @@ const app: Application = express();
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-//Uso de CORS
-// const allowedOrigins = ['http://localhost:1420','https://tauri.localhost']
-// const allowedOrigins = ['https://tauri.localhost']
-
 const corsOptions = {
     origin: '*',
     credentials: true,

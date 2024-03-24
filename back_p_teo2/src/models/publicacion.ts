@@ -45,6 +45,15 @@ export const Publicacion = sequelize.define('publicacion',
         f_validacion: {
             type: DataTypes.DATE
         },
+        isReported: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
+        f_reporte: {
+            allowNull: true,
+            type: DataTypes.DATE
+        },
         created_at: {
             allowNull: false,
             type: DataTypes.DATE

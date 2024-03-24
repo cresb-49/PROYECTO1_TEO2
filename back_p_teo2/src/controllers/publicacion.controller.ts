@@ -229,11 +229,22 @@ export const reportarPublicacion = async (req: Request, res: Response) => {
     const { tokenPayload } = req;
     const id_usuario = tokenPayload.usuarioId;
     const { id_publicacion, comentario } = req.body;
+    //Obtenemos la publicacion en base a su id
+    let publicacion = await Publicacion.findByPk(id_publicacion);
+    if (publicacion === null) {
+        return responseAPI(HttpStatus.NOT_FOUND, res, null, "Publicacion no encontrada", "La publicacion no existe");
+    }
     Report.create({
         id_usuario: id_usuario,
         id_publicacion: id_publicacion,
         comentario: comentario
-    }).then((value: any) => {
+    }).then(async (value: any) => {
+        //Actulizamos ek estado de la publiacion a reportada
+        await publicacion.update({
+            isReported: true,
+            f_reporte: new Date()
+        });
+        //Enviamos al respuesta
         return responseAPI(HttpStatus.CREATED, res, value, "Publicacion reportada con exito");
     }).catch((reason: any) => {
         return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);

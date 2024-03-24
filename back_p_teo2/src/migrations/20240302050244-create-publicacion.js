@@ -41,6 +41,15 @@ module.exports = {
       f_validacion: {
         type: Sequelize.DATE
       },
+      isReported: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+      },
+      f_reporte: {
+        allowNull: true,
+        type: Sequelize.DATE
+      },
       created_at: {
         allowNull: false,
         type: Sequelize.DATE
