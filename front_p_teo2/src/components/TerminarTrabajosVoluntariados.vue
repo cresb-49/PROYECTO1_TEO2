@@ -6,7 +6,19 @@
 
 <script>
 export default {
-    name: 'TerminarTrabajosVoluntariados'
-    
+    name: 'TerminarTrabajosVoluntariados',
+    data() {
+        return {
+            data: []
+        }
+    },
+    mounted() {
+        this.getTrabajosVoluntariados();
+    },
+    methods: {
+        getTrabajosVoluntariados() {
+
+        }
+    }
 }
 </script>

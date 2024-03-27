@@ -59,6 +59,30 @@ export const getArticulosPublicados = async (req: Request, res: Response) => {
             console.error('Error al realizar la consulta:', error);
         });
 };
+export const getArticulosPublicadosIntercambiables = async (req: Request, res: Response) => {
+    const { tokenPayload } = req;
+    const idUsuario = tokenPayload.usuarioId;
+    Articulo.findAll({
+        include: [
+            {
+                model: Publicacion,
+                required: true, // INNER JOIN
+            },
+            {
+                model: Category,
+                required: true,
+                where: { id: [1, 4] }
+            }
+        ],
+        where: { id_usuario: idUsuario }
+    })
+        .then(result => {
+            return responseAPI(HttpStatus.OK, res, result, "Productos encontrados con exito");
+        })
+        .catch(error => {
+            console.error('Error al realizar la consulta:', error);
+        });
+};
 
 
 export const getArticulo = async (req: Request, res: Response) => {

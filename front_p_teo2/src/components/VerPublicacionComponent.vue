@@ -436,7 +436,7 @@ export default {
         },
         getArticulosPublicadosComprador() {
             let state = this.$store.state;
-            this.axios.get(`articulos/usuario/publicados`, {
+            this.axios.get(`articulos/usuario/publicados/intercambiables`, {
                 headers: {
                     Authorization: `Bearer ${state.token}`
                 }
