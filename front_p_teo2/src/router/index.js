@@ -22,6 +22,7 @@ import ListaComprasComponent from "@/components/ListaComprasComponent.vue";
 import AceptarIntercambioComponent from "@/components/AceptarIntercambioComponent.vue";
 import ChatComponent from "@/components/ChatComponent.vue"
 import ReportesPublicacionComponent from "@/components/ReportesPublicacionComponent.vue";
+import TerminarTrabajosVoluntariados from "@/components/TerminarTrabajosVoluntariados.vue";
 
 const routes = [
     {
@@ -143,6 +144,15 @@ const routes = [
         path: '/ReportesPublicacion',
         name: 'ReportesPublicacion',
         component: ReportesPublicacionComponent
+    },
+    {
+        path: '/FinTrabajoVoluntariado',
+        name: 'FinTrabajoVoluntariado',
+        component: TerminarTrabajosVoluntariados
+    },
+    {
+        path: '/:pathMatch(.*)*',
+        redirect: '/'
     }
 ];
 
