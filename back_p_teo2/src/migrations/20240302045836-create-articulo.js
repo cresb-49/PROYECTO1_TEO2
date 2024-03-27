@@ -14,8 +14,18 @@ module.exports = {
         allowNull: false
       },
       valor: {
-        type: Sequelize.DECIMAL(8,2),
+        type: Sequelize.DECIMAL(8, 2),
         allowNull: false
+      },
+      valor_entrada: {
+        type: Sequelize.DECIMAL(8, 2),
+        allowNull: false,
+        defaultValue: 0
+      },
+      recompenza: {
+        type: Sequelize.DECIMAL(8, 2),
+        allowNull: false,
+        defaultValue: 0
       },
       descripcion: {
         type: Sequelize.TEXT
@@ -36,7 +46,20 @@ module.exports = {
           key: 'id'
         }
       },
+      creditos_retirables_asignados: {
+        type: Sequelize.DECIMAL(8, 2),
+        allowNull: false,
+        defaultValue: 0
+      },
+      creditos_no_retirables_asignados: {
+        type: Sequelize.DECIMAL(8, 2),
+        allowNull: false,
+        defaultValue: 0
+      },
       f_desactivado: {
+        type: Sequelize.DATE
+      },
+      f_fin: {
         type: Sequelize.DATE
       },
       cantidad: {
