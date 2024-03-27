@@ -150,14 +150,14 @@ export const createArticulo = async (req: Request, res: Response) => {
         return responseAPI(HttpStatus.BAD_REQUEST, res, null, "Este tipo de articulo no puede tener recompenza", "Este tipo de articulo no puede tener recompenza");
     }
     //Validamos la cantidad positiva
-    if (payload.cantidad <= 1) {
+    if (payload.cantidad < 1) {
         return responseAPI(HttpStatus.BAD_REQUEST, res, null, "La cantidad no puede ser negativa o cero", "La cantidad no puede ser negativa o cero");
     }
     // Si el articulo es de la categoria 2 0 4 el valor de entrada puede ser >= 0 y la recompenza >= 1
-    if ((id_categoria === 2 || id_categoria === 4) && payload.valor_entrada < 0) {
+    if ((id_categoria === 2 || id_categoria === 3) && payload.valor_entrada < 0) {
         return responseAPI(HttpStatus.BAD_REQUEST, res, null, "El valor de entrada no puede ser negativo", "El valor de entrada no puede ser negativo");
     }
-    if ((id_categoria === 2 || id_categoria === 4) && payload.recompenza < 1) {
+    if ((id_categoria === 2 || id_categoria === 3) && payload.recompenza < 1) {
         return responseAPI(HttpStatus.BAD_REQUEST, res, null, "La recompenza no puede ser negativa o cero", "La recompenza no puede ser negativa o cero");
     }
     //El valor de la entrada no puede ser mayor a la recompenza
@@ -195,8 +195,13 @@ export const createArticulo = async (req: Request, res: Response) => {
             payload.creditos_retirables_asignados = asignancion_retirable;
             payload.creditos_no_retirables_asignados = asignancion_no_retirable;
             //Generamos el descuento de los creditos al usuario
-            generarTransaccionArticulo(id_usuario, 1, (asignancion_retirable * payload.cantidad), nombre, t);
-            generarTransaccionArticulo(id_usuario, 2, (asignancion_no_retirable * payload.cantidad), nombre, t);
+            console.log(payload);
+            if (asignancion_retirable > 0) {
+                await generarTransaccionArticulo(id_usuario, 1, (asignancion_retirable * payload.cantidad), nombre, t);
+            }
+            if (asignancion_no_retirable > 0) {
+                await generarTransaccionArticulo(id_usuario, 2, (asignancion_no_retirable * payload.cantidad), nombre, t);
+            }
         }
         let image_local = await saveImage(imagen);
         let articulo: any = await Articulo.create(payload, { transaction: t });

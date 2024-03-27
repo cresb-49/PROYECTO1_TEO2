@@ -246,6 +246,7 @@ export const generarTransaccionArticulo = async (id_usuario: number, tipo: numbe
         const cuenta_usuario = usuario.acount;
         if (cuenta_usuario) {
             let saldo_retirable = parseFloat(cuenta_usuario.saldo_retirable);
+            console.log('saldo_retirable: ', saldo_retirable);
             if (saldo_retirable > cantidad) {
                 saldo_retirable -= cantidad;
                 await Acount.update({
@@ -265,7 +266,7 @@ export const generarTransaccionArticulo = async (id_usuario: number, tipo: numbe
                 let transaccion = await Transaccion.create(payload_transaccion, { transaction: t });
                 return transaccion;
             } else {
-                throw new Error("No tienes suficientes creditos");
+                throw new Error("No tienes suficientes creditos retirables");
             }
         } else {
             throw new Error("Cuenta no encontrada");
@@ -295,7 +296,7 @@ export const generarTransaccionArticulo = async (id_usuario: number, tipo: numbe
                 let transaccion = await Transaccion.create(payload_transaccion, { transaction: t });
                 return transaccion;
             } else {
-                throw new Error("No tienes suficientes creditos");
+                throw new Error("No tienes suficientes creditos no retirables");
             }
         } else {
             throw new Error("Cuenta no encontrada");
