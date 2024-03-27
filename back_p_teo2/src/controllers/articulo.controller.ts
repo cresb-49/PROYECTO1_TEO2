@@ -8,6 +8,9 @@ import { readFileImage, saveImage } from '../middleware/image.midelware';
 import sequelize from '../database/database';
 import { TokenPayload } from '../middleware/authMiddleware';
 import { Category } from '../models/category';
+import { Usuario } from '../models/usuario';
+import { Acount } from '../models/acount';
+import { generarTransaccionArticulo } from './transaccion.controller';
 
 export const getArticulosUsuario = async (req: Request, res: Response) => {
     const { tokenPayload } = req;
@@ -91,48 +94,100 @@ export const getArticulo = async (req: Request, res: Response) => {
 
 export const createArticulo = async (req: Request, res: Response) => {
 
-    const { nombre, precio, cantidad, id_categoria, descripcion, imagen } = req.body;
-    const { tokenPayload } = req;
-    const idUsuario = tokenPayload.usuarioId;
+    const { nombre, precio, cantidad, descripcion, imagen, valor_entrada, recompenza } = req.body;
+    const id_categoria = parseInt(req.body.id_categoria);
+    const tokenPayload: TokenPayload = req.tokenPayload;
+    const id_usuario = parseInt(tokenPayload.usuarioId);
     let payload = {
         nombre: nombre,
-        valor: precio,
+        valor: parseFloat(precio),
+        valor_entrada: parseFloat(valor_entrada),
+        recompenza: parseFloat(recompenza),
         descripcion: descripcion,
         id_categoria: id_categoria,
-        id_usuario: idUsuario,
-        cantidad: cantidad
+        id_usuario: id_usuario,
+        cantidad: parseInt(cantidad),
+        creditos_retirables_asignados: 0,
+        creditos_no_retirables_asignados: 0
     }
-    //Validamos el precio y la cantidad positiva
-    if (precio <= 0) {
+    //Validamos el precio si el articulo es la catoegoria 1 o 4
+    if (payload.valor <= 0 && (id_categoria === 1 || id_categoria === 4)) {
         return responseAPI(HttpStatus.BAD_REQUEST, res, null, "El precio no puede ser negativo o cero", "El precio no puede ser negativo o cero");
     }
-    if (cantidad <= 0) {
+    //Si categoria es 2 o 3 el precio debe ser 0
+    if (payload.valor !== 0 && (id_categoria === 2 || id_categoria === 3)) {
+        return responseAPI(HttpStatus.BAD_REQUEST, res, null, "Este tipo de articulo no puede tener precio", "Este tipo de articulo no puede tener precio");
+    }
+    //Si la categoria es 1 o 4 el valor_entrada y recompenza deben ser 0
+    if (payload.valor_entrada !== 0 && (id_categoria === 1 || id_categoria === 4)) {
+        return responseAPI(HttpStatus.BAD_REQUEST, res, null, "Este tipo de articulo no puede tener valor de entrada", "Este tipo de articulo no puede tener valor de entrada");
+    }
+    if (payload.recompenza !== 0 && (id_categoria === 1 || id_categoria === 4)) {
+        return responseAPI(HttpStatus.BAD_REQUEST, res, null, "Este tipo de articulo no puede tener recompenza", "Este tipo de articulo no puede tener recompenza");
+    }
+    //Validamos la cantidad positiva
+    if (payload.cantidad <= 1) {
         return responseAPI(HttpStatus.BAD_REQUEST, res, null, "La cantidad no puede ser negativa o cero", "La cantidad no puede ser negativa o cero");
     }
-
-    saveImage(imagen).then((path_image: any) => {
-        Articulo.create(payload)
-            .then(async (articulo: any) => {
-                Image.create({
-                    id_articulo: articulo.id,
-                    url: path_image,
-                    prioridad: 1
-                })
-                    .then((image: any) => {
-                        return responseAPI(HttpStatus.OK, res, articulo, "Producto Creado");
-                    })
-                    .catch(async (reason: any) => {
-                        //eliminamos el articulo creado
-                        await Articulo.destroy({ where: { id: articulo.id } });
-                        return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
-                    });
-            })
-            .catch((reason: any) => {
-                return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
-            })
-    }).catch((reason: any) => {
-        return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
-    });
+    // Si el articulo es de la categoria 2 0 4 el valor de entrada puede ser >= 0 y la recompenza >= 1
+    if ((id_categoria === 2 || id_categoria === 4) && payload.valor_entrada < 0) {
+        return responseAPI(HttpStatus.BAD_REQUEST, res, null, "El valor de entrada no puede ser negativo", "El valor de entrada no puede ser negativo");
+    }
+    if ((id_categoria === 2 || id_categoria === 4) && payload.recompenza < 1) {
+        return responseAPI(HttpStatus.BAD_REQUEST, res, null, "La recompenza no puede ser negativa o cero", "La recompenza no puede ser negativa o cero");
+    }
+    //El valor de la entrada no puede ser mayor a la recompenza
+    if (payload.valor_entrada > payload.recompenza) {
+        return responseAPI(HttpStatus.BAD_REQUEST, res, null, "El valor de la entrada no puede ser mayor a la recompenza", "El valor de la entrada no puede ser mayor a la recompenza");
+    }
+    const t = await sequelize.transaction();
+    try {
+        //Verificasmos si la multiplicacion entre la cantidad y la recompenza es mayor al saldo del usuario
+        if (recompenza > 0) {
+            let cantidad_creditos_descontar = payload.cantidad * payload.recompenza;
+            let usuario: any = await Usuario.findByPk(id_usuario, { include: [{ model: Acount, required: true }] });
+            let saldo_total_disponible = usuario.acount.saldo_retirable + usuario.acount.saldo_no_retirable;
+            if (cantidad_creditos_descontar > saldo_total_disponible) {
+                throw new Error("No tienes suficientes creditos para publicar este articulo");
+            }
+            //Calculamos el uso de los creditos no retirables
+            let total_asignado = 0;
+            let asignancion_no_retirable = 0;
+            let asignancion_retirable = 0;
+            if (usuario.acount.saldo_no_retirable > cantidad_creditos_descontar) {
+                asignancion_no_retirable = payload.recompenza;
+                total_asignado += asignancion_no_retirable;
+            } else {
+                asignancion_no_retirable = usuario.acount.saldo_no_retirable / payload.cantidad;
+                total_asignado += asignancion_no_retirable;
+            }
+            if (total_asignado !== payload.recompenza) {
+                asignancion_retirable = payload.recompenza - total_asignado;
+                total_asignado += asignancion_retirable;
+            }
+            if (total_asignado !== payload.recompenza) {
+                throw new Error("Error al asignar los creditos");
+            }
+            payload.creditos_retirables_asignados = asignancion_retirable;
+            payload.creditos_no_retirables_asignados = asignancion_no_retirable;
+            //Generamos el descuento de los creditos al usuario
+            generarTransaccionArticulo(id_usuario, 1, (asignancion_retirable * payload.cantidad), nombre, t);
+            generarTransaccionArticulo(id_usuario, 2, (asignancion_no_retirable * payload.cantidad), nombre, t);
+        }
+        let image_local = await saveImage(imagen);
+        let articulo: any = await Articulo.create(payload, { transaction: t });
+        await Image.create(
+            {
+                id_articulo: articulo.id,
+                url: image_local,
+                prioridad: 1
+            }, { transaction: t });
+        await t.commit();
+        return responseAPI(HttpStatus.OK, res, articulo, "Producto Creado");
+    } catch (error) {
+        await t.rollback();
+        return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, error.message, error.message);
+    }
 };
 
 export const updateArticulo = async (req: Request, res: Response) => {

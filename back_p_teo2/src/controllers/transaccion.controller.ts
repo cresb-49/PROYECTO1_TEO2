@@ -147,11 +147,11 @@ export const retirarCreditos = async (req: Request, res: Response) => {
  */
 export const generarTransaccion = async (cantidad: number, tipo: number, id_cuenta_origen: number, id_cuenta_destino: number, comentario: string) => {
     const t = await sequelize.transaction();
-    try{
+    try {
         const transaccion = await generarTransaccion2(cantidad, tipo, id_cuenta_origen, id_cuenta_destino, comentario, t);
         await t.commit();
         return transaccion;
-    }catch(error){
+    } catch (error) {
         await t.rollback();
         throw error
     }
@@ -233,5 +233,74 @@ export const generarTransaccion2 = async (cantidad: number, tipo: number, id_cue
         }
     } catch (error) {
         throw new Error("Error al efectuar la transaccion: " + error.message);
+    }
+};
+
+export const generarTransaccionArticulo = async (id_usuario: number, tipo: number, cantidad: number, nombre_articulo: string, t: Transaction) => {
+    if (t === null) {
+        t = await sequelize.transaction();
+    }
+    if (tipo === 1) {
+        //Transaccion de saldo retirable
+        const usuario: any = await Usuario.findOne({ where: { id: id_usuario }, include: Acount });
+        const cuenta_usuario = usuario.acount;
+        if (cuenta_usuario) {
+            let saldo_retirable = parseFloat(cuenta_usuario.saldo_retirable);
+            if (saldo_retirable > cantidad) {
+                saldo_retirable -= cantidad;
+                await Acount.update({
+                    saldo_retirable: saldo_retirable
+                }, {
+                    where: {
+                        id: cuenta_usuario.id
+                    },
+                    transaction: t
+                });
+                const payload_transaccion = {
+                    "id_cuenta_origen": cuenta_usuario.id,
+                    "id_cuenta_destino": null,
+                    "valor": cantidad,
+                    "descripcion": `Uso de creditos retirables en la publicacion del articulo "${nombre_articulo}"`
+                };
+                let transaccion = await Transaccion.create(payload_transaccion, { transaction: t });
+                return transaccion;
+            } else {
+                throw new Error("No tienes suficientes creditos");
+            }
+        } else {
+            throw new Error("Cuenta no encontrada");
+        }
+    } else if (tipo === 2) {
+        //Transaccion de saldo no retirable
+        const usuario: any = await Usuario.findOne({ where: { id: id_usuario }, include: Acount });
+        const cuenta_usuario = usuario.acount;
+        if (cuenta_usuario) {
+            let saldo_no_retirable = parseFloat(cuenta_usuario.saldo_no_retirable);
+            if (saldo_no_retirable > cantidad) {
+                saldo_no_retirable -= cantidad;
+                await Acount.update({
+                    saldo_no_retirable: saldo_no_retirable
+                }, {
+                    where: {
+                        id: cuenta_usuario.id
+                    },
+                    transaction: t
+                });
+                const payload_transaccion = {
+                    "id_cuenta_origen": cuenta_usuario.id,
+                    "id_cuenta_destino": null,
+                    "valor": cantidad,
+                    "descripcion": `Uso de creditos no retirables en la publicacion del articulo "${nombre_articulo}"`
+                };
+                let transaccion = await Transaccion.create(payload_transaccion, { transaction: t });
+                return transaccion;
+            } else {
+                throw new Error("No tienes suficientes creditos");
+            }
+        } else {
+            throw new Error("Cuenta no encontrada");
+        }
+    } else {
+        throw new Error("Tipo de transaccion no valido");
     }
 };
