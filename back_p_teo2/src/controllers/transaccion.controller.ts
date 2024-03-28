@@ -305,3 +305,70 @@ export const generarTransaccionArticulo = async (id_usuario: number, tipo: numbe
         throw new Error("Tipo de transaccion no valido");
     }
 };
+
+export const descontarCreditos = async (id_cuenta_origen: number | string, tipo: number, cantidad: number, comentario: string, t: Transaction) => {
+    try {
+        const cuenta_origen: any = await Acount.findByPk(id_cuenta_origen);
+
+        if (!cuenta_origen) {
+            throw new Error("Cuenta origen no encontrada");
+        }
+
+        //Tipo 1: Transaccion de saldo retirable
+        if (tipo === 1) {
+            //Validamos que la cantidad sea menor a la cantidad de saldo retirable
+            if (cantidad > cuenta_origen.saldo_retirable) {
+                throw new Error("No tienes suficientes Creditos Retirables");
+            }
+            let nuevo_saldo_retirable = cuenta_origen.saldo_retirable -= cantidad;
+            await Acount.update({
+                saldo_retirable: nuevo_saldo_retirable
+            }, {
+                where: {
+                    id: cuenta_origen.id
+                },
+                transaction: t
+            });
+            //Registramos la transaccion del usuario
+            const payload_transaccion = {
+                "id_cuenta_origen": cuenta_origen.id,
+                "id_cuenta_destino": null,
+                "valor": cantidad,
+                "descripcion": comentario
+            };
+            let transaccion = await Transaccion.create(payload_transaccion, { transaction: t });
+            return transaccion;
+        }
+        //Tipo 2: Transaccion de saldo no retirable 
+        else if (tipo === 2) {
+            //Validamos que la cantidad sea menor a la cantidad de saldo no retirable
+            if (cantidad > cuenta_origen.saldo_no_retirable) {
+                throw new Error("No tienes suficientes Creditos No Retirables");
+            }
+            let nuevo_saldo_no_retirable = cuenta_origen.saldo_no_retirable -= cantidad;
+            await Acount.update({
+                saldo_no_retirable: nuevo_saldo_no_retirable
+            }, {
+                where: {
+                    id: cuenta_origen.id
+                },
+                transaction: t
+            });
+            //Registramos la transaccion del usuario
+            const payload_transaccion = {
+                "id_cuenta_origen": cuenta_origen.id,
+                "id_cuenta_destino": null,
+                "valor": cantidad,
+                "descripcion": comentario
+            };
+            let transaccion = await Transaccion.create(payload_transaccion, { transaction: t });
+            return transaccion;
+        }
+        //Otro caso: Se lanza un error 
+        else {
+            throw new Error("Tipo de transaccion no valido");
+        }
+    } catch (error) {
+        throw new Error("Error al efectuar la transaccion: " + error.message);
+    }
+}

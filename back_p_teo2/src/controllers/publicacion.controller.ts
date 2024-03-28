@@ -9,6 +9,12 @@ import { Category } from '../models/category';
 import { Report } from '../models/report';
 import { generatePagesToShow } from '../handler/generatePagesToShow';
 import { findOrCreateChat, sendMessageOnChat } from './chat.controller';
+import { TokenPayload } from '../middleware/authMiddleware';
+import { Buy } from '../models/buy';
+import { Usuario } from '../models/usuario';
+import { Acount } from '../models/acount';
+import sequelize from '../database/database';
+import { BuyTransaccion } from '../models/buy_transaccion';
 
 export const getPublicaciones = async (req: Request, res: Response) => {
     //Obtenemos el parametro nombre
@@ -420,3 +426,187 @@ export const banearPublicacion = async (req: Request, res: Response) => {
         return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
     });
 };
+
+export const deleteVoluntariadoTrabajo = async (req: Request, res: Response) => {
+    const id_publicacion: number = parseInt(req.params.idPublicacion);
+    const tokenPayload: TokenPayload = req.tokenPayload;
+    //Buscamos la publicacion en base a su id y el id del usuario
+    const publicacion: any = await Publicacion.findOne({
+        where: {
+            id: id_publicacion,
+            id_usuario: tokenPayload.usuarioId
+        }
+        , include: [
+            {
+                model: Articulo,
+                required: true
+            }
+        ]
+    });
+    const articulo: any = publicacion.articulo;
+    const id_categoria: number = parseInt(publicacion.articulo.id_categoria);
+    if (id_categoria === 1 || id_categoria === 4) {
+        return responseAPI(HttpStatus.FORBIDDEN, res, null, "No tienes permiso para realizar esta accion", "La publicacion no es un voluntariado o trabajo");
+    }
+    const tipo = id_categoria === 3 ? "voluntariado" : "trabajo";
+    if (publicacion === null) {
+        return responseAPI(HttpStatus.NOT_FOUND, res, null, "Publicacion no encontrada", "La publicacion no existe");
+    }
+    //Obtenemos todas las compras relacionadas a la publicacion
+    const buys: any[] = await Buy.findAll({
+        where: {
+            id_publicacion: id_publicacion
+        }
+    });
+    //Retornamos los creditos utilizados en las compras al usuario que compro
+    const t = await sequelize.transaction();
+    try {
+        let ids_buy: number[] = [];
+        //Realizamos el retorno de creditos
+        for (const buy of buys) {
+            ids_buy.push(buy.id);
+            const usuario: any = await Usuario.findByPk(buy.id_usuario_compra, { include: [{ model: Acount, required: true }] });
+            const acount: any = usuario.acount;
+            let chat: any = await findOrCreateChat(tokenPayload.usuarioId, buy.id_usuario_compra, t);
+            if (buy.valida) {
+                if (parseFloat(buy.creditos_retirables_usados) > 0) {
+                    acount.update({
+                        saldo_retirable: parseFloat(acount.saldo_retirable) + parseFloat(buy.creditos_retirables_usados)
+                    }, { transaction: t });
+                }
+                if (parseFloat(buy.creditos_no_retirables_usados) > 0) {
+                    acount.update({
+                        saldo_no_retirable: parseFloat(acount.saldo_no_retirable) + parseFloat(buy.creditos_no_retirables_usados)
+                    }, { transaction: t });
+                }
+                //Enviamos un mensaje al chat del usaurio que se retornaron sus creditos al eliminar el voluntariado o trabajo
+                await sendMessageOnChat(
+                    tokenPayload.usuarioId,
+                    chat.id,
+                    `Se eliminó el ${tipo} "${articulo.nombre}"\nSe han retornado los creditos utilizados en la entrada del ${tipo}:\nCreditos Retirables: ${buy.creditos_retirables_usados}\nCreditos No Retirables: ${buy.creditos_no_retirables_usados}`,
+                    t
+                );
+            } else {
+                await sendMessageOnChat(
+                    tokenPayload.usuarioId,
+                    chat.id,
+                    `Se eliminó el ${tipo} "${articulo.nombre}" a la cual estaba aplicando`,
+                    t
+                );
+            }
+        }
+        //Eliminamos las transacciones de las compras
+        await BuyTransaccion.destroy({
+            where: {
+                id_buy: ids_buy
+            },
+            transaction: t
+        });
+        //Eliminamos las compras
+        await Buy.destroy({
+            where: {
+                id: ids_buy
+            },
+            transaction: t
+        });
+        //Eliminamos la publicacion
+        await publicacion.destroy({ transaction: t });
+        await t.commit();
+        responseAPI(HttpStatus.OK, res, null, "Publicacion eliminada con exito");
+    } catch (error) {
+        await t.rollback();
+        return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, error.message, error.message);
+    }
+}
+
+export const terminarVoluntariadoTrabajo = async (req: Request, res: Response) => {
+    const { id_publicacion } = req.body;
+    const tokenPayload: TokenPayload = req.tokenPayload;
+    //Buscamos la publicacion en base a su id y el id del usuario
+    const publicacion: any = await Publicacion.findOne({
+        where: {
+            id: id_publicacion,
+            id_usuario: tokenPayload.usuarioId
+        }
+        , include: [
+            {
+                model: Articulo,
+                required: true
+            }
+        ]
+    });
+    const articulo: any = publicacion.articulo;
+    const id_categoria: number = parseInt(publicacion.articulo.id_categoria);
+    if (id_categoria === 1 || id_categoria === 4) {
+        return responseAPI(HttpStatus.FORBIDDEN, res, null, "No tienes permiso para realizar esta accion", "La publicacion no es un voluntariado o trabajo");
+    }
+    const tipo = id_categoria === 3 ? "voluntariado" : "trabajo";
+    if (publicacion === null) {
+        return responseAPI(HttpStatus.NOT_FOUND, res, null, "Publicacion no encontrada", "La publicacion no existe");
+    }
+    //Obtenemos todas las compras relacionadas a la publicacion
+    const buys: any[] = await Buy.findAll({
+        where: {
+            id_publicacion: id_publicacion
+        }
+    });
+    //Retornamos los creditos utilizados en las compras al usuario que compro
+    const t = await sequelize.transaction();
+    try {
+        let ids_buy: number[] = [];
+        //Realizamos el retorno de creditos
+        const usuario_vendedor: any = await Usuario.findByPk(tokenPayload.usuarioId, { include: [{ model: Acount, required: true }] });
+        const acount_vendedor: any = usuario_vendedor.acount;
+        for (const buy of buys) {
+            ids_buy.push(buy.id);
+            const usuario_comprador: any = await Usuario.findByPk(buy.id_usuario_compra, { include: [{ model: Acount, required: true }] });
+            const acount_comprador: any = usuario_comprador.acount;
+            let chat: any = await findOrCreateChat(tokenPayload.usuarioId, buy.id_usuario_compra, t);
+            if (buy.valida) {
+                if (parseFloat(buy.creditos_retirables_usados) > 0) {
+                    acount_vendedor.update({
+                        saldo_retirable: parseFloat(acount_vendedor.saldo_retirable) + parseFloat(buy.creditos_retirables_usados)
+                    }, { transaction: t });
+                }
+                if (parseFloat(buy.creditos_no_retirables_usados) > 0) {
+                    acount_vendedor.update({
+                        saldo_no_retirable: parseFloat(acount_vendedor.saldo_no_retirable) + parseFloat(buy.creditos_no_retirables_usados)
+                    }, { transaction: t });
+                }
+                if (parseFloat(articulo.creditos_retirables_asignados) > 0) {
+                    acount_comprador.update({
+                        saldo_retirable: parseFloat(acount_comprador.saldo_retirable) + parseFloat(articulo.creditos_retirables_asignados)
+                    }, { transaction: t });
+                }
+                if (parseFloat(articulo.creditos_no_retirables_asignados) > 0) {
+                    acount_comprador.update({
+                        saldo_no_retirable: parseFloat(acount_comprador.saldo_no_retirable) + parseFloat(articulo.creditos_no_retirables_asignados)
+                    }, { transaction: t });
+                }
+                //Enviamos un mensaje al chat del usaurio que se retornaron sus creditos al eliminar el voluntariado o trabajo
+                await sendMessageOnChat(
+                    tokenPayload.usuarioId,
+                    chat.id,
+                    `Se termino el ${tipo} "${articulo.nombre}"\nRecibira la recompenza del ${tipo}:\nCreditos Retirables: ${articulo.creditos_retirables_asignados}\nCreditos No Retirables: ${articulo.creditos_no_retirables_asignados}`,
+                    t
+                );
+            } else {
+                await sendMessageOnChat(
+                    tokenPayload.usuarioId,
+                    chat.id,
+                    `Se termino el ${tipo} "${articulo.nombre}" a la cual estaba aplicando`,
+                    t
+                );
+            }
+        }
+        //finalizamos la publicacion
+        await publicacion.update({
+            finished_at: new Date()
+        }, { transaction: t });
+        await t.commit();
+        responseAPI(HttpStatus.OK, res, null, "Publicacion terminada con exito");
+    } catch (error) {
+        await t.rollback();
+        return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, error.message, error.message);
+    }
+}

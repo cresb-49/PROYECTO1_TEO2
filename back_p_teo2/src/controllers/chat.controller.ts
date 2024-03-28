@@ -60,7 +60,7 @@ export const getChat = async (req: Request, res: Response) => {
     return responseAPI(HttpStatus.OK, res, chat, 'Chat encontrado con exito');
 };
 
-export const findOrCreateChat = async (id_usuario_1: number, id_usuario_2: number, t = null) => {
+export const findOrCreateChat = async (id_usuario_1: number | string, id_usuario_2: number | string, t = null) => {
     //Creamos el chat si no existe ya la conversacion entre los dos usuarios
     let chat = await Chat.findOne({
         where: {
@@ -163,7 +163,7 @@ export const sendMessageChat = async (req: Request, res: Response) => {
     }
 }
 
-export const sendMessageOnChat = async (id_usuario: number, id_chat: number | string, mensaje: string, t = null) => {
+export const sendMessageOnChat = async (id_usuario: number | string, id_chat: number | string, mensaje: string, t = null) => {
     //Creamos el mensaje
     try {
         let message = null;

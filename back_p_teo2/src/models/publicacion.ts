@@ -65,6 +65,9 @@ export const Publicacion = sequelize.define('publicacion',
         },
         deleted_at: {
             type: DataTypes.DATE
+        },
+        finished_at: {
+            type: DataTypes.DATE
         }
     }, {
     timestamps: true,

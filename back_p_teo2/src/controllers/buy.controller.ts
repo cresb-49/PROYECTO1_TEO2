@@ -7,7 +7,7 @@ import { Category } from '../models/category';
 import { Buy } from '../models/buy';
 import { Usuario } from '../models/usuario';
 import { Acount } from '../models/acount';
-import { generarTransaccion, generarTransaccion2 } from './transaccion.controller';
+import { descontarCreditos, generarTransaccion, generarTransaccion2 } from './transaccion.controller';
 import { BuyTransaccion } from '../models/buy_transaccion';
 import { resCantidadArticulo } from './articulo.controller';
 import sequelize from '../database/database';
@@ -443,12 +443,11 @@ export const aceptarSolicitud = async (req: Request, res: Response) => {
         //Realizamos las transacciones y lo guardamos en un arreglo
         let transacciones = [];
         if (parseFloat(compra.creditos_retirables_usados) > 0) {
-            let tr = await generarTransaccion2(
-                parseFloat(compra.creditos_retirables_usados),
-                1,
+            let tr = await descontarCreditos(
                 usuario_comprador.acount.id,
-                usuario_vendedor.acount.id,
-                `Creditos retirables en solicitud del ${tipo} "${articulo_venta.nombre}" con creditos retirables`,
+                1,
+                parseFloat(compra.creditos_retirables_usados),
+                `Creditos retirables en solicitud del ${tipo} "${articulo_venta.nombre}"`,
                 t
             );
             if (tr) {
@@ -456,12 +455,11 @@ export const aceptarSolicitud = async (req: Request, res: Response) => {
             }
         }
         if (parseFloat(compra.creditos_no_retirables_usados) > 0) {
-            let tr = await generarTransaccion2(
-                parseFloat(compra.creditos_no_retirables_usados),
-                2,
+            let tr = await descontarCreditos(
                 usuario_comprador.acount.id,
-                usuario_vendedor.acount.id,
-                `Creditos no retirables en solicitud del ${tipo} "${articulo_venta.nombre}" con creditos no retirables`,
+                2,
+                parseFloat(compra.creditos_no_retirables_usados),
+                `Creditos no retirables en solicitud del ${tipo} "${articulo_venta.nombre}"`,
                 t
             );
             if (tr) {

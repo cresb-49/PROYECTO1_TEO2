@@ -42,11 +42,6 @@
                                 <div class="row mb-4">
                                     <button class="btn btn-warning" @click="terminar(publicacion)">Terminar</button>
                                 </div>
-                                <div class="row">
-                                    <button class="btn btn-primary" @click="eliminarVacante(publicacion)">
-                                        Eliminar Vacante
-                                    </button>
-                                </div>
                             </div>
                         </div>
 
@@ -128,12 +123,44 @@ export default {
         },
         eliminar(publicacion) {
             console.log(publicacion);
+            this.axios.delete(`publicacion/voluntariado-trabajo/${publicacion.id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${this.token}`
+                    }
+                }).then(response => {
+                    console.log(response.data);
+                    toast.success(response.data.mensaje);
+                    this.getTrabajosVoluntariados();
+                }).catch(error => {
+                    toast.error(error.response.data.error);
+                    let errores = error.response.data.errores;
+                    for (const element of errores) {
+                        toast.error(element);
+                    }
+                });
         },
         terminar(publicacion) {
             console.log(publicacion);
-        },
-        eliminarVacante(publicacion) {
-            console.log(publicacion);
+            this.axios.post('publicacion/voluntariado-trabajo/terminar',
+                {
+                    id_publicacion: publicacion.id
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${this.token}`
+                    }
+                }).then(response => {
+                    console.log(response.data);
+                    toast.success(response.data.mensaje);
+                    this.getTrabajosVoluntariados();
+                }).catch(error => {
+                    toast.error(error.response.data.error);
+                    let errores = error.response.data.errores;
+                    for (const element of errores) {
+                        toast.error(element);
+                    }
+                });
         }
     }
 }
