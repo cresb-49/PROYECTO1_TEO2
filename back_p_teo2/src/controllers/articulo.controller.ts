@@ -33,6 +33,7 @@ export const getArticulosUsuarioSinPublicar = async (req: Request, res: Response
             include: [{
                 model: Publicacion,
                 required: false, // LEFT JOIN
+                attributes: []
             }],
             where: {
                 id_usuario: idUsuario,
@@ -40,7 +41,8 @@ export const getArticulosUsuarioSinPublicar = async (req: Request, res: Response
                     { '$publicacion.id$': null },
                     { '$publicacion.finished_at$': { [Op.not]: null } }
                 ]
-            }
+            },
+            group: ['articulo.id']
         })
         .then(result => {
             return responseAPI(HttpStatus.OK, res, result, "Productos encontrados con exito");
