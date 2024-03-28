@@ -88,6 +88,21 @@ module.exports = {
         cantidad: 1,
         created_at: new Date(),
         updated_at: new Date()
+      },
+      {
+        id: 8,
+        nombre: 'Limpieza del Campo',
+        valor: 0,
+        valor_entrada: 10,
+        recompenza: 25,
+        descripcion: 'Limpieza de un campo recreativo usado el fin de semana, con el motivo de ayudar al sector en la prevención de enfermedades',
+        id_categoria: 3,
+        id_usuario: 5,
+        creditos_retirables_asignados: 25,
+        creditos_no_retirables_asignados: 0,
+        cantidad: 3,
+        created_at: new Date(),
+        updated_at: new Date()
       }
     ];
     await queryInterface.bulkInsert('articulo', articulos, {});

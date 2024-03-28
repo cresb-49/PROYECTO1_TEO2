@@ -73,6 +73,16 @@ module.exports = {
         f_validacion: new Date(),
         created_at: new Date(),
         updated_at: new Date()
+      },
+      {
+        id: 8,
+        id_articulo: 8,
+        id_tipo_publicacion: 1,
+        id_usuario: 5,
+        isValidate: true,
+        f_validacion: new Date(),
+        created_at: new Date(),
+        updated_at: new Date()
       }
     ];
     await queryInterface.bulkInsert('publicacion', publicaciones, {});
