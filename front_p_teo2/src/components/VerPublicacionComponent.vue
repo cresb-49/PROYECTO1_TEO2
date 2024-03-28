@@ -16,7 +16,9 @@
             <li style="margin-left: 30px;">{{ cate }}</li>
         </ul>
         <h5 style="margin-top: 20px;"> <strong>Disponibles:</strong> {{ articulo.cantidad }}</h5>
-        <h5 style="margin-top: 20px;"> <strong>KORNS:</strong> {{ articulo.precio }}</h5>
+        <h5 style="margin-top: 20px;" v-if="parseFloat(articulo.precio) > 0"> <strong>Precio: </strong>KOR. {{ articulo.precio }}</h5>
+        <h5 style="margin-top: 20px;" v-if="parseFloat(articulo.valor_entrada) > 0"> <strong>Valor Entrada: </strong>KOR. {{ articulo.valor_entrada }}</h5>
+        <h5 style="margin-top: 20px;" v-if="parseFloat(articulo.recompenza) > 0"> <strong>Recompenza: </strong>KOR. {{ articulo.recompenza }}</h5>
         <div class="container mt-4">
             <div class="row">
                 <div class="col-md-6 d-flex justify-content-center align-items-center" @click="changeStateLike(true)">
@@ -36,8 +38,8 @@
             </div>
         </div>
         <div class="row justify-content-between" style="margin-top: 20px;">
-            <button v-if="isAuth && articulo.usuario !== idUser" @click="comparArticulo(articulo)"
-                class="btn btn-outline-success col" style="margin: 5px;">{{
+            <button v-if="isAuth && articulo.usuario !== idUser && parseInt(articulo.cantidad) > 0"
+                @click="comparArticulo(articulo)" class="btn btn-outline-success col" style="margin: 5px;">{{
                 labelButton }}</button>
             <button v-if="isAuth && articulo.usuario === idUser" @click="modificarProducto"
                 class="btn btn-outline-warning col" style="margin: 5px;">Modificar Producto
@@ -215,6 +217,8 @@ export default {
                 nombre: 'Producto Modelo',
                 cantidad: -1,
                 precio: 100.99,
+                valor_entrada: 100.99,
+                recompenza: 100.99,
                 descripcion: 'This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.',
                 categoria: ['otros']
             },
@@ -275,9 +279,12 @@ export default {
                     usuario: publicacion.articulo.id_usuario,
                     nombre: publicacion.articulo.nombre,
                     precio: publicacion.articulo.valor,
+                    valor_entrada: publicacion.articulo.valor_entrada,
+                    recompenza: publicacion.articulo.recompenza,
                     descripcion: publicacion.articulo.descripcion,
                     categoria: [publicacion.articulo.category.nombre]
                 }
+                console.log(this.articulo);
             }).catch(error => {
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
@@ -336,7 +343,6 @@ export default {
                     Authorization: `Bearer ${state.token}`
                 }
             }).then(response => {
-                console.log(response.data.data);
                 const { likes, dislikes } = response.data.data;
                 this.likes.count_like = likes;
                 this.likes.count_dislike = dislikes;
