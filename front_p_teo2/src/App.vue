@@ -53,10 +53,11 @@
             </li>
             <li class="nav-item dropdown" v-if="isAuth && !isAdmin">
               <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Fin Voluntariados y Trabajos
+                Voluntariados y Trabajos
               </a>
               <ul class="dropdown-menu">
-                <li><router-link to="/FinTrabajoVoluntariado" class="dropdown-item">Voluntariados/Trabajos</router-link></li>
+                <li><router-link to="/FinTrabajoVoluntariado" class="dropdown-item">Terminar Voluntariado/Trabajo</router-link></li>
+                <li><router-link to="/AceptarTrabajoVoluntariado" class="dropdown-item">Solicitudes Voluntariado/Trabajo</router-link></li>
               </ul>
             </li>
             <li class="nav-item dropdown" v-if="isAuth && isAdmin">

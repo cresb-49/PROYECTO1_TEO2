@@ -16,9 +16,12 @@
             <li style="margin-left: 30px;">{{ cate }}</li>
         </ul>
         <h5 style="margin-top: 20px;"> <strong>Disponibles:</strong> {{ articulo.cantidad }}</h5>
-        <h5 style="margin-top: 20px;" v-if="parseFloat(articulo.precio) > 0"> <strong>Precio: </strong>KOR. {{ articulo.precio }}</h5>
-        <h5 style="margin-top: 20px;" v-if="parseFloat(articulo.valor_entrada) > 0"> <strong>Valor Entrada: </strong>KOR. {{ articulo.valor_entrada }}</h5>
-        <h5 style="margin-top: 20px;" v-if="parseFloat(articulo.recompenza) > 0"> <strong>Recompenza: </strong>KOR. {{ articulo.recompenza }}</h5>
+        <h5 style="margin-top: 20px;" v-if="parseFloat(articulo.precio) > 0"> <strong>Precio: </strong>KOR. {{
+                articulo.precio }}</h5>
+        <h5 style="margin-top: 20px;" v-if="parseFloat(articulo.valor_entrada) > 0"> <strong>Valor Entrada:
+            </strong>KOR. {{ articulo.valor_entrada }}</h5>
+        <h5 style="margin-top: 20px;" v-if="parseFloat(articulo.recompenza) > 0"> <strong>Recompenza: </strong>KOR. {{
+                articulo.recompenza }}</h5>
         <div class="container mt-4">
             <div class="row">
                 <div class="col-md-6 d-flex justify-content-center align-items-center" @click="changeStateLike(true)">
@@ -98,7 +101,9 @@
         </div>
     </div>
 
-    <div class="mt-4 container col-md-8" v-if="buyArticulo === true && articulo.usuario !== idUser">
+    <!-- Adquirir Articulo o Servicio -->
+    <div class="mt-4 container col-md-8"
+        v-if="buyArticulo === true && articulo.usuario !== idUser && tipo_adquisicion === 1">
         <form @submit.prevent="generarCompra">
             <fieldset>
                 <div class="form-group mb-4">
@@ -139,7 +144,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <img :src="'http://localhost:3000/api/image?articulo=' + articuloSeleccionado.id"
-                                    class="imgP img-fluid" alt="imagen producto">
+                                    class="imgP img-fluid" alt="Producto">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -168,6 +173,40 @@
                     <button type="submit" class="btn btn-primary">Comprar</button>
                 </div>
             </fieldset>
+        </form>
+    </div>
+    <!-- Aplicar Trabajo / Voluntariado -->
+    <div class="mt-4 container col-md-8"
+        v-if="buyArticulo === true && articulo.usuario !== idUser && (tipo_adquisicion === 2 || tipo_adquisicion === 3)">
+        <form @submit.prevent="aplicarVoluntariadoTrabajo">
+            <div>
+                <div class="form-group mb-4">
+                    <label for="disabledTextInput">Razon para Aplicar</label>
+                    <textarea rows="5" class="form-control" v-model="compra.razon_aplicar"></textarea>
+                </div>
+                <div class="form-group row"
+                    v-if="(cuenta.saldo_no_retirable > 0 || cuenta.saldo_retirable > 0) && parseFloat(articulo.valor_entrada) > 0">
+                    <div class="col-md-6">
+                        <label for="disabledTextInput">Korns Retirables Disponibles</label>
+                        <input type="number" id="disabledTextInput" class="form-control" placeholder="Cantidad" disabled
+                            v-model="cuenta.saldo_retirable">
+                        <label for="disabledTextInput">Korns No Retirables Disponibles</label>
+                        <input type="number" id="disabledTextInput" class="form-control" placeholder="Cantidad" disabled
+                            v-model="cuenta.saldo_no_retirable">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="disabledTextInput">Korns Retirables a utilizar</label>
+                        <input type="number" id="disabledTextInput" class="form-control" placeholder="Cantidad" min="0"
+                            :max="cuenta.saldo_retirable" v-model="compra.uso_retirable">
+                        <label for="disabledTextInput">Korns No Retirables a utilizar</label>
+                        <input type="number" id="disabledTextInput" class="form-control" placeholder="Cantidad" min="0"
+                            :max="cuenta.saldo_no_retirable" v-model="compra.uso_no_retirable">
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">Aplicar</button>
+                </div>
+            </div>
         </form>
     </div>
 
@@ -220,6 +259,7 @@ export default {
                 valor_entrada: 100.99,
                 recompenza: 100.99,
                 descripcion: 'This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.',
+                id_categoria: 0,
                 categoria: ['otros']
             },
             cuenta: {
@@ -236,13 +276,15 @@ export default {
                 uso_retirable: 0,
                 uso_no_retirable: 0,
                 cantidad_articulo: 0,
-                cantidad_articulo_cambio: 0
+                cantidad_articulo_cambio: 0,
+                razon_aplicar: ""
             },
             articuloSeleccionado: {
                 id: 0,
                 cantidad: 0,
                 valor: 0
             },
+            tipo_adquisicion: 0, // 1 = Compra/Indercambio, 2 = Trabajo, 3 = Voluntariado
             comment: '',
             comments: [],
             totalPages: 1,
@@ -273,6 +315,7 @@ export default {
                 }
             }).then(response => {
                 const publicacion = response.data.data;
+                const id_categoria = publicacion.articulo.category.id;
                 this.articulo = {
                     id: publicacion.articulo.id,
                     cantidad: publicacion.articulo.cantidad,
@@ -282,9 +325,29 @@ export default {
                     valor_entrada: publicacion.articulo.valor_entrada,
                     recompenza: publicacion.articulo.recompenza,
                     descripcion: publicacion.articulo.descripcion,
+                    id_categoria: id_categoria,
                     categoria: [publicacion.articulo.category.nombre]
                 }
                 console.log(this.articulo);
+                switch (id_categoria) {
+                    case 1:
+                        this.labelButton = 'Comprar Articulo'
+                        this.tipo_adquisicion = 1;
+                        break;
+                    case 2:
+                        this.labelButton = 'Aplicar Trabajo'
+                        this.tipo_adquisicion = 2;
+                        break;
+                    case 3:
+                        this.labelButton = 'Aplicar Voluntariado'
+                        this.tipo_adquisicion = 3;
+                        break;
+                    case 4:
+                        this.labelButton = 'Contratar Servicio'
+                        this.tipo_adquisicion = 1;
+                        break;
+                }
+                console.log(id_categoria);
             }).catch(error => {
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
@@ -435,9 +498,43 @@ export default {
         comparArticulo() {
             this.buyArticulo = !this.buyArticulo;
             if (this.buyArticulo) {
-                this.labelButton = 'Ver Articulo';
+                switch (this.articulo.id_categoria) {
+                    case 1:
+                        this.labelButton = 'Ver Articulo'
+                        this.tipo_adquisicion = 1;
+                        break;
+                    case 2:
+                        this.labelButton = 'Ver Trabajo'
+                        this.tipo_adquisicion = 2;
+                        break;
+                    case 3:
+                        this.labelButton = 'Ver Voluntariado'
+                        this.tipo_adquisicion = 3;
+                        break;
+                    case 4:
+                        this.labelButton = 'Ver Servicio'
+                        this.tipo_adquisicion = 1;
+                        break;
+                }
             } else {
-                this.labelButton = 'Comprar Articulo';
+                switch (this.articulo.id_categoria) {
+                    case 1:
+                        this.labelButton = 'Comprar Articulo'
+                        this.tipo_adquisicion = 1;
+                        break;
+                    case 2:
+                        this.labelButton = 'Aplicar Trabajo'
+                        this.tipo_adquisicion = 2;
+                        break;
+                    case 3:
+                        this.labelButton = 'Aplicar Voluntariado'
+                        this.tipo_adquisicion = 3;
+                        break;
+                    case 4:
+                        this.labelButton = 'Contratar Servicio'
+                        this.tipo_adquisicion = 1;
+                        break;
+                }
             }
         },
         getArticulosPublicadosComprador() {
@@ -539,6 +636,34 @@ export default {
                     toast.error(element);
                 }
             });
+        },
+        aplicarVoluntariadoTrabajo() {
+            let state = this.$store.state;
+            let payload = {
+                id_publicacion: this.$route.params.id,
+                cantidad: 1,
+                creditos: {
+                    retirables: this.compra.uso_retirable,
+                    no_retirables: this.compra.uso_no_retirable
+                },
+                razon: this.compra.razon_aplicar
+            }
+            this.axios.post(`compra`, payload, {
+                headers: {
+                    Authorization: `Bearer ${state.token}`
+                }
+            }).then((response) => {
+                toast.success(response.data.mensaje);
+                this.parametrosVista();
+            }).catch(error => {
+                toast.error(error.response.data.error);
+                let errores = error.response.data.errores;
+                for (const element of errores) {
+                    toast.error(element);
+                }
+            });
+            console.log(payload);
+            console.log('Aplicar Voluntariado');
         }
     }
 }

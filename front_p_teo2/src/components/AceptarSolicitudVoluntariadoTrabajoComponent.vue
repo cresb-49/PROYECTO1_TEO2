@@ -1,10 +1,10 @@
 <template>
     <div class="mt-4">
-        <h3>Aceptar Oferta de Intercambio</h3>
+        <h3 class="mb-4">Aceptar Solicitud </h3>
         <div v-for="d in data" v-bind:key="d">
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5><small>Identificacion de Compra #{{ d.id }}</small></h5>
+                    <h5><small>Identificacion de Solicitud (compra) #{{ d.id }}</small></h5>
                     <div class="mt-4">
                         <div class="row">
                             <div class="col-5">
@@ -16,13 +16,10 @@
                                     <div class="col-9">
                                         <h5 class="card-title"><strong>Nombre:</strong> {{ d.articulo_venta.nombre }}
                                         </h5>
-                                        <p class="card-text"><strong>Cantidad:</strong> <small> {{
-            d.cantidad_articulo_venta
-        }}</small></p>
-                                        <p class="card-text"><strong>KORNS:</strong> <small> {{ d.valor_venta }}</small>
+                                        <p class="card-text">
+                                            <strong>Fecha: </strong>
+                                            <small>{{ formatDate(d.updated_at) }}</small>
                                         </p>
-                                        <p class="card-text"><strong>Fecha:</strong> <small> {{ formatDate(d.updated_at)
-                                                }}</small></p>
                                     </div>
                                 </div>
                             </div>
@@ -31,43 +28,28 @@
                             </div>
                             <div class="col-5">
                                 <div class="row">
-                                    <div class="col-3">
-                                        <img :src="'http://localhost:3000/api/image?articulo=' + d.id_articulo_cambio"
-                                            class="img-fluid" alt="Producto">
-                                    </div>
                                     <div class="col-9">
                                         <h5 class="card-title">
-                                            <strong>Nombre:</strong> {{ d.articulo_cambio.nombre }}
+                                            <strong>Nombre:</strong>
                                         </h5>
                                         <p class="card-text">
-                                            <strong>Cantidad:</strong> <small> {{ d.cantidad_articulo_cambio }}</small>
+                                            <strong>Mensaje:</strong>
+                                            <small></small>
                                         </p>
                                         <p class="card-text">
-                                            <strong>Valor Unitario: </strong>
-                                            <small>{{ d.articulo_cambio.valor }}</small>
-                                        </p>
-                                        <p class="card-text">
-                                            <strong>Creditos Retirables: </strong>
-                                            <small> {{ d.creditos_retirables_usados }}</small>
-                                        </p>
-                                        <p class="card-text">
-                                            <strong>Creditos No Retirables: </strong>
-                                            <small> {{ d.creditos_no_retirables_usados }}</small>
-                                        </p>
-                                        <p class="card-text">
-                                            <strong>SUMA TOTAL KORNS:</strong> <small> {{ sumatoriaKorns(d) }}</small>
+                                            <small></small>
                                         </p>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-6">
-                                    <button @click="cambioIntercambio(true, d)"
-                                        class="btn btn-success float-right mt-4">Aceptar Intercambio</button>
+                                    <button @click="cambioSolicitud(true, d)"
+                                        class="btn btn-success float-right mt-4">Aceptar Solicitud</button>
                                 </div>
                                 <div class="col-6">
-                                    <button @click="cambioIntercambio(false, d)"
-                                        class="btn btn-danger float-right mt-4">Rechazar Intercambio</button>
+                                    <button @click="cambioSolicitud(false, d)"
+                                        class="btn btn-danger float-right mt-4">Rechazar Solicitud</button>
                                 </div>
                             </div>
                         </div>
@@ -102,7 +84,7 @@ import { toast } from 'vue3-toastify';
 import { mapGetters } from 'vuex';
 
 export default {
-    name: 'AceptarIntercambioComponent',
+    name: 'AceptarSolicitudVoluntariadoTrabajoComponent',
     components: {
         ...mapGetters(['token'])
     },
@@ -122,7 +104,7 @@ export default {
     methods: {
         getVentasValidar(page = 1) {
             let state = this.$store.state;
-            this.axios.get('ventas/por-validar/usuario',
+            this.axios.get('ventas/solicitudes/por-validar/usuario',
                 {
                     headers: {
                         Authorization: `Bearer ${state.token}`
@@ -156,11 +138,11 @@ export default {
         sumatoriaKorns(d) {
             return parseFloat(d.cantidad_articulo_cambio) * parseFloat(d.articulo_cambio.valor) + parseFloat(d.creditos_retirables_usados) + parseFloat(d.creditos_no_retirables_usados);
         },
-        cambioIntercambio(estado, compra) {
+        cambioSolicitud(estado, compra) {
             let state = this.$store.state;
             console.log(estado, compra.id);
             if (estado) {
-                this.axios.put('ventas/aceptar-intercambio/' + compra.id, {}, {
+                this.axios.put('ventas/aceptar-solicitud/' + compra.id, {}, {
                     headers: {
                         Authorization: `Bearer ${state.token}`
                     }
@@ -177,7 +159,7 @@ export default {
                         }
                     });
             } else {
-                this.axios.put('ventas/rechazar-intercambio/' + compra.id, {}, {
+                this.axios.put('ventas/rechazar-solicitud/' + compra.id, {}, {
                     headers: {
                         Authorization: `Bearer ${state.token}`
                     }

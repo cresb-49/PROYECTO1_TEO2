@@ -11,6 +11,7 @@ import { Category } from '../models/category';
 import { Usuario } from '../models/usuario';
 import { Acount } from '../models/acount';
 import { generarTransaccionArticulo } from './transaccion.controller';
+import { Transaction } from 'sequelize';
 
 export const getArticulosUsuario = async (req: Request, res: Response) => {
     const { tokenPayload } = req;
@@ -287,29 +288,22 @@ export const updateArticulo = async (req: Request, res: Response) => {
     }
 };
 
-export const resCantidadArticulo = async (id_articulo: number | null, cantidad_restar: number | null) => {
+export const resCantidadArticulo = async (id_articulo: number | null, cantidad_restar: number | null, t: Transaction | null) => {
     if (id_articulo !== null && cantidad_restar !== null) {
-        const t = await sequelize.transaction();
-        try {
-            const articulo: any = await Articulo.findByPk(id_articulo);
-            if (!articulo) {
-                throw new Error("Articulo no encontrado");
-            }
-            if (articulo.cantidad <= cantidad_restar) {
-                throw new Error("Cantidad invalida del producto a comprar");
-            }
-            let cantidad = articulo.cantidad - cantidad_restar;
-            await Articulo.update(
-                { cantidad: cantidad },
-                { where: { id: id_articulo }, transaction: t }
-            );
-            await t.commit();
-            return await Articulo.findByPk(id_articulo);
-        } catch (error) {
-            await t.rollback();
-            throw error;
+        const articulo: any = await Articulo.findByPk(id_articulo);
+        if (!articulo) {
+            throw new Error("Articulo no encontrado");
         }
+        if (articulo.cantidad < cantidad_restar) {
+            throw new Error("Cantidad invalida del producto a comprar");
+        }
+        let cantidad = articulo.cantidad - cantidad_restar;
+        await Articulo.update(
+            { cantidad: cantidad },
+            { where: { id: id_articulo }, transaction: t }
+        );
+        return await Articulo.findByPk(id_articulo);
     } else {
-        console.log('Se envio null en alguno de los parametros');
+        throw new Error('Se envio null en alguno de los parametros como id_articulo o cantidad_restar');
     }
 };
