@@ -292,6 +292,47 @@ export const getPublicacionesReportadas = async (req: Request, res: Response) =>
         })
 };
 
+export const getPublicacionesTrabajosVoluntariados = async (req: Request, res: Response) => {
+    //Obtenermos el id del cliente
+    const { tokenPayload } = req;
+    const id_usuario: number = parseInt(tokenPayload.usuarioId);
+    const page: number = req.query.page ? parseInt(req.query.page.toString()) : 1; // Página actual, si no se proporciona, se asume 1
+    const limit: number = 20; // Comentarios por página
+    const offset: number = (page - 1) * limit; // Calculo del desplazamiento
+
+    Publicacion.findAndCountAll(
+        {
+            where: {
+                isValidate: true,
+                id_usuario: id_usuario
+            },
+            order: [['f_reporte', 'DESC']],
+            limit: limit,
+            offset: offset,
+            include: [
+                {
+                    model: Articulo,
+                    required: true,
+                    include: [
+                        {
+                            model: Category,
+                            required: true,
+                            where: {
+                                id: [2, 3]
+                            }
+                        }
+                    ],
+                }
+            ]
+        })
+        .then((value: any) => {
+            return responsePaginateAPI(HttpStatus.OK, { res, req }, value, "Publicaciones encontradas con exito");
+        })
+        .catch((reason: any) => {
+            return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
+        })
+};
+
 export const rechazarReportes = async (req: Request, res: Response) => {
     const { id_publicacion } = req.body;
     let publicacion = await Publicacion.findByPk(id_publicacion);
