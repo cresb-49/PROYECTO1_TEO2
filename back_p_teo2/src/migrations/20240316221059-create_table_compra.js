@@ -26,6 +26,14 @@ module.exports = {
           key: 'id'
         }
       },
+      id_publicacion: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'publicacion',
+          key: 'id'
+        }
+      },
       id_articulo_venta: {
         type: Sequelize.INTEGER,
         allowNull: false,

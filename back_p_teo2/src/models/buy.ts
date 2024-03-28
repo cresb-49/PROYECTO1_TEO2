@@ -26,6 +26,14 @@ export const Buy = sequelize.define('buy',
                 key: 'id'
             }
         },
+        id_publicacion: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            references: {
+                model: 'publicacion',
+                key: 'id'
+            }
+        },
         id_articulo_venta: {
             type: DataTypes.INTEGER,
             allowNull: false,

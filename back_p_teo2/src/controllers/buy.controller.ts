@@ -54,6 +54,16 @@ const aplicarVoluntariadoTrabajo = async (req: Request, res: Response, publicaci
     const id_usuario = tokenPayload.usuarioId;
     const creditos_retirables = parseFloat(creditos.retirables);
     const creditos_no_retirables = parseFloat(creditos.no_retirables);
+    //Verificamos si ya existe un registro de buy con el id de la publicacion y el usuario de compra
+    const buy: any = await Buy.findOne({
+        where: {
+            id_publicacion: publicacion.id,
+            id_usuario_compra: id_usuario
+        }
+    });
+    if (buy !== null) {
+        return responseAPI(HttpStatus.BAD_REQUEST, res, null, `Ya ha aplicado al ${tipo} "${publicacion.articulo.nombre}"`, `Ya ha aplicado al ${tipo} "${publicacion.articulo.nombre}"`);
+    }
     //Validamos que la cantidad sea 1 para aplicar a un voluntariado
     if (parseInt(cantidad) !== 1) {
         return responseAPI(HttpStatus.BAD_REQUEST, res, null, `Solo puede ocupar un cupo del ${tipo}`, `Solo puede ocupar un cupo del ${tipo}`);
@@ -86,6 +96,7 @@ const aplicarVoluntariadoTrabajo = async (req: Request, res: Response, publicaci
     const t = await sequelize.transaction();
     try {
         const payload = {
+            id_publicacion: publicacion.id,
             id_usuario_compra: id_usuario,
             id_usuario_venta: publicacion.id_usuario,
             id_articulo_venta: publicacion.id_articulo,
@@ -189,6 +200,7 @@ const compraArticuloServicio = async (req: Request, res: Response, publicacion: 
         const usuario_vendedor: any = await Usuario.findByPk(publicacion.id_usuario, { include: [{ model: Acount, required: false }] });
 
         const payload = {
+            id_publicacion: publicacion.id,
             id_usuario_compra: id_usuario,
             id_usuario_venta: publicacion.id_usuario,
             id_articulo_venta: publicacion.id_articulo,
@@ -377,7 +389,6 @@ export const validarCompra = async (req: Request, res: Response) => {
 };
 
 export const aceptarSolicitud = async (req: Request, res: Response) => {
-    return responseAPI(HttpStatus.OK, res, null, "En construccion");
     const { idCompra } = req.params;
     const { tokenPayload } = req;
     const id_usuario: number = parseInt(tokenPayload.usuarioId);
@@ -387,57 +398,47 @@ export const aceptarSolicitud = async (req: Request, res: Response) => {
         let costo_compra: number = 0;
         const compra: any = await Buy.findByPk(idCompra);
         if (compra === null) {
-            await t.rollback();
-            return responseAPI(HttpStatus.NOT_FOUND, res, null, "Compra no encontrada", "La compra no existe");
+            throw new Error("Compra no encontrada");
         }
         if (compra.id_usuario_venta !== id_usuario) {
-            await t.rollback();
-            return responseAPI(HttpStatus.FORBIDDEN, res, null, "No tienes permisos para validar esta compra", "No tienes permisos para validar esta compra");
+            throw new Error("No tienes permisos para validar esta compra");
         }
         if (compra.valida === true) {
-            await t.rollback();
-            return responseAPI(HttpStatus.BAD_REQUEST, res, null, "Compra ya validada", "La compra ya ha sido validada");
+            throw new Error("Compra ya validada");
         }
         const articulo_venta: any = await Articulo.findByPk(compra.id_articulo_venta, { transaction: t });
-        const articulo_cambio: any = await Articulo.findByPk(compra.id_articulo_cambio, { transaction: t });
         if (articulo_venta === null) {
-            await t.rollback();
-            return responseAPI(HttpStatus.NOT_FOUND, res, null, "Articulo no encontrado", "El articulo no existe");
+            throw new Error("Articulo no encontrado");
         } else {
-            costo_compra += parseFloat(compra.cantidad_articulo_venta) * parseFloat(articulo_venta.valor);
+            costo_compra += parseFloat(compra.cantidad_articulo_venta) * parseFloat(articulo_venta.valor_entrada);
         }
-        //Si la cantidad de articulos a intercambiar es mayor a 0, entonces se debe validar que el articulo de intercambio exista
-        if (compra.cantidad_articulo_cambio > 0 && articulo_cambio === null) {
-            await t.rollback();
-            return responseAPI(HttpStatus.NOT_FOUND, res, null, "Articulo de intercambio no encontrado", "El articulo de intercambio no existe");
-        } else {
-            creditos_usar_compra += parseFloat(compra.cantidad_articulo_cambio) * parseFloat(articulo_cambio.valor);
+        const id_categoria = parseInt(articulo_venta.id_categoria);
+        if (id_categoria === 1 || id_categoria === 4) {
+            throw new Error("Categoria del producto invalida para esta operacion");
         }
+        const tipo = id_categoria === 2 ? 'trabajo' : 'voluntariado';
+
         //Obtenemos el usuario que vende y el que compra con su acount
         const usuario_comprador: any = await Usuario.findByPk(compra.id_usuario_compra, { include: [{ model: Acount, required: false }] });
         const usuario_vendedor: any = await Usuario.findByPk(compra.id_usuario_venta, { include: [{ model: Acount, required: false }] });
         //Verificamos que el usuario comprador tenga los creditos necesarios
         if (parseFloat(compra.creditos_retirables_usados) > parseFloat(usuario_comprador.acount.saldo_retirable)) {
-            await t.rollback();
-            return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "El usuario comprador no tiene los suficientes creditos retirables disponibles, notifique!!!", "El usuario comprador no tiene los suficientes creditos retirables disponibles, notifique!!!");
+            throw new Error("El usuario comprador no tiene los suficientes creditos retirables disponibles, notifique!!!");
         } else {
             creditos_usar_compra += parseFloat(compra.creditos_retirables_usados);
         }
         if (parseFloat(compra.creditos_no_retirables_usados) > parseFloat(usuario_comprador.acount.saldo_no_retirable)) {
-            await t.rollback();
-            return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "El usuario comprador no tiene los suficientes creditos no retirables disponibles, notifique!!!", "El usuario comprador no tiene los suficientes creditos no retirables disponibles, notifique!!!");
+            throw new Error("El usuario comprador no tiene los suficientes creditos no retirables disponibles, notifique!!!");
         } else {
             creditos_usar_compra += parseFloat(compra.creditos_no_retirables_usados);
         }
         //Si el precio de compra es igual al regitrado en la base de datos del buy no hay problema
         if (costo_compra !== parseFloat(compra.valor_venta)) {
-            await t.rollback();
-            return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "El precio del producto cambio, rechace el intercambio", "El precio del producto cambio, rechace el intercambio");
+            throw new Error("El precio del producto cambio, rechace la solicitud");
         }
         //Si los creditos usados en la compra son iguales a los registrados en la base de datos del buy no hay problema
         if (creditos_usar_compra !== parseFloat(compra.valor_venta)) {
-            await t.rollback();
-            return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "Los creditos usados en la compra cambio, rechace el intercambio", "Los creditos usados en la compra cambio, rechace el intercambio");
+            throw new Error("Los creditos usados en la compra cambio, rechace la solicitud");
         }
         //Realizamos las transacciones y lo guardamos en un arreglo
         let transacciones = [];
@@ -447,7 +448,7 @@ export const aceptarSolicitud = async (req: Request, res: Response) => {
                 1,
                 usuario_comprador.acount.id,
                 usuario_vendedor.acount.id,
-                `Compra "${compra.id}" de articulo con creditos retirables`,
+                `Creditos retirables en solicitud del ${tipo} "${articulo_venta.nombre}" con creditos retirables`,
                 t
             );
             if (tr) {
@@ -460,7 +461,7 @@ export const aceptarSolicitud = async (req: Request, res: Response) => {
                 2,
                 usuario_comprador.acount.id,
                 usuario_vendedor.acount.id,
-                `Compra "${compra.id}" de articulo con creditos no retirables`,
+                `Creditos no retirables en solicitud del ${tipo} "${articulo_venta.nombre}" con creditos no retirables`,
                 t
             );
             if (tr) {
@@ -487,11 +488,11 @@ export const aceptarSolicitud = async (req: Request, res: Response) => {
         await sendMessageOnChat(
             usuario_vendedor.id,
             chat.id,
-            `El intercambio entre el artículo "${articulo_venta.nombre}" (cantidad: ${compra.cantidad_articulo_venta}) POR el artículo "${articulo_cambio.nombre}" (cantidad: ${compra.cantidad_articulo_cambio}) se ha validado con éxito.\nUso de KORNS:\n- Retirables: KOR. ${compra.creditos_retirables_usados}\n- No Retirables: KOR. ${compra.creditos_no_retirables_usados}`,
+            `Su solicitud de ${tipo} "${articulo_venta.nombre}" ha sido aceptada.`,
             t
         );
         await t.commit();
-        return responseAPI(HttpStatus.OK, res, compra, "Compra validada con exito");
+        return responseAPI(HttpStatus.OK, res, compra, "Solicutud aceptada con exito");
     } catch (error) {
         await t.rollback();
         return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "Error al validar la compra", error.message);
@@ -545,7 +546,6 @@ export const rechazarCompra = async (req: Request, res: Response) => {
     }
 };
 export const rechazarSolicitud = async (req: Request, res: Response) => {
-    return responseAPI(HttpStatus.OK, res, null, "En construccion");
     const { idCompra } = req.params;
     const { tokenPayload } = req;
     const id_usuario: number = parseInt(tokenPayload.usuarioId);
@@ -553,26 +553,27 @@ export const rechazarSolicitud = async (req: Request, res: Response) => {
     try {
         const compra: any = await Buy.findByPk(idCompra);
         if (compra === null) {
-            return responseAPI(HttpStatus.NOT_FOUND, res, null, "Compra no encontrada", "La compra no existe");
+            throw new Error("Compra no encontrada");
         }
         if (compra.id_usuario_venta !== id_usuario) {
-            return responseAPI(HttpStatus.FORBIDDEN, res, null, "No tienes permisos para validar esta compra", "No tienes permisos para validar esta compra");
+            throw new Error("No tienes permisos para validar esta compra");
         }
         if (compra.valida === true) {
-            return responseAPI(HttpStatus.BAD_REQUEST, res, null, "Compra ya validada", "La compra ya ha sido validada");
+            throw new Error("Compra ya validada");
         }
         const articulo_venta: any = await Articulo.findByPk(compra.id_articulo_venta, { transaction: t });
         if (articulo_venta === null) {
-            return responseAPI(HttpStatus.NOT_FOUND, res, null, "Articulo no encontrado", "El articulo no existe");
+            throw new Error("Articulo no encontrado");
         }
+        const id_categoria = parseInt(articulo_venta.id_categoria);
+        if (id_categoria === 1 || id_categoria === 4) {
+            throw new Error("Categoria del producto invalida para esta operacion");
+        }
+        const tipo = id_categoria === 2 ? 'trabajo' : 'voluntariado';
         //Retoornamos la cantidad de articulos a su estado original
         let producto_venta: any = await Articulo.findByPk(compra.id_articulo_venta, { transaction: t });
-        let producto_cambio: any = await Articulo.findByPk(compra.id_articulo_cambio, { transaction: t });
         if (producto_venta !== null) {
             await producto_venta.update({ cantidad: producto_venta.cantidad + compra.cantidad_articulo_venta }, { transaction: t });
-        }
-        if (producto_cambio !== null) {
-            await producto_cambio.update({ cantidad: producto_cambio.cantidad + compra.cantidad_articulo_cambio }, { transaction: t });
         }
         //Eliminamos la compra
         await compra.destroy({ transaction: t });
@@ -581,14 +582,14 @@ export const rechazarSolicitud = async (req: Request, res: Response) => {
         await sendMessageOnChat(
             compra.id_usuario_venta,
             chat.id,
-            `El intercambio entre el artículo "${articulo_venta.nombre}" POR el artículo "${producto_cambio.nombre}" se ha rechazado.`,
+            `Su solicitud de ${tipo} "${articulo_venta.nombre}" ha sido rechazada.`,
             t
         );
         await t.commit();
-        return responseAPI(HttpStatus.OK, res, compra, "Compra rechazada con exito");
+        return responseAPI(HttpStatus.OK, res, compra, "Solitud rechazada con exito");
     } catch (error) {
         await t.rollback();
-        return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "Error al validar la compra", error.message);
+        return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "Error al rechazar la solicitud", error.message);
     }
 };
 
