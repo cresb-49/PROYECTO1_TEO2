@@ -81,9 +81,9 @@
                         <button class="page-link" @click="getPublicacionesReportadas(pageNumber)">{{ pageNumber
                             }}</button>
                     </li>
-                    <li :class="['page-item', { 'disabled': currentPage === totalPages }]">
+                    <li :class="['page-item', { 'disabled': currentPage === totalPages || nextPage === null }]">
                         <button class="page-link" @click="getPublicacionesReportadas(nextPage)"
-                            :disabled="currentPage === totalPages">Siguiente</button>
+                            :disabled="currentPage === totalPages || nextPage === null">Siguiente</button>
                     </li>
                 </ul>
             </nav>
@@ -131,6 +131,7 @@ export default {
                 this.previousPage = response.data.previousPage;
                 this.nextPage = response.data.nextPage;
                 this.pagesToShow = response.data.pagesToShow;
+                console.log(this.pagesToShow);
             }).catch(error => {
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
@@ -201,6 +202,6 @@ export default {
 
 <style scoped>
 .contenedor {
-    min-height: 450px;
+    /* min-height: 450px; */
 }
 </style>
