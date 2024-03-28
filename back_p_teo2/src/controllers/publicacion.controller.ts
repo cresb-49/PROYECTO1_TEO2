@@ -28,7 +28,8 @@ export const getPublicaciones = async (req: Request, res: Response) => {
         console.log('con nombre');
         Publicacion.findAndCountAll({
             where: {
-                isValidate: true
+                isValidate: true,
+                finished_at: null
             },
             order: [['created_at', 'DESC']],
             limit: limit,
@@ -71,7 +72,8 @@ export const getPublicaciones = async (req: Request, res: Response) => {
     } else {
         Publicacion.findAndCountAll({
             where: {
-                isValidate: true
+                isValidate: true,
+                finished_at: null
             },
             order: [['created_at', 'DESC']],
             limit: limit,
@@ -112,7 +114,8 @@ export const getPublicaciones = async (req: Request, res: Response) => {
 export const getPublicacionesPorConfirmar = async (req: Request, res: Response) => {
     Publicacion.findAll({
         where: {
-            isValidate: false
+            isValidate: false,
+            finished_at: null
         },
         include: [
             {
@@ -310,7 +313,8 @@ export const getPublicacionesTrabajosVoluntariados = async (req: Request, res: R
         {
             where: {
                 isValidate: true,
-                id_usuario: id_usuario
+                id_usuario: id_usuario,
+                finished_at: null
             },
             order: [['f_reporte', 'DESC']],
             limit: limit,

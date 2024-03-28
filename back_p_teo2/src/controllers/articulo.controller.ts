@@ -11,7 +11,7 @@ import { Category } from '../models/category';
 import { Usuario } from '../models/usuario';
 import { Acount } from '../models/acount';
 import { generarTransaccionArticulo } from './transaccion.controller';
-import { Transaction } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 
 export const getArticulosUsuario = async (req: Request, res: Response) => {
     const { tokenPayload } = req;
@@ -28,13 +28,20 @@ export const getArticulosUsuario = async (req: Request, res: Response) => {
 export const getArticulosUsuarioSinPublicar = async (req: Request, res: Response) => {
     const { tokenPayload } = req;
     const idUsuario = tokenPayload.usuarioId;
-    Articulo.findAll({
-        include: [{
-            model: Publicacion,
-            required: false, // LEFT JOIN
-        }],
-        where: { id_usuario: idUsuario, '$publicacion.id$': null }
-    })
+    Articulo.findAll(
+        {
+            include: [{
+                model: Publicacion,
+                required: false, // LEFT JOIN
+            }],
+            where: {
+                id_usuario: idUsuario,
+                [Op.or]: [
+                    { '$publicacion.id$': null },
+                    { '$publicacion.finished_at$': { [Op.not]: null } }
+                ]
+            }
+        })
         .then(result => {
             return responseAPI(HttpStatus.OK, res, result, "Productos encontrados con exito");
         })
