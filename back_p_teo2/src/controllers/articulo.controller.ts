@@ -28,28 +28,39 @@ export const getArticulosUsuario = async (req: Request, res: Response) => {
 export const getArticulosUsuarioSinPublicar = async (req: Request, res: Response) => {
     const { tokenPayload } = req;
     const idUsuario = tokenPayload.usuarioId;
-    Articulo.findAll(
-        {
-            include: [{
-                model: Publicacion,
-                required: false, // LEFT JOIN
-                attributes: []
-            }],
+    try {
+        //Obtenemos los articulos que no tienen publicaciones, o publiaciones finalizadas
+        let filtro1 = await Articulo.findAll(
+            {
+                include: [{
+                    model: Publicacion,
+                    required: false, // LEFT JOIN
+                    attributes: []
+                }],
+                where: {
+                    id_usuario: idUsuario,
+                    [Op.or]: [
+                        { '$publicacion.id$': null },
+                        { '$publicacion.finished_at$': { [Op.not]: null } }
+                    ]
+                },
+                group: ['articulo.id']
+            });
+        let ids_articulos = filtro1.map((articulo: any) => articulo.id);
+        //Ahora en base a los ids de los articulos buscamos si hay publicaciones activas con esos articulos
+        let filtro2 = await Publicacion.findAll({
             where: {
-                id_usuario: idUsuario,
-                [Op.or]: [
-                    { '$publicacion.id$': null },
-                    { '$publicacion.finished_at$': { [Op.not]: null } }
-                ]
-            },
-            group: ['articulo.id']
-        })
-        .then(result => {
-            return responseAPI(HttpStatus.OK, res, result, "Productos encontrados con exito");
-        })
-        .catch(error => {
-            console.error('Error al realizar la consulta:', error);
+                id_articulo: ids_articulos,
+                isValidate: true,
+                finished_at: null
+            }
         });
+        let ids_articulos_publicados = filtro2.map((publicacion: any) => publicacion.id_articulo);
+        let result = filtro1.filter((articulo: any) => !ids_articulos_publicados.includes(articulo.id));
+        return responseAPI(HttpStatus.OK, res, result, "Productos encontrados con exito");
+    } catch (error) {
+        return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, error.message, error.message);
+    }
 };
 
 export const getArticulosPublicados = async (req: Request, res: Response) => {
