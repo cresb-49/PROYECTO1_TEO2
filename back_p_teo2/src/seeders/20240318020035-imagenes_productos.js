@@ -31,6 +31,27 @@ module.exports = {
         prioridad: 1,
         created_at: new Date(),
         updated_at: new Date()
+      },
+      {
+        id_articulo: 5,
+        url: 'construccion_imagen.ib64.model',
+        prioridad: 1,
+        created_at: new Date(),
+        updated_at: new Date()
+      },
+      {
+        id_articulo: 6,
+        url: 'reparacion_cel_imagen.ib64.model',
+        prioridad: 1,
+        created_at: new Date(),
+        updated_at: new Date()
+      },
+      {
+        id_articulo: 7,
+        url: 'arboles_imagen.ib64.model',
+        prioridad: 1,
+        created_at: new Date(),
+        updated_at: new Date()
       }
     ];
     await queryInterface.bulkInsert('image', images, {});
