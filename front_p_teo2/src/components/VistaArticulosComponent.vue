@@ -13,9 +13,17 @@
         <div id="contenedorProductos" style="margin-top: 20px;">
             <div class="row row-cols-1 row-cols-md-3 g-4">
                 <template v-for="publicacion in publicaciones" :key="publicacion.id">
-                    <CardArticulo
-                        :articulo="{ id: publicacion.id_articulo, usuario: publicacion.id_usuario, nombre: publicacion.articulo.nombre, valor: publicacion.articulo.valor, imagen: publicacion.articulo.id, descripcion: publicacion.articulo.descripcion, categoria: publicacion.articulo.category.nombre }"
-                        :publicacion="{ id: publicacion.id }" :comprar="true" :isPublicacion="true">
+                    <CardArticulo :articulo="{
+                            id: publicacion.id_articulo,
+                            usuario: publicacion.id_usuario,
+                            nombre: publicacion.articulo.nombre,
+                            valor: publicacion.articulo.valor,
+                            valor_entrada: publicacion.articulo.valor_entrada,
+                            recompenza: publicacion.articulo.recompenza,
+                            imagen: publicacion.articulo.id,
+                            descripcion: publicacion.articulo.descripcion,
+                            categoria: publicacion.articulo.category.nombre
+                        }" :publicacion="{ id: publicacion.id }" :comprar="true" :isPublicacion="true">
                     </CardArticulo>
                 </template>
             </div>

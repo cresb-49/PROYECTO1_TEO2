@@ -1,12 +1,13 @@
 <template>
   <div class="col">
     <div class="card h-100">
-      <img :src="'http://localhost:3000/api/image?articulo=' + articulo.id" class="imgP img-fluid"
-        alt="imagen producto">
+      <img :src="'http://localhost:3000/api/image?articulo=' + articulo.id" class="imgP img-fluid" alt="Producto">
       <div class="card-body">
         <h5 class="card-title">{{ articulo.nombre }}</h5>
         <p class="card-text overflow-ellipsis"><small>{{ articulo.descripcion }}</small></p>
-        <p class="card-text">Valor: Q.{{ articulo.valor }}</p>
+        <p class="card-text" v-if="parseFloat(articulo.valor) !== 0">Valor: KOR. {{ articulo.valor }}</p>
+        <p class="card-text" v-if="parseFloat(articulo.valor_entrada) !== 0">Valor Entrada: KOR. {{ articulo.valor_entrada }}</p>
+        <p class="card-text"  v-if="parseFloat(articulo.recompenza) !== 0">Recompensa: KOR. {{ articulo.recompenza }}</p>
         <p class="card-text">Categoria: {{ articulo.categoria }}</p>
         <RouterLink :to="{ name: 'Publicacion', params: { id: publicacion.id } }" class="btn btn-outline-primary btn-sm"
           v-show="comprar">
@@ -27,6 +28,8 @@ export default {
           id: 0,
           nombre: 'nombre',
           valor: 100.99,
+          valor_entrada: 100.99,
+          recompenza: 100.99,
           descripcion: 'descripcion',
           category: {
             nombre: 'categoria'
