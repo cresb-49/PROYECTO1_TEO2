@@ -74,6 +74,10 @@ module.exports = {
         allowNull: false,
         defaultValue: 0,
       },
+      mensaje: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
       validate_at: {
         allowNull: true,
         type: Sequelize.DATE

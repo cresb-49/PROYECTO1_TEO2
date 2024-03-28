@@ -20,6 +20,10 @@
                                             <strong>Fecha: </strong>
                                             <small>{{ formatDate(d.updated_at) }}</small>
                                         </p>
+                                        <p class="card-text">
+                                            <strong>Tipo: </strong>
+                                            <small>{{ d.articulo_venta.category.nombre }}</small>
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -30,13 +34,13 @@
                                 <div class="row">
                                     <div class="col-9">
                                         <h5 class="card-title">
-                                            <strong>Nombre:</strong>
+                                            <strong>Nombre: </strong>
+                                            <small>{{ d.usuario_compra.nombres }} {{ d.usuario_compra.apellidos
+                                                }}</small>
                                         </h5>
                                         <p class="card-text">
-                                            <strong>Mensaje:</strong>
-                                            <small></small>
-                                        </p>
-                                        <p class="card-text">
+                                            <strong>Mensaje: </strong>
+                                            <small>{{ d.mensaje }}</small>
                                             <small></small>
                                         </p>
                                     </div>

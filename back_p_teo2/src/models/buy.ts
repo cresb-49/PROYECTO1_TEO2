@@ -74,6 +74,10 @@ export const Buy = sequelize.define('buy',
             allowNull: false,
             defaultValue: 0,
         },
+        mensaje: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+        },
         validate_at: {
             allowNull: true,
             type: DataTypes.DATE

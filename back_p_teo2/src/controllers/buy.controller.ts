@@ -97,7 +97,8 @@ const aplicarVoluntariadoTrabajo = async (req: Request, res: Response, publicaci
             creditos_retirables_usados: creditos_retirables ?? 0,
             creditos_no_retirables_usados: creditos_no_retirables ?? 0,
             creditos_generados: 0, //TODO: Por implementar
-            validate_at: null
+            validate_at: null,
+            mensaje: razon
         };
         //Restamos la cantidad de articulos de la publicacion
         await resCantidadArticulo(publicacion.id_articulo, cantidad, t);
@@ -771,6 +772,12 @@ export const getVentasValidarTrabajosVoluntariados = async (req: Request, res: R
                 model: Articulo,
                 as: 'articulo_cambio',
                 required: false
+            },
+            {
+                model: Usuario,
+                as: 'usuario_compra',
+                required: true,
+                attributes: ['id', 'nombres', 'apellidos']
             }
         ]
     })
