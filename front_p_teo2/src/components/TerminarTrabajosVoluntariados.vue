@@ -37,10 +37,12 @@
                         <div class="col-2 d-flex justify-content-center align-items-center">
                             <div class="col">
                                 <div class="row mb-4">
-                                    <button class="btn btn-danger" @click="eliminar(publicacion)">Eliminar</button>
+                                    <button class="btn btn-danger"
+                                        @click="doDialog(() => this.eliminar(publicacion))">Eliminar</button>
                                 </div>
                                 <div class="row mb-4">
-                                    <button class="btn btn-warning" @click="terminar(publicacion)">Terminar</button>
+                                    <button class="btn btn-warning"
+                                        @click="doDialog(() => terminar(publicacion))">Terminar</button>
                                 </div>
                             </div>
                         </div>
@@ -69,16 +71,22 @@
             </nav>
         </div>
     </div>
+    <Dialog :show="dialog.show" :cancel="closeDialog" :tittle="dialog.title" :description="dialog.description"
+        :confirm="dialog.action"></Dialog>
 </template>
 
 <script>
 import { toast } from 'vue3-toastify';
 import { mapGetters } from 'vuex';
+import Dialog from '@/components/Dialog.vue'
 
 export default {
     name: 'TerminarTrabajosVoluntariados',
     computed: {
         ...mapGetters(['token', 'isAuth', 'isAdmin', 'isUser', 'isConfirm'])
+    },
+    components: {
+        Dialog
     },
     data() {
         return {
@@ -87,7 +95,13 @@ export default {
             currentPage: 0,
             previousPage: null,
             nextPage: null,
-            pagesToShow: []
+            pagesToShow: [],
+            dialog: {
+                show: false,
+                title: "Confirmar acción",
+                description: "¿Está seguro de realizar esta acción?",
+                action: null
+            }
         }
     },
     mounted() {
@@ -161,6 +175,16 @@ export default {
                         toast.error(element);
                     }
                 });
+        },
+        doDialog(action, tittle, des) {
+            this.title = tittle ?? "Confirmar acción";
+            this.description = des ?? "¿Está seguro de realizar esta acción?";
+            this.dialog.show = true;
+            this.dialog.action = action;
+        },
+        closeDialog() {
+            this.dialog.show = false;
+            this.dialog.action = null;
         }
     }
 }
