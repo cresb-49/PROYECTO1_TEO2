@@ -38,6 +38,7 @@
               <ul class="dropdown-menu">
                 <li><router-link to="/ListaCompras" class="dropdown-item">Compras</router-link></li>
                 <li><router-link to="/ListaVentas" class="dropdown-item">Ventas</router-link></li>
+                <li><router-link to="/CancelarIntercambio" class="dropdown-item">Cancelar Intercambio</router-link></li>
                 <li><router-link to="/AceptarIntercambio" class="dropdown-item">Aceptar Intercambio</router-link></li>
               </ul>
             </li>

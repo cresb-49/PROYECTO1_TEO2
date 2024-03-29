@@ -507,7 +507,9 @@ export const rechazarCompra = async (req: Request, res: Response) => {
         if (compra === null) {
             return responseAPI(HttpStatus.NOT_FOUND, res, null, "Compra no encontrada", "La compra no existe");
         }
-        if (compra.id_usuario_venta !== id_usuario) {
+        //Validamos que el usuario sea el vendedor o el comprador pero no ambos u otro
+        let usuarios_permitidos = [parseInt(compra.id_usuario_compra), parseInt(compra.id_usuario_venta)];
+        if (!usuarios_permitidos.includes(id_usuario)) {
             return responseAPI(HttpStatus.FORBIDDEN, res, null, "No tienes permisos para validar esta compra", "No tienes permisos para validar esta compra");
         }
         if (compra.valida === true) {
@@ -528,19 +530,22 @@ export const rechazarCompra = async (req: Request, res: Response) => {
         }
         //Eliminamos la compra
         await compra.destroy({ transaction: t });
-        //Le enviamos un mensaje al usuario comprador que la compra fue recachazada
-        let chat: any = await findOrCreateChat(compra.id_usuario_compra, compra.id_usuario_venta, t);
-        await sendMessageOnChat(
-            compra.id_usuario_venta,
-            chat.id,
-            `El intercambio entre el artículo "${articulo_venta.nombre}" POR el artículo "${producto_cambio.nombre}" se ha rechazado.`,
-            t
-        );
+        //Si el usuario comprador rechaza no enviaremos mensaje
+        if (id_usuario !== parseInt(compra.id_usuario_compra)) {
+            //Le enviamos un mensaje al usuario comprador que la compra fue recachazada
+            let chat: any = await findOrCreateChat(compra.id_usuario_compra, compra.id_usuario_venta, t);
+            await sendMessageOnChat(
+                compra.id_usuario_venta,
+                chat.id,
+                `El intercambio entre el artículo "${articulo_venta.nombre}" POR el artículo "${producto_cambio.nombre}" se ha rechazado.`,
+                t
+            );
+        }
         await t.commit();
-        return responseAPI(HttpStatus.OK, res, compra, "Compra rechazada con exito");
+        return responseAPI(HttpStatus.OK, res, compra, id_usuario === parseInt(compra.id_usuario_compra) ? "Compra cancelada con exito" : "Compra rechazada con exito");
     } catch (error) {
         await t.rollback();
-        return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "Error al validar la compra", error.message);
+        return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "Error al rechazar la compra", error.message);
     }
 };
 export const rechazarSolicitud = async (req: Request, res: Response) => {
@@ -692,6 +697,61 @@ export const getVentasValidar = async (req: Request, res: Response) => {
     Buy.findAndCountAll({
         where: {
             id_usuario_venta: id_usuario,
+            valida: false
+        },
+        order: [['validate_at', 'DESC']],
+        limit: limit,
+        offset: offset,
+        include: [
+            {
+                model: Articulo,
+                as: 'articulo_venta',
+                required: true,
+                include: [
+                    {
+                        model: Category,
+                        required: true,
+                        where: {
+                            id: [1, 4]
+                        }
+                    }
+                ]
+            },
+            {
+                model: Articulo,
+                as: 'articulo_cambio',
+                required: false
+            }
+        ]
+    })
+        .then((result: any) => {
+            const ventas = result.rows;
+            const totalVentas = result.count;
+            const totalPages = Math.ceil(totalVentas / limit); // Total de páginas
+            const payload = {
+                data: ventas,
+                totalPages: totalPages,
+                currentPage: page,
+                previousPage: page > 1 ? page - 1 : null,
+                nextPage: page < totalPages ? page + 1 : null,
+                pagesToShow: generatePagesToShow(page, totalPages)
+            }
+            return responseAPI(HttpStatus.OK, res, payload, "Ventas realizadas por el usuario");
+        })
+        .catch((error: any) => {
+            return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "Error al obtener las ventas", error.message);
+        });
+};
+
+export const getCompraValidar = async (req: Request, res: Response) => {
+    const tokenPayload: TokenPayload = req.tokenPayload;
+    const id_usuario = tokenPayload.usuarioId;
+    const page = req.query.page ? parseInt(req.query.page.toString()) : 1; // Página actual, si no se proporciona, se asume 1
+    const limit = 10; // Comentarios por página
+    const offset = (page - 1) * limit; // Calculo del desplazamiento
+    Buy.findAndCountAll({
+        where: {
+            id_usuario_compra: id_usuario,
             valida: false
         },
         order: [['validate_at', 'DESC']],

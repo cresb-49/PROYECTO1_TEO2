@@ -24,6 +24,7 @@ import ChatComponent from "@/components/ChatComponent.vue"
 import ReportesPublicacionComponent from "@/components/ReportesPublicacionComponent.vue";
 import TerminarTrabajosVoluntariados from "@/components/TerminarTrabajosVoluntariados.vue";
 import AceptarSolicitudVoluntariadoTrabajoComponent from "@/components/AceptarSolicitudVoluntariadoTrabajoComponent.vue";
+import CancelarIntercambio from "@/components/CancelarIntercambioComponent.vue";
 
 const routes = [
     {
@@ -101,6 +102,11 @@ const routes = [
         path: '/AceptarIntercambio',
         name: 'AceptarIntercambio',
         component: AceptarIntercambioComponent
+    },
+    {
+        path: '/CancelarIntercambio',
+        name: 'CancelarIntercambio',
+        component: CancelarIntercambio
     },
     {
         path: '/AceptarTrabajoVoluntariado',
