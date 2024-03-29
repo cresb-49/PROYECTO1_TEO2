@@ -542,7 +542,7 @@ export const rechazarCompra = async (req: Request, res: Response) => {
             );
         }
         await t.commit();
-        return responseAPI(HttpStatus.OK, res, compra, id_usuario === parseInt(compra.id_usuario_compra) ? "Compra cancelada con exito" : "Compra rechazada con exito");
+        return responseAPI(HttpStatus.OK, res, null, id_usuario === parseInt(compra.id_usuario_compra) ? "Compra cancelada con exito" : "Compra rechazada con exito");
     } catch (error) {
         await t.rollback();
         return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "Error al rechazar la compra", error.message);
@@ -558,7 +558,8 @@ export const rechazarSolicitud = async (req: Request, res: Response) => {
         if (compra === null) {
             throw new Error("Compra no encontrada");
         }
-        if (compra.id_usuario_venta !== id_usuario) {
+        let usuarios_permitidos = [parseInt(compra.id_usuario_compra), parseInt(compra.id_usuario_venta)];
+        if (!usuarios_permitidos.includes(id_usuario)) {
             throw new Error("No tienes permisos para validar esta compra");
         }
         if (compra.valida === true) {
@@ -580,16 +581,19 @@ export const rechazarSolicitud = async (req: Request, res: Response) => {
         }
         //Eliminamos la compra
         await compra.destroy({ transaction: t });
-        //Le enviamos un mensaje al usuario comprador que la compra fue recachazada
-        let chat: any = await findOrCreateChat(compra.id_usuario_compra, compra.id_usuario_venta, t);
-        await sendMessageOnChat(
-            compra.id_usuario_venta,
-            chat.id,
-            `Su solicitud de ${tipo} "${articulo_venta.nombre}" ha sido rechazada.`,
-            t
-        );
+        //Si el usuario comprador cancela no enviaremos mensaje
+        if (id_usuario !== parseInt(compra.id_usuario_compra)) {
+            //Le enviamos un mensaje al usuario comprador que la compra fue recachazada
+            let chat: any = await findOrCreateChat(compra.id_usuario_compra, compra.id_usuario_venta, t);
+            await sendMessageOnChat(
+                compra.id_usuario_venta,
+                chat.id,
+                `Su solicitud de ${tipo} "${articulo_venta.nombre}" ha sido rechazada.`,
+                t
+            );
+        }
         await t.commit();
-        return responseAPI(HttpStatus.OK, res, compra, "Solitud rechazada con exito");
+        return responseAPI(HttpStatus.OK, res, null, id_usuario === parseInt(compra.id_usuario_compra) ? "Solitud cancelada con exito" : "Solitud rechazada con exito");
     } catch (error) {
         await t.rollback();
         return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "Error al rechazar la solicitud", error.message);
@@ -828,9 +832,60 @@ export const getVentasValidarTrabajosVoluntariados = async (req: Request, res: R
                 ]
             },
             {
+                model: Usuario,
+                as: 'usuario_compra',
+                required: true,
+                attributes: ['id', 'nombres', 'apellidos']
+            }
+        ]
+    })
+        .then((result: any) => {
+            const ventas = result.rows;
+            const totalVentas = result.count;
+            const totalPages = Math.ceil(totalVentas / limit); // Total de páginas
+            const payload = {
+                data: ventas,
+                totalPages: totalPages,
+                currentPage: page,
+                previousPage: page > 1 ? page - 1 : null,
+                nextPage: page < totalPages ? page + 1 : null,
+                pagesToShow: generatePagesToShow(page, totalPages)
+            }
+            return responseAPI(HttpStatus.OK, res, payload, "Ventas realizadas por el usuario");
+        })
+        .catch((error: any) => {
+            return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "Error al obtener las ventas", error.message);
+        });
+};
+
+export const getSolicitudesValidar = async (req: Request, res: Response) => {
+    const tokenPayload: TokenPayload = req.tokenPayload;
+    const id_usuario = tokenPayload.usuarioId;
+    const page = req.query.page ? parseInt(req.query.page.toString()) : 1; // Página actual, si no se proporciona, se asume 1
+    const limit = 10; // Comentarios por página
+    const offset = (page - 1) * limit; // Calculo del desplazamiento
+    Buy.findAndCountAll({
+        where: {
+            id_usuario_compra: id_usuario,
+            valida: false
+        },
+        order: [['validate_at', 'DESC']],
+        limit: limit,
+        offset: offset,
+        include: [
+            {
                 model: Articulo,
-                as: 'articulo_cambio',
-                required: false
+                as: 'articulo_venta',
+                required: true,
+                include: [
+                    {
+                        model: Category,
+                        required: true,
+                        where: {
+                            id: [2, 3]
+                        }
+                    }
+                ]
             },
             {
                 model: Usuario,
@@ -857,4 +912,8 @@ export const getVentasValidarTrabajosVoluntariados = async (req: Request, res: R
         .catch((error: any) => {
             return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, "Error al obtener las ventas", error.message);
         });
+};
+
+export const cancelarSolicitud = async (req: Request, res: Response) => {
+
 };

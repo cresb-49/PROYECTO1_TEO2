@@ -25,7 +25,7 @@ import ReportesPublicacionComponent from "@/components/ReportesPublicacionCompon
 import TerminarTrabajosVoluntariados from "@/components/TerminarTrabajosVoluntariados.vue";
 import AceptarSolicitudVoluntariadoTrabajoComponent from "@/components/AceptarSolicitudVoluntariadoTrabajoComponent.vue";
 import CancelarIntercambio from "@/components/CancelarIntercambioComponent.vue";
-
+import CancelarSolicitudVoluntariadoTrabajoComponent from "@/components/CancelarSolicitudVoluntariadoTrabajoComponent.vue";
 const routes = [
     {
         path: '/',
@@ -112,6 +112,11 @@ const routes = [
         path: '/AceptarTrabajoVoluntariado',
         name: 'AceptarTrabajoVoluntariado',
         component: AceptarSolicitudVoluntariadoTrabajoComponent
+    },
+    {
+        path: '/CancelarTrabajoVoluntariado',
+        name: 'CancelarTrabajoVoluntariado',
+        component: CancelarSolicitudVoluntariadoTrabajoComponent
     },
     {
         path: '/ModificarEstado/:id',

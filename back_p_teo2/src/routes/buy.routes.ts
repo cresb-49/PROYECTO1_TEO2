@@ -1,6 +1,6 @@
 import { verifyToken } from '../middleware/authMiddleware';
 import { Router } from 'express';
-import { aceptarSolicitud, createCompra, getCompraValidar, getComprasUsuario, getVentasUsuario, getVentasValidar, getVentasValidarTrabajosVoluntariados, rechazarCompra, rechazarSolicitud, validarCompra } from '../controllers/buy.controller';
+import { aceptarSolicitud, cancelarSolicitud, createCompra, getCompraValidar, getComprasUsuario, getSolicitudesValidar, getVentasUsuario, getVentasValidar, getVentasValidarTrabajosVoluntariados, rechazarCompra, rechazarSolicitud, validarCompra } from '../controllers/buy.controller';
 const router = Router();
 
 router.post('/compra', verifyToken, createCompra);
@@ -16,4 +16,6 @@ router.get('/ventas/por-validar/usuario', verifyToken, getVentasValidar);
 router.get('/ventas/por-validar/usuario/comprador', verifyToken, getCompraValidar);
 router.get('/ventas/solicitudes/por-validar/usuario', verifyToken, getVentasValidarTrabajosVoluntariados);
 
+router.get('/compra/solicitudes/por-validar/usuario', verifyToken, getSolicitudesValidar);
+router.get('/compra/solicitud/cancelar', verifyToken, cancelarSolicitud);
 export default router;
