@@ -106,7 +106,7 @@
         </div>
     </div>
     <Dialog :show="dialog.show" :cancel="closeDialog" :tittle="dialog.title" :description="dialog.description"
-        :confirm="dialog.action" />
+        :confirm="dialog.action"></Dialog>
 </template>
 
 <script>
@@ -147,7 +147,6 @@ export default {
                 title: "Eliminar Chat",
                 description: "¿Está seguro que desea eliminar el chat?",
                 action: null
-
             }
         }
     },

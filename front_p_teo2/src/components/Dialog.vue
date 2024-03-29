@@ -8,8 +8,8 @@
                 </div>
                 <hr />
                 <div class="dialog__footer">
-                    <button @click="cancel" class="dialog__cancel">Cancelar</button>
-                    <button @click="confirm" class="dialog__confirm">Continuar</button>
+                    <button @click="cancel" class="dialog__cancel">No</button>
+                    <button @click="yesAndClose()" class="dialog__confirm">Si</button>
                 </div>
             </div>
         </div>
@@ -19,7 +19,13 @@
 <script>
 export default {
     name: 'DialogVue',
-    props:['show','cancel','confirm','tittle','description']
+    props: ['show', 'cancel', 'confirm', 'tittle', 'description'],
+    methods: {
+        yesAndClose() {
+            this.confirm();
+            this.cancel();
+        }
+    }
 }
 </script>
 

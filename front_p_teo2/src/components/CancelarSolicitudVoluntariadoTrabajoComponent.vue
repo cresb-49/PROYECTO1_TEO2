@@ -29,8 +29,8 @@
                             </div>
                             <div class="row">
                                 <div class="col-auto">
-                                    <button @click="cambioSolicitud(d)"
-                                        class="btn btn-danger float-right mt-4">Cancelar Solicitud</button>
+                                    <button @click="doDialog(() => this.cambioSolicitud(d))" class="btn btn-danger float-right mt-4">Cancelar
+                                        Solicitud</button>
                                 </div>
                             </div>
                         </div>
@@ -58,16 +58,22 @@
             </nav>
         </div>
     </div>
+    <Dialog :show="dialog.show" :cancel="closeDialog" :tittle="dialog.title" :description="dialog.description"
+        :confirm="dialog.action"></Dialog>
 </template>
 
 <script>
 import { toast } from 'vue3-toastify';
 import { mapGetters } from 'vuex';
+import Dialog from '@/components/Dialog.vue'
 
 export default {
     name: 'CancelarSolicitudVoluntariadoTrabajoComponent',
-    components: {
+    computed: {
         ...mapGetters(['token'])
+    },
+    components: {
+        Dialog
     },
     data() {
         return {
@@ -76,7 +82,13 @@ export default {
             currentPage: 0,
             previousPage: null,
             nextPage: null,
-            pagesToShow: []
+            pagesToShow: [],
+            dialog: {
+                show: false,
+                title: "Cancelar Solitud",
+                description: "¿Está seguro de cancelar la solicitud?",
+                action: null
+            }
         }
     },
     mounted() {
@@ -139,6 +151,14 @@ export default {
                         toast.error(element);
                     }
                 });
+        },
+        doDialog(action) {
+            this.dialog.show = true;
+            this.dialog.action = action;
+        },
+        closeDialog() {
+            this.dialog.show = false;
+            this.dialog.action = null;
         }
     }
 }
