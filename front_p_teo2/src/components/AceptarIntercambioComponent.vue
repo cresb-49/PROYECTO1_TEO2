@@ -62,11 +62,11 @@
                             </div>
                             <div class="row">
                                 <div class="col-6">
-                                    <button @click="cambioIntercambio(true, d)"
+                                    <button @click="doDialog(() => this.cambioIntercambio(true, d))"
                                         class="btn btn-success float-right mt-4">Aceptar Intercambio</button>
                                 </div>
                                 <div class="col-6">
-                                    <button @click="cambioIntercambio(false, d)"
+                                    <button @click="doDialog(() => this.cambioIntercambio(false, d))"
                                         class="btn btn-danger float-right mt-4">Rechazar Intercambio</button>
                                 </div>
                             </div>
@@ -95,16 +95,22 @@
             </nav>
         </div>
     </div>
+    <Dialog :show="dialog.show" :cancel="closeDialog" :tittle="dialog.title" :description="dialog.description"
+        :confirm="dialog.action"></Dialog>
 </template>
 
 <script>
 import { toast } from 'vue3-toastify';
 import { mapGetters } from 'vuex';
+import Dialog from '@/components/Dialog.vue'
 
 export default {
     name: 'AceptarIntercambioComponent',
-    components: {
+    computed: {
         ...mapGetters(['token'])
+    },
+    components: {
+        Dialog
     },
     data() {
         return {
@@ -113,7 +119,13 @@ export default {
             currentPage: 0,
             previousPage: null,
             nextPage: null,
-            pagesToShow: []
+            pagesToShow: [],
+            dialog: {
+                show: false,
+                title: "Confirmar acción",
+                description: "¿Está seguro de realizar esta acción?",
+                action: null
+            }
         }
     },
     mounted() {
@@ -194,6 +206,16 @@ export default {
                         }
                     });
             }
+        },
+        doDialog(action, tittle, des) {
+            this.title = tittle ?? "Confirmar acción";
+            this.description = des ?? "¿Está seguro de realizar esta acción?";
+            this.dialog.show = true;
+            this.dialog.action = action;
+        },
+        closeDialog() {
+            this.dialog.show = false;
+            this.dialog.action = null;
         }
     }
 }
