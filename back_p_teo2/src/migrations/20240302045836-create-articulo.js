@@ -19,12 +19,12 @@ module.exports = {
       },
       valor_entrada: {
         type: Sequelize.DECIMAL(8, 2),
-        allowNull: false,
+        allowNull: true,
         defaultValue: 0
       },
       recompenza: {
         type: Sequelize.DECIMAL(8, 2),
-        allowNull: false,
+        allowNull: true,
         defaultValue: 0
       },
       descripcion: {
@@ -48,12 +48,12 @@ module.exports = {
       },
       creditos_retirables_asignados: {
         type: Sequelize.DECIMAL(8, 2),
-        allowNull: false,
+        allowNull: true,
         defaultValue: 0
       },
       creditos_no_retirables_asignados: {
         type: Sequelize.DECIMAL(8, 2),
-        allowNull: false,
+        allowNull: true,
         defaultValue: 0
       },
       f_desactivado: {
