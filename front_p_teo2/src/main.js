@@ -11,7 +11,8 @@ import router from './router'
 
 import storage from './storage';
 
-export const URL_API = 'http://localhost/api'; // Conexion al api con el reverse proxy
+// export const URL_API = 'http://localhost/api'; // Conexion al api con el reverse proxy windows
+export const URL_API = 'http://localhost:8080/api'; // Conexion al api con el reverse proxy linux
 // export const URL_API = 'http://localhost:3000/api'; // Conexion al api sin el reverse proxy
 
 axios.defaults.baseURL = URL_API; // Conexion al api con el reverse proxy
