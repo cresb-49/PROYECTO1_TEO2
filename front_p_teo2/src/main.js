@@ -11,8 +11,10 @@ import router from './router'
 
 import storage from './storage';
 
-// axios.defaults.baseURL='http://localhost:3000/api'; // Conexion al api sin el reverse proxy
-axios.defaults.baseURL = 'http://localhost/api'; // Conexion al api con el reverse proxy
+export const URL_API = 'http://localhost/api'; // Conexion al api con el reverse proxy
+// export const URL_API = 'http://localhost:3000/api'; // Conexion al api sin el reverse proxy
+
+axios.defaults.baseURL = URL_API; // Conexion al api con el reverse proxy
 
 // let token = localStorage.getItem('token');
 // axios.defaults.headers.common['Authorization']='Bearer '+token;
