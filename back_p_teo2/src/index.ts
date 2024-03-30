@@ -66,6 +66,10 @@ app.use('/api', rolRoutes);
 import chatRoutes from './routes/chat.routes';
 app.use('/api', chatRoutes);
 
+app.use('/api/test', (req, res) => {
+    res.send('Hello World');
+});
+
 //Inicio del servidor
 const PORT: string | undefined = process.env.SERVER_PORT;
 app.listen(PORT, (): void => {
