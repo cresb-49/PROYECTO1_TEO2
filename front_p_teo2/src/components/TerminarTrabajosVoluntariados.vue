@@ -8,7 +8,7 @@
                         <div class="col-3 d-flex justify-content-center align-items-center">
                             <div class="col">
                                 <div class="row">
-                                    <img :src="'http://localhost:3000/api/image?articulo=' + publicacion.id_articulo"
+                                    <img :src="`${URL_API}/image?articulo=` + publicacion.id_articulo"
                                         class="img-fluid" alt="Producto">
                                 </div>
                                 <div class="row">
@@ -79,6 +79,7 @@
 import { toast } from 'vue3-toastify';
 import { mapGetters } from 'vuex';
 import Dialog from '@/components/Dialog.vue'
+import { URL_API } from '@/main';
 
 export default {
     name: 'TerminarTrabajosVoluntariados',
@@ -101,7 +102,8 @@ export default {
                 title: "Confirmar acción",
                 description: "¿Está seguro de realizar esta acción?",
                 action: null
-            }
+            },
+            URL_API
         }
     },
     mounted() {

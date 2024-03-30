@@ -6,8 +6,8 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-3">
-                            <img :src="'http://localhost:3000/api/image?articulo=' + compra.id_articulo_venta"
-                                class="img-fluid" alt="Imagen del producto">
+                            <img :src="`${URL_API}/image?articulo=` + compra.id_articulo_venta" class="img-fluid"
+                                alt="Producto">
                         </div>
                         <div class="col-9">
                             <h5 class="card-title"><strong>Nombre:</strong> {{ compra.articulo_venta.nombre }}</h5>
@@ -46,6 +46,7 @@
 <script>
 import { toast } from 'vue3-toastify';
 import { mapGetters } from 'vuex';
+import { URL_API } from '@/main';
 
 export default {
     name: 'ListaVentasComponent',
@@ -61,7 +62,8 @@ export default {
             currentPage: 1,
             previousPage: 1,
             nextPage: 1,
-            pagesToShow: []
+            pagesToShow: [],
+            URL_API
         }
     },
     props: {

@@ -7,7 +7,7 @@
                     <template v-for="articulo in articulos" :key="articulo">
                         <div class="col-md-3">
                             <div class="card mb-3">
-                                <img :src="'http://localhost:3000/api/image?articulo=' + articulo.id" class="card-img-top" alt="Imagen de {{articulo.nombre}}">
+                                <img :src="`${URL_API}/image?articulo=` + articulo.id" class="card-img-top" alt="Articulo {{articulo.nombre}}">
                                 <div class="card-body">
                                     <h5 class="card-title">{{ articulo.nombre }}</h5>
                                     <p class="card-text">{{ articulo.descripcion }}</p>
@@ -28,6 +28,7 @@
 //import { toast } from 'vue3-toastify';
 import { toast } from 'vue3-toastify';
 // import CardArticulo from './CardArticuloComponent.vue';
+import { URL_API } from '@/main';
 
 export default {
     name: 'VerMisProductos',
@@ -36,7 +37,8 @@ export default {
     },
     data() {
         return {
-            articulos: []
+            articulos: [],
+            URL_API
         }
     },
     mounted() {

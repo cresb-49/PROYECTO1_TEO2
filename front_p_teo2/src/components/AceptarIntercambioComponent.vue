@@ -10,7 +10,7 @@
                             <div class="col-5">
                                 <div class="row">
                                     <div class="col-3">
-                                        <img :src="'http://localhost:3000/api/image?articulo=' + d.id_articulo_venta"
+                                        <img :src="`${URL_API}/image?articulo=` + d.id_articulo_venta"
                                             class="img-fluid" alt="Producto">
                                     </div>
                                     <div class="col-9">
@@ -32,7 +32,7 @@
                             <div class="col-5">
                                 <div class="row">
                                     <div class="col-3">
-                                        <img :src="'http://localhost:3000/api/image?articulo=' + d.id_articulo_cambio"
+                                        <img :src="`${URL_API}/image?articulo=` + d.id_articulo_cambio"
                                             class="img-fluid" alt="Producto">
                                     </div>
                                     <div class="col-9">
@@ -103,7 +103,7 @@
 import { toast } from 'vue3-toastify';
 import { mapGetters } from 'vuex';
 import Dialog from '@/components/Dialog.vue'
-
+import { URL_API } from '@/main';
 export default {
     name: 'AceptarIntercambioComponent',
     computed: {
@@ -125,7 +125,8 @@ export default {
                 title: "Confirmar acción",
                 description: "¿Está seguro de realizar esta acción?",
                 action: null
-            }
+            },
+            URL_API
         }
     },
     mounted() {

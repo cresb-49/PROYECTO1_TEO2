@@ -1,7 +1,7 @@
 <template>
   <div class="col">
     <div class="card h-100">
-      <img :src="'http://localhost:3000/api/image?articulo=' + articulo.id" class="imgP img-fluid" alt="Producto">
+      <img :src="`${URL_API}/image?articulo=` + articulo.id" class="imgP img-fluid" alt="Producto">
       <div class="card-body">
         <h5 class="card-title">{{ articulo.nombre }}</h5>
         <p class="card-text overflow-ellipsis"><small>{{ articulo.descripcion }}</small></p>
@@ -18,6 +18,8 @@
 </template>
 
 <script>
+import { URL_API } from '@/main';
+
 export default {
   name: 'CardArticulo',
   props: {
@@ -50,6 +52,11 @@ export default {
     },
     isPublicacion: {
       type: Boolean
+    }
+  },
+  data() {
+    return {
+      URL_API
     }
   }
 }

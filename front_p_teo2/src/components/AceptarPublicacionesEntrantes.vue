@@ -5,7 +5,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-3">
-                            <img :src="'http://localhost:3000/api/image?articulo=' + publicacion.id_articulo"
+                            <img :src="`${URL_API}/image?articulo=` + publicacion.id_articulo"
                                 class="img-fluid" alt="Producto">
                         </div>
                         <div class="col-9">
@@ -29,6 +29,8 @@
 <script>
 import { toast } from 'vue3-toastify';
 import { mapGetters } from 'vuex';
+import { URL_API } from '@/main';
+
 export default {
     name: 'AceptarPublicacionesEntrantes',
     computed: {
@@ -36,7 +38,8 @@ export default {
     },
     data() {
         return {
-            publicaciones: []
+            publicaciones: [],
+            URL_API
         }
     },
     props: {

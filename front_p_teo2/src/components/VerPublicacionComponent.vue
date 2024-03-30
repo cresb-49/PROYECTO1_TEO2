@@ -1,8 +1,7 @@
 <template>
     <div class="mt-4">
         <div align="center">
-            <img :src="'http://localhost:3000/api/image?articulo=' + articulo.id" alt="Articulo"
-                style="max-width: 100%;">
+            <img :src="`${URL_API}/image?articulo=` + articulo.id" alt="Articulo" style="max-width: 100%;">
         </div>
         <!-- Button trigger modal -->
         <button type="button" class="btn btn-sm btn-link" data-bs-toggle="modal" data-bs-target="#exampleModal"
@@ -143,7 +142,7 @@
                         <label for="disabledTextInput">Producto Seleccionado</label>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <img :src="'http://localhost:3000/api/image?articulo=' + articuloSeleccionado.id"
+                                <img :src="`${URL_API}/image?articulo=` + articuloSeleccionado.id"
                                     class="imgP img-fluid" alt="Producto">
                             </div>
                         </div>
@@ -239,6 +238,7 @@
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import { mapGetters } from 'vuex';
+import { URL_API } from '@/main';
 
 export default {
     name: 'VerPublicacion',
@@ -247,6 +247,7 @@ export default {
     },
     data() {
         return {
+            URL_API,
             reporte: {
                 texto: ""
             },

@@ -8,8 +8,8 @@
                         <div class="col-3 d-flex justify-content-center align-items-center">
                             <div class="col">
                                 <div class="row">
-                                    <img :src="'http://localhost:3000/api/image?articulo=' + publicacion.id_articulo"
-                                        class="img-fluid" alt="Producto">
+                                    <img :src="`${URL_API}/image?articulo=` + publicacion.id_articulo" class="img-fluid"
+                                        alt="Producto">
                                 </div>
                                 <div class="row">
                                     <RouterLink :to="{ name: 'Publicacion', params: { id: publicacion.id } }"
@@ -94,6 +94,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import { toast } from 'vue3-toastify';
+import { URL_API } from '@/main';
 
 export default {
     name: 'ReportesPublicacionComponent',
@@ -108,7 +109,8 @@ export default {
             currentPage: 1,
             previousPage: 1,
             nextPage: 1,
-            pagesToShow: []
+            pagesToShow: [],
+            URL_API
         }
     },
     mounted() {
