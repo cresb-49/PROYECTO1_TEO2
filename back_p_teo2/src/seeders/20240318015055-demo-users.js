@@ -47,8 +47,8 @@ module.exports = {
         updated_at: new Date(),
       },{
         id: 5,
-        nombres: 'Carlos',
-        apellidos: 'Pac',
+        nombres: 'Benjamin',
+        apellidos: 'Flores',
         f_nacimiento: '1999-04-09',
         email: 'carlospac49@gmail.com',
         password: await bcrypt.hash('12345', 10),
