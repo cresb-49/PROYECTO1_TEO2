@@ -23,12 +23,10 @@ export const Articulo = sequelize.define('articulo',
         },
         valor_entrada: {
             type: DataTypes.DECIMAL(8, 2),
-            allowNull: false,
             defaultValue: 0
         },
         recompenza: {
             type: DataTypes.DECIMAL(8, 2),
-            allowNull: false,
             defaultValue: 0
         },
         descripcion: {
@@ -52,12 +50,10 @@ export const Articulo = sequelize.define('articulo',
         },
         creditos_retirables_asignados: {
             type: DataTypes.DECIMAL(8, 2),
-            allowNull: false,
             defaultValue: 0
         },
         creditos_no_retirables_asignados: {
             type: DataTypes.DECIMAL(8, 2),
-            allowNull: false,
             defaultValue: 0
         },
         f_desactivado: {
