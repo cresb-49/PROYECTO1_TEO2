@@ -4,7 +4,7 @@
         <div class="container mt-4">
             <div class="row justify-content-center">
                 <!-- Lado Izquierdo: Campos para Saldo y Datos Personales -->
-                <div class="col-md-6">
+                <div class="col-md-6" v-if="miCuenta">
                     <div class="border p-3 mb-4">
                         <h5 class="mb-3">Datos de mi cuenta</h5>
                         <div class="mb-3">
@@ -132,10 +132,11 @@ export default {
                 this.miCuenta.apellidos = data.apellidos;
                 this.email = response.data.email;
             }).catch(error => {
+                this.miCuenta = null;
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
-                for (let index = 0; index < errores.length; index++) {
-                    toast.error(errores[index]);
+                for (const element of errores) {
+                    toast.error(element);
                 }
             });
         },

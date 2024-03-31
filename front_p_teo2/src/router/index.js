@@ -26,6 +26,7 @@ import TerminarTrabajosVoluntariados from "@/components/TerminarTrabajosVoluntar
 import AceptarSolicitudVoluntariadoTrabajoComponent from "@/components/AceptarSolicitudVoluntariadoTrabajoComponent.vue";
 import CancelarIntercambio from "@/components/CancelarIntercambioComponent.vue";
 import CancelarSolicitudVoluntariadoTrabajoComponent from "@/components/CancelarSolicitudVoluntariadoTrabajoComponent.vue";
+import TasaDeCambioComponent from "@/components/TasaDeCambioComponent.vue";
 const routes = [
     {
         path: '/',
@@ -166,6 +167,11 @@ const routes = [
         path: '/FinTrabajoVoluntariado',
         name: 'FinTrabajoVoluntariado',
         component: TerminarTrabajosVoluntariados
+    },
+    {
+        path: '/TasaDeCambio',
+        name: 'TasaDeCambio',
+        component: TasaDeCambioComponent
     },
     {
         path: '/:pathMatch(.*)*',

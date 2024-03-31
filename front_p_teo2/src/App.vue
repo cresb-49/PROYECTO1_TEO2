@@ -79,6 +79,14 @@
                 <li><router-link to="/ReportesPublicacion" class="dropdown-item">Reportes de Publicacion</router-link></li>
               </ul>
             </li>
+            <li class="nav-item dropdown" v-if="isAuth && isAdmin">
+              <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Economia
+              </a>
+              <ul class="dropdown-menu">
+                <li><router-link to="/TasaDeCambio" class="dropdown-item">Tasa de Cambio</router-link></li>
+              </ul>
+            </li>
           </ul>
           <div style="margin-right: 10px;">
             <ul class="navbar-nav my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
