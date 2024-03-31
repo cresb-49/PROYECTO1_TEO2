@@ -1,6 +1,6 @@
 <template>
     <div class="mt-4">
-        <h2>Actulizar Tasa de Cambio</h2>
+        <h2>Actualizar Tasa de Cambio</h2>
         <div class="col-md-auto">
             <form @submit.prevent="doDialog(() => cambiarTasaDeCambio())" class="mt-4">
                 <div class="col">
@@ -8,16 +8,16 @@
                         <div class="form-group col-md-6">
                             <label for="inputEmail4">Valor de Compra</label>
                             <input type="number" class="form-control" id="inputEmail4" placeholder="Valor" min="0"
-                                v-model="tasaDeCambio.valor_compra">
+                                v-model="tasaDeCambio.valor_compra" step="0.1">
                         </div>
                         <div class="form-group col-md-6">
                             <label for="inputPassword4">Valor de Venta</label>
                             <input type="number" class="form-control" id="inputPassword4" placeholder="Valor" min="0"
-                                v-model="tasaDeCambio.valor_venta">
+                                v-model="tasaDeCambio.valor_venta" step="0.1">
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary mt-4">Sign in</button>
+                    <button type="submit" class="btn btn-primary mt-4">Actualizar</button>
                 </div>
             </form>
         </div>
@@ -27,6 +27,7 @@
 </template>
 
 <script>
+import { toast } from 'vue3-toastify';
 import { mapGetters } from 'vuex';
 import Dialog from '@/components/Dialog.vue'
 
@@ -56,12 +57,43 @@ export default {
     },
     mounted() {
         this.obtenerTasaDeCambio();
+        //Verificamos que el usuario sea administrador para poder acceder a esta vista
+        if (!this.isAdmin) {
+            this.$router.push('/');
+        }
     },
     methods: {
         cambiarTasaDeCambio() {
-            console.log("Cambiando tasa de cambio");
+            const payload = {
+                valor_compra: this.tasaDeCambio.valor_compra,
+                valor_venta: this.tasaDeCambio.valor_venta
+            };
+            this.axios.put('tasa', payload,
+                {
+                    headers: {
+                        Authorization: `Bearer ${this.token}`
+                    }
+                })
+                .then(response => {
+                    this.obtenerTasaDeCambio();
+                    toast.success(response.data.mensaje);
+                }).catch(error => {
+                    toast.error(error.response.data.error);
+                    let errores = error.response.data.errores;
+                    for (const element of errores) {
+                        toast.error(element);
+                    }
+                });
         },
         obtenerTasaDeCambio() {
+            this.axios.get('tasa')
+                .then(response => {
+                    const data = response.data.data;
+                    this.tasaDeCambio.valor_compra = data.valor_compra;
+                    this.tasaDeCambio.valor_venta = data.valor_venta;
+                }).catch(error => {
+                    console.log(error);
+                });
             console.log("Obteniendo tasa de cambio");
         },
         doDialog(action, tittle, des) {
