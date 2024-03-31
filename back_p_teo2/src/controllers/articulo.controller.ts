@@ -145,9 +145,9 @@ export const createArticulo = async (req: Request, res: Response) => {
     const id_usuario = parseInt(tokenPayload.usuarioId);
     let payload = {
         nombre: nombre,
-        valor: parseFloat(precio),
-        valor_entrada: parseFloat(valor_entrada),
-        recompenza: parseFloat(recompenza),
+        valor: parseFloat(precio ?? 0),
+        valor_entrada: parseFloat(valor_entrada ?? 0),
+        recompenza: parseFloat(recompenza ?? 0),
         descripcion: descripcion,
         id_categoria: id_categoria,
         id_usuario: id_usuario,
