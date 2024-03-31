@@ -66,6 +66,9 @@ app.use('/api', rolRoutes);
 import chatRoutes from './routes/chat.routes';
 app.use('/api', chatRoutes);
 
+import tasaCambioRoutes from "./routes/tasa_cambio.routes";
+app.use('/api', tasaCambioRoutes);
+
 app.use('/api/test', (req, res) => {
     res.send('Hello World');
 });
