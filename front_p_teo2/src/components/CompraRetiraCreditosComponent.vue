@@ -14,11 +14,11 @@
                                     <input type="number" class="form-control" v-model="cantidadCompra">
                                 </div>
                                 <div class="form-group mb-2">
-                                    <label>Compra QUETZALES</label>
+                                    <label>Compra</label>
                                     <input type="text" class="form-control" v-model="tasaCambio1" readonly>
                                 </div>
                                 <div class="form-group mb-2">
-                                    <label>Venta KORNS</label>
+                                    <label>Venta</label>
                                     <input type="text" class="form-control" v-model="tasaCambio2" readonly>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Comprar</button>
@@ -70,6 +70,7 @@ export default {
     },
     mounted() {
         this.infoCuenta();
+        this.obtenerTasaDeCambio();
     },
     methods: {
         infoCuenta() {
@@ -84,8 +85,8 @@ export default {
             }).catch(error => {
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
-                for (let index = 0; index < errores.length; index++) {
-                    toast.error(errores[index]);
+                for (const element of errores) {
+                    toast.error(element);
                 }
             });
         },
@@ -105,8 +106,8 @@ export default {
             }).catch(error => {
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
-                for (let index = 0; index < errores.length; index++) {
-                    toast.error(errores[index]);
+                for (const element of errores) {
+                    toast.error(element);
                 }
             })
         },
@@ -126,11 +127,25 @@ export default {
             }).catch(error => {
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
-                for (let index = 0; index < errores.length; index++) {
-                    toast.error(errores[index]);
+                for (const element of errores) {
+                    toast.error(element);
                 }
             })
-        }
+        },
+        obtenerTasaDeCambio() {
+            this.axios.get('tasa')
+                .then(response => {
+                    const data = response.data.data;
+                    this.tasaCambio1 = data.valor_compra;
+                    this.tasaCambio2 = data.valor_venta;
+                }).catch(error => {
+                    toast.error(error.response.data.error);
+                    let errores = error.response.data.errores;
+                    for (const element of errores) {
+                        toast.error(element);
+                    }
+                });
+        },
     }
 }
 </script>

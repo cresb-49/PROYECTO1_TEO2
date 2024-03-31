@@ -92,9 +92,12 @@ export default {
                     this.tasaDeCambio.valor_compra = data.valor_compra;
                     this.tasaDeCambio.valor_venta = data.valor_venta;
                 }).catch(error => {
-                    console.log(error);
+                    toast.error(error.response.data.error);
+                    let errores = error.response.data.errores;
+                    for (const element of errores) {
+                        toast.error(element);
+                    }
                 });
-            console.log("Obteniendo tasa de cambio");
         },
         doDialog(action, tittle, des) {
             this.title = tittle ?? "Confirmar acción";
