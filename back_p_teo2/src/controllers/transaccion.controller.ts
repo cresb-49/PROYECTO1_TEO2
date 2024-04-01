@@ -6,6 +6,7 @@ import { Acount } from '../models/acount';
 import { Usuario } from '../models/usuario';
 import { Op, Transaction } from 'sequelize';
 import sequelize from '../database/database';
+import { TasaCambio } from '../models/tasa_cambio';
 
 export const getTransacciones = async (req: Request, res: Response) => {
     Transaccion.findAll()
@@ -44,20 +45,25 @@ export const getTransaccionesUsuario = async (req: Request, res: Response) => {
 export const buyCreditos = async (req: Request, res: Response) => {
     let { cantidad } = req.body;
     if (!cantidad) {
-        return responseAPI(HttpStatus.BAD_REQUEST, res, null, 'Cantidad de creditos no enviada', 'Cantidad de creditos no enviada');
+        return responseAPI(HttpStatus.BAD_REQUEST, res, null, 'Cantidad de Quetzales no enviada', 'Cantidad de Quetzales no enviada');
     }
     cantidad = parseFloat(cantidad);
     if (cantidad <= 0) {
-        return responseAPI(HttpStatus.BAD_REQUEST, res, null, 'La cantidad de creditos debe ser mayor a 0', 'La cantidad de creditos debe ser mayor a 0');
+        return responseAPI(HttpStatus.BAD_REQUEST, res, null, 'La cantidad de Quetzales debe ser mayor a 0', 'La cantidad de Quetzales debe ser mayor a 0');
     }
     const { tokenPayload } = req;
     let id_usuario = tokenPayload.usuarioId;
     try {
+        //Obtenemos la tasa de cambio
+        const tasa_cambio: any = await TasaCambio.findByPk(1);
+        if (!tasa_cambio) {
+            throw new Error("Tasa de cambio no encontrada");
+        }
         const usuario: any = await Usuario.findOne({ where: { id: id_usuario }, include: Acount });
         const cuenta_usuario = usuario.acount;
         if (cuenta_usuario) {
             let saldo_retirable = parseFloat(cuenta_usuario.saldo_retirable);
-            saldo_retirable += cantidad;
+            saldo_retirable += cantidad * parseFloat(tasa_cambio.valor_compra);
             await Acount.update({
                 "saldo_retirable": saldo_retirable
             }, {
@@ -99,10 +105,16 @@ export const retirarCreditos = async (req: Request, res: Response) => {
     const { tokenPayload } = req;
     let id_usuario = tokenPayload.usuarioId;
     try {
+        //Obtenemos la tasa de cambio
+        const tasa_cambio: any = await TasaCambio.findByPk(1);
+        if (!tasa_cambio) {
+            throw new Error("Tasa de cambio no encontrada");
+        }
         const usuario: any = await Usuario.findOne({ where: { id: id_usuario }, include: Acount });
         const cuenta_usuario = usuario.acount;
         if (cuenta_usuario) {
             let saldo_retirable = parseFloat(cuenta_usuario.saldo_retirable);
+            let cantidad_quetzales = cantidad / parseFloat(tasa_cambio.valor_venta);
             if (saldo_retirable > cantidad) {
                 saldo_retirable -= cantidad;
                 await Acount.update({
@@ -117,11 +129,11 @@ export const retirarCreditos = async (req: Request, res: Response) => {
                     "id_cuenta_origen": cuenta_usuario.id,
                     "id_cuenta_destino": null,
                     "valor": cantidad,
-                    "descripcion": "Retiro de creditos"
+                    "descripcion": `Retiro de creditos equivalente un monto de Q${cantidad_quetzales}`
                 };
                 let transaccion = await Transaccion.create(payload_transaccion);
                 if (transaccion) {
-                    return responseAPI(HttpStatus.OK, res, null, 'Creditos retirados con exito');
+                    return responseAPI(HttpStatus.OK, res, null, `Creditos retirados con exito, equivalente a Q${cantidad_quetzales}`);
                 } else {
                     return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, 'Error al retirar creditos');
                 }
