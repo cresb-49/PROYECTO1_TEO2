@@ -76,7 +76,7 @@ export const buyCreditos = async (req: Request, res: Response) => {
                 "id_cuenta_origen": null,
                 "id_cuenta_destino": cuenta_usuario.id,
                 "valor": cantidad,
-                "descripcion": "Compra de creditos"
+                "descripcion": `Se adquirieron ${cantidad} creditos por un monto de Q. ${cantidad}`
             };
             let transaccion = await Transaccion.create(payload_transaccion);
             if (transaccion) {
