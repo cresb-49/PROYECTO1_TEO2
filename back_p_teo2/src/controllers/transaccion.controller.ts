@@ -7,6 +7,7 @@ import { Usuario } from '../models/usuario';
 import { Op, Transaction } from 'sequelize';
 import sequelize from '../database/database';
 import { TasaCambio } from '../models/tasa_cambio';
+import { Category } from '../models/category';
 
 export const getTransacciones = async (req: Request, res: Response) => {
     Transaccion.findAll()
@@ -383,4 +384,32 @@ export const descontarCreditos = async (id_cuenta_origen: number | string, tipo:
     } catch (error) {
         throw new Error("Error al efectuar la transaccion: " + error.message);
     }
+}
+
+export const gananciaCompraCategoria = async (id_usuario: number, id_categoria: number, cantidad: number, t: Transaction) => {
+    //Obtenemos la cuenta del usuario
+    const usuario: any = await Usuario.findOne({ where: { id: id_usuario }, include: { model: Acount, required: true } });
+    //CUenta del usuario
+    const cuenta_usuario: any = usuario.acount;
+    //Obtenemos la categoria
+    const categoria: any = await Category.findByPk(id_categoria);
+    //Obtenemos el valor del porcentaje de ganancia
+    const porcentaje_ganancia = parseFloat(categoria.porcentaje_ganancias);
+    //Calculamos la ganancia total de la transaccion
+    const ganancia = cantidad * porcentaje_ganancia / 100;
+    //Sumamos la cantidad ganada al sldo no retirable del usuario
+    let saldo_no_retirable = parseFloat(cuenta_usuario.saldo_no_retirable);
+    saldo_no_retirable += ganancia;
+    cuenta_usuario.saldo_no_retirable = saldo_no_retirable;
+    await cuenta_usuario.save({ transaction: t });
+    //Registramos la transaccion del usuario
+    const payload_transaccion = {
+        "id_cuenta_origen": null,
+        "id_cuenta_destino": cuenta_usuario.id,
+        "valor": ganancia,
+        "descripcion": `Creditos no retirables ganados por la compra de un articulo de la categoria ${categoria.nombre}`
+    };
+    let transaccion = await Transaccion.create(payload_transaccion, { transaction: t });
+    return transaccion;
+
 }

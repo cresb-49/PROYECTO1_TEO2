@@ -7,7 +7,7 @@ import { Category } from '../models/category';
 import { Buy } from '../models/buy';
 import { Usuario } from '../models/usuario';
 import { Acount } from '../models/acount';
-import { descontarCreditos, generarTransaccion, generarTransaccion2 } from './transaccion.controller';
+import { descontarCreditos, gananciaCompraCategoria, generarTransaccion, generarTransaccion2 } from './transaccion.controller';
 import { BuyTransaccion } from '../models/buy_transaccion';
 import { resCantidadArticulo } from './articulo.controller';
 import sequelize from '../database/database';
@@ -249,6 +249,13 @@ const compraArticuloServicio = async (req: Request, res: Response, publicacion: 
                 transacciones.push(tr);
             }
         }
+        if (buy.valida === true) {
+
+            let tr = await gananciaCompraCategoria(usuario_comprador.id, articulo.id_categoria, valor_compra, t);
+            if (tr) {
+                transacciones.push(tr);
+            }
+        }
         //Generamos las relaciones de transacciones con la compra
         if (transacciones.length > 0) {
             await Promise.all(transacciones.map(async (transaccion) => {
@@ -356,6 +363,10 @@ export const validarCompra = async (req: Request, res: Response) => {
             if (tr) {
                 transacciones.push(tr);
             }
+        }
+        let tr = await gananciaCompraCategoria(usuario_comprador.id, articulo_venta.id_categoria, parseFloat(compra.valor_venta), t);
+        if (tr) {
+            transacciones.push(tr);
         }
         //Generamos las relaciones de transacciones con la compra
         if (transacciones.length > 0) {

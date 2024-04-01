@@ -576,7 +576,7 @@ module.exports = {
     ];
 
     categorias.forEach(categoria => {
-      categoria.porcentaje_ganancias = 25;
+      categoria.porcentaje_ganancias = 1.5;
       categoria.created_at = new Date();
       categoria.updated_at = new Date();
     });
