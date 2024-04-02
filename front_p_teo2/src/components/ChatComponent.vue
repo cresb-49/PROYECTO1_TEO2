@@ -263,6 +263,9 @@ export default {
                     apellidos: chat.usuario_1.apellidos
                 };
             }
+            this.getMessagesOfChat(chat);
+        },
+        getMessagesOfChat(chat) {
             this.axios.post('chat/mensajes', {
                 id_chat: chat.id
             }, {
@@ -339,8 +342,27 @@ export default {
                     toast.error(error);
                 }
             });
+        },
+        actulizacionChat() {
+            //Generemaos una funcion que se ejecute cada 5 segundos
+            setInterval(() => {
+                this.axios.get('chats', {
+                    headers: {
+                        Authorization: `Bearer ${this.token}`
+                    }
+                }).then(response => {
+                    const data = response.data.data;
+                    this.chats = data;
+                }).catch(error => {
+                    console.log(error.response);
+                    toast.error(error.response.data.error);
+                    let errores = error.response.data.errores;
+                    for (let error of errores) {
+                        toast.error(error);
+                    }
+                });
+            }, 5000);
         }
-
     }
 }
 </script>
