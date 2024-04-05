@@ -147,7 +147,8 @@ export default {
                 title: "Eliminar Chat",
                 description: "¿Está seguro que desea eliminar el chat?",
                 action: null
-            }
+            },
+            intervalID: null
         }
     },
     mounted() {
@@ -264,6 +265,7 @@ export default {
                 };
             }
             this.getMessagesOfChat(chat);
+            this.actulizacionChat();
         },
         getMessagesOfChat(chat) {
             this.axios.post('chat/mensajes', {
@@ -344,25 +346,18 @@ export default {
             });
         },
         actulizacionChat() {
-            //Generemaos una funcion que se ejecute cada 5 segundos
-            setInterval(() => {
-                this.axios.get('chats', {
-                    headers: {
-                        Authorization: `Bearer ${this.token}`
-                    }
-                }).then(response => {
-                    const data = response.data.data;
-                    this.chats = data;
-                }).catch(error => {
-                    console.log(error.response);
-                    toast.error(error.response.data.error);
-                    let errores = error.response.data.errores;
-                    for (let error of errores) {
-                        toast.error(error);
-                    }
-                });
-            }, 5000);
+            this.intervalID = setInterval(() => {
+                if (this.current_chat.id !== undefined || this.current_chat.id !== null || this.current_chat.id !== -1)
+                    this.getMessagesOfChat(this.current_chat)
+            }, 2000);
+        },
+        stopActulizacionChat() {
+            if (this.intervalID !== null)
+                clearInterval(this.intervalID);
         }
+    },
+    beforeUnmount() {
+        this.stopActulizacionChat();
     }
 }
 </script>
