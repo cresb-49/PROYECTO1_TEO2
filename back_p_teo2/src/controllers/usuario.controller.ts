@@ -73,16 +73,17 @@ export const createUsuario = async (req: Request, res: Response) => {
             if (rol === undefined) {
                 responseAPI(HttpStatus.BAD_REQUEST, res, null, "El rol no puede estar vacio");
             }
-            Usuario.create(nuevoUsuario)
-                .then((value: any) => {
-                    UsuarioRol.create({ id_rol: rol, id_usuario: value.id }).then((value: any) => {
-                        responseAPI(HttpStatus.OK, res, null, "Usuario creado con exito");
-                    }).catch((reason: any) => {
-                        responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
-                    });
-                }).catch((reason: any) => {
-                    responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
-                });
+            //TODO: aqui debemos de agregar si es admin se agregue los demas tipos de usuario
+            let usuario: any = await Usuario.create(nuevoUsuario);
+            if (rol === 1) {
+                await UsuarioRol.create({ id_rol: 1, id_usuario: usuario.id });
+                await UsuarioRol.create({ id_rol: 2, id_usuario: usuario.id });
+                await UsuarioRol.create({ id_rol: 3, id_usuario: usuario.id });
+                return responseAPI(HttpStatus.OK, res, null, "Usuario creado con exito");
+            } else {
+                await UsuarioRol.create({ id_rol: rol, id_usuario: usuario.id });
+                return responseAPI(HttpStatus.OK, res, null, "Usuario creado con exito");
+            }
         }
     }
 };
