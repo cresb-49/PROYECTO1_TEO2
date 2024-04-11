@@ -241,6 +241,17 @@ export const createArticulo = async (req: Request, res: Response) => {
 };
 
 export const updateArticulo = async (req: Request, res: Response) => {
+    const id_categoria: number = parseInt(req.body.id_categoria);
+    if (id_categoria === 1 || id_categoria === 4) {
+        return await updateArticuloServicio(req, res);
+    } else if (id_categoria === 2 || id_categoria === 3) {
+        return await updateTrabajoVoluntariado(req, res);
+    } else {
+        return responseAPI(HttpStatus.BAD_REQUEST, res, null, "Categoria invalida", "Categoria invalida");
+    }
+};
+
+export const updateArticuloServicio = async (req: Request, res: Response) => {
     const { nombre, precio, cantidad, id_categoria, descripcion, imagen } = req.body;
     const { idArticulo } = req.params;
     const { tokenPayload } = req;
@@ -306,7 +317,91 @@ export const updateArticulo = async (req: Request, res: Response) => {
                 return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
             });
     }
-};
+}
+
+export const updateTrabajoVoluntariado = async (req: Request, res: Response) => {
+    const { nombre, precio, cantidad, id_categoria, descripcion, imagen, valor_entrada, recompenza } = req.body;
+    const { idArticulo } = req.params;
+    const { tokenPayload } = req;
+    const idUsuario: number = parseInt(tokenPayload.usuarioId);
+    let articulo_original: any = await Articulo.findByPk(idArticulo, { include: [{ model: Image, required: false }] });
+    if (!articulo_original) {
+        return responseAPI(HttpStatus.NOT_FOUND, res, null, "Producto no encontrado", "Producto no encontrado");
+    }
+    if (articulo_original.id_usuario !== idUsuario) {
+        return responseAPI(HttpStatus.FORBIDDEN, res, null, "No tienes permisos para modificar este producto", "No tienes permisos para modificar este producto");
+    }
+    //Validamos el precio y la cantidad positiva
+    if (precio <= 0) {
+        return responseAPI(HttpStatus.BAD_REQUEST, res, null, "El precio no puede ser negativo o cero", "El precio no puede ser negativo o cero");
+    }
+    if (cantidad <= 0) {
+        return responseAPI(HttpStatus.BAD_REQUEST, res, null, "La cantidad no puede ser negativa o cero", "La cantidad no puede ser negativa o cero");
+    }
+    if (valor_entrada < 0) {
+        return responseAPI(HttpStatus.BAD_REQUEST, res, null, "El valor de entrada no puede ser negativo", "El valor de entrada no puede ser negativo");
+    }
+    if (recompenza < 0) {
+        return responseAPI(HttpStatus.BAD_REQUEST, res, null, "La recompenza no puede ser negativa", "La recompenza no puede ser negativa");
+    }
+    let base64Articulo = await readFileImage(articulo_original.images[0].url);
+    let payloadActulizacion = {}
+    if (nombre) {
+        if (nombre !== articulo_original.nombre) {
+            payloadActulizacion['nombre'] = nombre;
+        }
+    }
+    if (precio) {
+        if (precio !== articulo_original.valor) {
+            payloadActulizacion['valor'] = precio;
+        }
+    }
+    if (cantidad) {
+        if (cantidad !== articulo_original.cantidad) {
+            payloadActulizacion['cantidad'] = cantidad;
+        }
+    }
+    if (descripcion) {
+        if (descripcion !== articulo_original.descripcion) {
+            payloadActulizacion['descripcion'] = descripcion;
+        }
+    }
+    if (id_categoria) {
+        if (id_categoria !== articulo_original.id_categoria) {
+            payloadActulizacion['id_categoria'] = id_categoria;
+        }
+    }
+    if (valor_entrada) {
+        if (valor_entrada !== articulo_original.valor_entrada) {
+            payloadActulizacion['valor_entrada'] = valor_entrada;
+        }
+    }
+    if (recompenza) {
+        if (recompenza !== articulo_original.recompenza) {
+            payloadActulizacion['recompenza'] = recompenza;
+        }
+    }
+    let banderaImagen = false;
+    if (base64Articulo !== imagen) {
+        banderaImagen = true;
+    }
+    if (Object.keys(payloadActulizacion).length === 0 && banderaImagen === false) {
+        return responseAPI(HttpStatus.NOT_MODIFIED, res, null, "No se realizo ninguna actualizacion", "No se realizo ninguna actualizacion");
+    } else {
+        Articulo.update(payloadActulizacion, { where: { id: idArticulo } })
+            .then(async (articulo: any) => {
+                if (banderaImagen) {
+                    let path_image = await saveImage(imagen);
+                    let id_imagen = articulo_original.images[0].id;
+                    await Image.update({ url: path_image }, { where: { id: id_imagen } });
+                }
+                return responseAPI(HttpStatus.OK, res, articulo, "Producto actualizado con exito");
+            })
+            .catch((reason: any) => {
+                return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, reason.message, reason.message);
+            });
+    }
+}
 
 export const resCantidadArticulo = async (id_articulo: number | null, cantidad_restar: number | null, t: Transaction | null) => {
     if (id_articulo !== null && cantidad_restar !== null) {

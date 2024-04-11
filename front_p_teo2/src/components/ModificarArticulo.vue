@@ -14,13 +14,45 @@
                             seda azul o la marca del producto asi como Samsumg Galxy s20
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-3" v-if="enable_precio">
+                            <div class="input-group mb-3">
+                                <label for="precio" class="col-form-label" style="margin-right: 15px;">Precio</label>
+                                <div class="input-group-text" style="border-radius: 5px 0px 0px 5px;">KOR</div>
+                                <input type="number" step="0.01" class="form-control"
+                                    style="max-width: 200px;border-radius: 0px 5px 5px 0px;" v-model="precio" required>
+                                <span class="input-group form-text">
+                                    <small>Precio a pagar por el articulo</small>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-4" v-if="enable_valor_entrada">
+                            <div class="input-group mb-3">
+                                <label for="precio" class="col-form-label" style="margin-right: 15px;">Valor de
+                                    Entrada</label>
+                                <div class="input-group-text" style="border-radius: 5px 0px 0px 5px;">KOR</div>
+                                <input type="number" step="0.01" class="form-control"
+                                    style="max-width: 200px;border-radius: 0px 5px 5px 0px;" v-model="valor_entrada"
+                                    required>
+                                <span class="input-group form-text">
+                                    <small>Valor de entrada a la actividad</small>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-4" v-if="enable_recompenza">
+                            <div class="input-group mb-3">
+                                <label for="precio" class="col-form-label"
+                                    style="margin-right: 15px;">Recompenza</label>
+                                <div class="input-group-text" style="border-radius: 5px 0px 0px 5px;">KOR</div>
+                                <input type="number" step="0.01" class="form-control"
+                                    style="max-width: 200px;border-radius: 0px 5px 5px 0px;" v-model="recompenza"
+                                    required>
+                                <span class="input-group form-text">
+                                    <small>Recompenza por la actividad</small>
+                                </span>
+                            </div>
+                        </div>
 
-                    <div class="input-group mb-3">
-                        <label for="precio" class="col-form-label" style="margin-right: 15px;">Precio</label>
-                        <div class="input-group-text" style="border-radius: 5px 0px 0px 5px;">$</div>
-                        <input type="number" step="0.01" class="form-control"
-                            style="max-width: 200px;border-radius: 0px 5px 5px 0px;" v-model="precio" required>
-                        <span class="input-group form-text">Agrega el valor del articulo</span>
                     </div>
                     <div class="input-group mb-3">
                         <label for="cantidad" class="col-form-label" style="margin-right: 15px;">Cantidad</label>
@@ -40,7 +72,7 @@
                     </div>
                     <div class="mb-3">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-6" v-if="false">
                                 <div class="row">
                                     <div>
                                         <form @submit.prevent="buscarCategorias" class="form-inline">
@@ -85,7 +117,7 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <label for="categoriaInput">Categoría Seleccionada:</label>
+                                <label for="categoriaInput">Categoría del Articulo:</label>
                                 <input type="text" id="categoriaInput" class="form-control" readonly
                                     v-model="nombreCategoria">
                             </div>
@@ -117,8 +149,10 @@ export default {
             nombre: null,
             nombreOriginal: null,
             precio: 0.00,
-            precioOriginal: 0.00,
+            valor_entrada: 0.00,
+            recompenza: 0.00,
             cantidad: 1,
+            precioOriginal: 0.00,
             cantidadOriginal: 1,
             id_categoria: null,
             id_categoriaOriginal: null,
@@ -129,7 +163,10 @@ export default {
             imagenOriginal: null,
             img: false,
             findCategoria: "",
-            categorias: []
+            categorias: [],
+            enable_precio: true,
+            enable_valor_entrada: true,
+            enable_recompenza: true
         }
     }, mounted() {
         this.getCategorias();
@@ -141,6 +178,31 @@ export default {
         seleccionarCategoria(categoria) {
             this.id_categoria = categoria.id;
             this.nombreCategoria = categoria.nombre;
+            switch (this.id_categoria) {
+                case 1:
+                case 4:
+                    this.enable_precio = true;
+                    this.enable_valor_entrada = false;
+                    this.valor_entrada = 0.00;
+                    this.enable_recompenza = false;
+                    this.recompenza = 0.00;
+                    break;
+                case 2:
+                case 3:
+                    this.enable_precio = false;
+                    this.precio = 0.00;
+                    this.enable_valor_entrada = true;
+                    this.enable_recompenza = true;
+                    break;
+                default:
+                    this.enable_precio = false;
+                    this.precio = 0.00;
+                    this.enable_valor_entrada = false;
+                    this.valor_entrada = 0.00;
+                    this.enable_recompenza = false;
+                    this.recompenza = 0.00;
+                    break;
+            }
         },
         getCategorias() {
             let state = this.$store.state;
@@ -154,8 +216,8 @@ export default {
                 console.log(error);
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
-                for (let index = 0; index < errores.length; index++) {
-                    toast.error(errores[index]);
+                for (const element of errores) {
+                    toast.error(element);
                 }
             });
         },
@@ -167,6 +229,8 @@ export default {
                 {
                     nombre: this.nombre,
                     valor: this.precio,
+                    valor_entrada: this.valor_entrada,
+                    recompenza: this.recompenza,
                     cantidad: this.cantidad,
                     descripcion: this.descripcion,
                     id_categoria: this.id_categoria,
@@ -184,11 +248,11 @@ export default {
                 }).catch(error => {
                     if (error.response.status === 304) {
                         toast.info("No se realizaron cambios");
-                    }else{
+                    } else {
                         toast.error(error.response.data.error);
                         let errores = error.response.data.errores;
-                        for (let index = 0; index < errores.length; index++) {
-                            toast.error(errores[index]);
+                        for (const element of errores) {
+                            toast.error(element);
                         }
                     }
                 });
@@ -203,6 +267,8 @@ export default {
                 this.nombre = data.nombre;
                 this.nombreOriginal = data.nombre;
                 this.precio = data.valor;
+                this.valor_entrada = data.valor_entrada;
+                this.recompenza = data.recompenza;
                 this.precioOriginal = data.valor;
                 this.cantidad = data.cantidad;
                 this.cantidadOriginal = data.cantidad;
@@ -214,8 +280,8 @@ export default {
                 console.log(error);
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
-                for (let index = 0; index < errores.length; index++) {
-                    toast.error(errores[index]);
+                for (const element of errores) {
+                    toast.error(element);
                 }
             });
         },
@@ -257,8 +323,8 @@ export default {
                 console.log(error);
                 toast.error(error.response.data.error);
                 let errores = error.response.data.errores;
-                for (let index = 0; index < errores.length; index++) {
-                    toast.error(errores[index]);
+                for (const element of errores) {
+                    toast.error(element);
                 }
             });
         }
