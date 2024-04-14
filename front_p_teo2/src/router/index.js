@@ -27,6 +27,8 @@ import AceptarSolicitudVoluntariadoTrabajoComponent from "@/components/AceptarSo
 import CancelarIntercambio from "@/components/CancelarIntercambioComponent.vue";
 import CancelarSolicitudVoluntariadoTrabajoComponent from "@/components/CancelarSolicitudVoluntariadoTrabajoComponent.vue";
 import TasaDeCambioComponent from "@/components/TasaDeCambioComponent.vue";
+import ModificarPorcentajeGanancias from "@/components/ModificarPorcentajeGanancias.vue";
+
 const routes = [
     {
         path: '/',
@@ -172,6 +174,12 @@ const routes = [
         path: '/TasaDeCambio',
         name: 'TasaDeCambio',
         component: TasaDeCambioComponent
+    },
+    {
+        path: '/ModificarPorcentajeGanancias',
+        name: 'ModificarPorcentajeGanancias',
+        component: ModificarPorcentajeGanancias
+
     },
     {
         path: '/:pathMatch(.*)*',

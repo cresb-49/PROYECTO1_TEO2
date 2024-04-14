@@ -40,6 +40,10 @@ export const getCategorias = async (req: Request, res: Response) => {
 
 };
 
+export const updateRecompenzaCategoria = async (req: Request, res: Response) => {
+
+};
+
 export const getCategoria = async (req: Request, res: Response) => {
 
 };
