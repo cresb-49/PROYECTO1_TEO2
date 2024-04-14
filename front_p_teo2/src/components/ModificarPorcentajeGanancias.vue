@@ -5,12 +5,12 @@
             <div class="col-md-12">
                 <div class="row" v-for="categoria in categorias" v-bind:key="categoria">
                     <div class="col-auto">
-                        <label for="inputPassword4">Valor de Venta</label>
-                            <input type="number" class="form-control" id="inputPassword4" placeholder="Valor" min="0"
-                                v-model="tasaDeCambio.valor_venta" step="0.1">
+                        <span>Categoria</span>
                     </div>
                     <div class="col-auto">
-
+                        <label for="categoryPercentaje">Valor de Venta</label>
+                        <input type="number" class="form-control" id="categoryPercentaje" placeholder="porcentaje"
+                            min="0" v-model="tasaDeCambio.valor_venta" step="0.5">
                     </div>
                 </div>
             </div>
