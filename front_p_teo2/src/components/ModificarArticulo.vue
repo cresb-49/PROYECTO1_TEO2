@@ -39,7 +39,7 @@
                                 </span>
                             </div>
                         </div>
-                        <div class="col-4" v-if="enable_recompenza">
+                        <div class="col-4" v-if="enable_recompenza && false">
                             <div class="input-group mb-3">
                                 <label for="precio" class="col-form-label"
                                     style="margin-right: 15px;">Recompenza</label>
@@ -54,7 +54,7 @@
                         </div>
 
                     </div>
-                    <div class="input-group mb-3">
+                    <div class="input-group mb-3" v-if="id_categoria === 1 || id_categoria === 4">
                         <label for="cantidad" class="col-form-label" style="margin-right: 15px;">Cantidad</label>
                         <input type="number" step="1" class="form-control"
                             style="max-width: 200px;border-radius: 0px 5px 5px 0px;" v-model="cantidad" required>

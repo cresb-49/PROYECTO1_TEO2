@@ -4,13 +4,41 @@
         <div class="container">
             <div class="col-md-12">
                 <div class="row" v-for="categoria in categorias" v-bind:key="categoria">
+                    <div class="col-auto mt-4">
+                        <span>
+                            <strong>
+                                Categoria:
+                            </strong>
+                        </span>
+                        <span>{{ categoria.nombre }}</span>
+                        <div class="row">
+                            <div class="col-auto">
+                                <div class="row">
+                                    <div class="col-auto">
+                                        <label for="categoryPercentaje">Porcentaje de Ganancia</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <input type="number" class="form-control" id="categoryPercentaje"
+                                            placeholder="porcentaje" min="0" v-model="categoria.porcentaje_ganancias"
+                                            step="0.5">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 mt-4">
+                <div class="row">
                     <div class="col-auto">
-                        <span>Categoria</span>
+                        <button class="btn btn-primary" @click="doDialog(() => this.enviarCambios())">
+                            Guardar Cambios
+                        </button>
                     </div>
                     <div class="col-auto">
-                        <label for="categoryPercentaje">Valor de Venta</label>
-                        <input type="number" class="form-control" id="categoryPercentaje" placeholder="porcentaje"
-                            min="0" v-model="tasaDeCambio.valor_venta" step="0.5">
+                        <button class="btn btn-danger" @click="doDialog(() => this.resetCategorias())">
+                            Cancelar Cambios
+                        </button>
                     </div>
                 </div>
             </div>
@@ -55,8 +83,6 @@ export default {
                 .then((res) => {
                     this.categorias = res.data.data;
                     this.categorias_originales = res.data.data;
-                    console.log(this.categorias);
-                    console.log(this.categorias_originales);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -71,6 +97,14 @@ export default {
         closeDialog() {
             this.dialog.show = false;
             this.dialog.action = null;
+        },
+        resetCategorias() {
+            this.categorias = this.categorias_originales;
+        },
+        enviarCambios() {
+            this.categorias_originales.forEach(element => {
+                console.log(element);
+            });
         }
     }
 }
