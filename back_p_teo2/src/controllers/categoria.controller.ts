@@ -3,11 +3,12 @@ import { responseAPI } from '../handler/responseAPI';
 import { HttpStatus } from '../enums/httpStatus';
 import { Category } from '../models/category';
 import { Op } from 'sequelize';
+import sequelize from '../database/database';
 
 export const getCategorias = async (req: Request, res: Response) => {
     const { nombre } = req.params
     console.log(nombre);
-    
+
     let valor = ""
     if (nombre) {
         valor = nombre;
@@ -39,6 +40,33 @@ export const getCategorias = async (req: Request, res: Response) => {
 
 
 };
+
+export const updatePorcentajeCategoria = async (req: Request, res: Response) => {
+    const { id_categoria, porcentaje } = req.body;
+    //Obtenemos la categoria
+    let cat: any = await Category.findByPk(id_categoria);
+    if (cat === null) {
+        return responseAPI(HttpStatus.NOT_FOUND, res, null, "Categoria no encontrada");
+    }
+    //Verificamos que el porcentaje sea un numero
+    if (isNaN(porcentaje)) {
+        return responseAPI(HttpStatus.BAD_REQUEST, res, null, "El porcentaje debe ser un numero");
+    }
+    //Verificamos que el porcentaje sea mayor a 0 y menor a 100
+    if (porcentaje < 0 || porcentaje > 100) {
+        return responseAPI(HttpStatus.BAD_REQUEST, res, null, "El porcentaje debe ser mayor a 0 y menor a 100");
+    }
+    //Actualizamos el porcentaje y lo devolvemos
+    cat.porcentaje_ganancias = porcentaje;
+    //Generamos una transaccion
+    const t = await sequelize.transaction();
+    try {
+        await cat.save({ transaction: t });
+        return responseAPI(HttpStatus.OK, res, cat, "Porcentaje actualizado");
+    } catch (error) {
+        return responseAPI(HttpStatus.INTERNAL_SERVER_ERROR, res, null, error.message, error.message);
+    }
+}
 
 export const updateRecompenzaCategoria = async (req: Request, res: Response) => {
 
