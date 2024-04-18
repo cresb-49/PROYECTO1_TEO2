@@ -123,7 +123,83 @@ module.exports = {
         cantidad: 3,
         created_at: new Date(),
         updated_at: new Date()
+      },
+      {
+        id: 9,
+        nombre: 'Cámara DSLR Canon',
+        valor: 800,
+        valor_entrada: 0,
+        recompenza: 0,
+        creditos_retirables_asignados: 0,
+        creditos_no_retirables_asignados: 0,
+        descripcion: 'Cámara DSLR Canon EOS Rebel T7, sensor de imagen CMOS de 24.1 MP, incluye lente 18-55mm',
+        id_categoria: 1,
+        id_usuario: 2,
+        cantidad: 3,
+        created_at: new Date(),
+        updated_at: new Date()
+      },
+      {
+        id: 10,
+        nombre: 'Curso de Fotografía',
+        valor: 0,
+        valor_entrada: 20,
+        recompenza: 1,
+        creditos_retirables_asignados: 0,
+        creditos_no_retirables_asignados: 1,
+        descripcion: 'Curso introductorio de fotografía digital, 5 sesiones en línea',
+        id_categoria: 2,
+        id_usuario: 2,
+        cantidad: 15,
+        created_at: new Date(),
+        updated_at: new Date()
+      },
+      {
+        id: 11,
+        nombre: 'Set de Jardinería',
+        valor: 50,
+        valor_entrada: 0,
+        recompenza: 0,
+        creditos_retirables_asignados: 0,
+        creditos_no_retirables_asignados: 0,
+        descripcion: 'Set de herramientas de jardinería, incluye 5 herramientas básicas y guantes',
+        id_categoria: 1,
+        id_usuario: 2,
+        cantidad: 30,
+        created_at: new Date(),
+        updated_at: new Date()
+      },
+      {
+        id: 12,
+        nombre: 'Membresía de Gimnasio',
+        valor: 200,
+        valor_entrada: 0,
+        recompenza: 0,
+        creditos_retirables_asignados: 0,
+        creditos_no_retirables_asignados: 0,
+        descripcion: 'Membresía mensual para gimnasio local con acceso a todas las instalaciones',
+        id_categoria: 4,
+        id_usuario: 3,
+        cantidad: 50,
+        created_at: new Date(),
+        updated_at: new Date()
+      },
+      {
+        id: 13,
+        nombre: 'Bicicleta de montaña',
+        valor: 300,
+        valor_entrada: 0,
+        recompenza: 0,
+        creditos_retirables_asignados: 0,
+        creditos_no_retirables_asignados: 0,
+        descripcion: 'Bicicleta de montaña con marco de aluminio y frenos de disco, ideal para terrenos difíciles',
+        id_categoria: 1,
+        id_usuario: 3,
+        cantidad: 5,
+        created_at: new Date(),
+        updated_at: new Date()
       }
+
     ];
     await queryInterface.bulkInsert('articulo', articulos, {});
   },
