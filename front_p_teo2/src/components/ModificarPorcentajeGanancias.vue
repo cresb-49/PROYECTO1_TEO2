@@ -122,17 +122,16 @@ export default {
                         id_categoria: this.categorias[index].id,
                         porcentaje_ganancias: this.categorias[index].porcentaje_ganancias
                     }
-                    console.log(payload)
                     this.axios.put('categoria/porcentaje', payload)
                         .then((res) => {
-                            console.log(res);
+                            toast.success(res.data.mensaje);
                         })
                         .catch((error) => {
                             toast.error(error.response.data.error);
-                let errores = error.response.data.errores;
-                for (const element of errores) {
-                    toast.error(element);
-                }
+                            let errores = error.response.data.errores;
+                            for (const element of errores) {
+                                toast.error(element);
+                            }
                         });
                 }
                 this.getInfoCategorias();
