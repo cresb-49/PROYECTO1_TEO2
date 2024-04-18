@@ -50,7 +50,8 @@
 
 <script>
 import { mapGetters } from 'vuex';
-// import { toast } from 'vue3-toastify';
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
 import Dialog from '@/components/Dialog.vue'
 
 
@@ -75,13 +76,25 @@ export default {
         }
     },
     mounted() {
-        this.getCategorias();
+        this.getInfoCategorias();
     },
     methods: {
+        getInfoCategorias() {
+            this.getCategorias();
+            this.getCategoriasOriginales();
+        },
         getCategorias() {
             this.axios.get('categorias')
                 .then((res) => {
                     this.categorias = res.data.data;
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        },
+        getCategoriasOriginales() {
+            this.axios.get('categorias')
+                .then((res) => {
                     this.categorias_originales = res.data.data;
                 })
                 .catch((err) => {
@@ -99,12 +112,31 @@ export default {
             this.dialog.action = null;
         },
         resetCategorias() {
-            this.categorias = this.categorias_originales;
+            this.getInfoCategorias();
         },
         enviarCambios() {
-            this.categorias_originales.forEach(element => {
-                console.log(element);
-            });
+            for (let index = 0; index < this.categorias.length; index++) {
+                //Comparamos el porcentaje de ganancia de la categoria con el original
+                if (this.categorias[index].porcentaje_ganancias !== this.categorias_originales[index].porcentaje_ganancias) {
+                    const payload = {
+                        id_categoria: this.categorias[index].id,
+                        porcentaje_ganancias: this.categorias[index].porcentaje_ganancias
+                    }
+                    console.log(payload)
+                    this.axios.put('categoria/porcentaje', payload)
+                        .then((res) => {
+                            console.log(res);
+                        })
+                        .catch((error) => {
+                            toast.error(error.response.data.error);
+                let errores = error.response.data.errores;
+                for (const element of errores) {
+                    toast.error(element);
+                }
+                        });
+                }
+                this.getInfoCategorias();
+            }
         }
     }
 }
