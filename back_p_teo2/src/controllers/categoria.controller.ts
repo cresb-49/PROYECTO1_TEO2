@@ -43,21 +43,22 @@ export const getCategorias = async (req: Request, res: Response) => {
 
 export const updatePorcentajeCategoria = async (req: Request, res: Response) => {
     const { id_categoria, porcentaje } = req.body;
+    const valorPorcentual = parseInt(porcentaje);
     //Obtenemos la categoria
     let cat: any = await Category.findByPk(id_categoria);
     if (cat === null) {
-        return responseAPI(HttpStatus.NOT_FOUND, res, null, "Categoria no encontrada");
+        return responseAPI(HttpStatus.NOT_FOUND, res, null, "Categoria no encontrada","Categoria no encontrada");
     }
     //Verificamos que el porcentaje sea un numero
-    if (isNaN(porcentaje)) {
-        return responseAPI(HttpStatus.BAD_REQUEST, res, null, "El porcentaje debe ser un numero");
+    if (isNaN(valorPorcentual)) {
+        return responseAPI(HttpStatus.BAD_REQUEST, res, null, "El porcentaje debe ser un numero","El porcentaje debe ser un numero");
     }
     //Verificamos que el porcentaje sea mayor a 0 y menor a 100
-    if (porcentaje < 0 || porcentaje > 100) {
-        return responseAPI(HttpStatus.BAD_REQUEST, res, null, "El porcentaje debe ser mayor a 0 y menor a 100");
+    if (valorPorcentual < 0 || valorPorcentual > 100) {
+        return responseAPI(HttpStatus.BAD_REQUEST, res, null, "El porcentaje debe ser mayor a 0 y menor a 100","El porcentaje debe ser mayor a 0 y menor a 100");
     }
     //Actualizamos el porcentaje y lo devolvemos
-    cat.porcentaje_ganancias = porcentaje;
+    cat.porcentaje_ganancias = valorPorcentual;
     //Generamos una transaccion
     const t = await sequelize.transaction();
     try {
