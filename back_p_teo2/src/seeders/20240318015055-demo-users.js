@@ -24,6 +24,7 @@ module.exports = {
         f_nacimiento: '2022-03-02',
         email: 'josel@gmail.com',
         password: await bcrypt.hash('12345', 10),
+        id_cuenta: 4,
         created_at: new Date(),
         updated_at: new Date(),
       },{
