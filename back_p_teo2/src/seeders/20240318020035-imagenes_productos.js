@@ -59,6 +59,41 @@ module.exports = {
         prioridad: 1,
         created_at: new Date(),
         updated_at: new Date()
+      },
+      {
+        id_articulo: 9,
+        url: 'camara_imagen.ib64.model',
+        prioridad: 1,
+        created_at: new Date(),
+        updated_at: new Date()
+      },
+      {
+        id_articulo: 10,
+        url: 'curso_imagen.ib64.model',
+        prioridad: 1,
+        created_at: new Date(),
+        updated_at: new Date()
+      },
+      {
+        id_articulo: 11,
+        url: 'set_jardin_imagen.ib64.model',
+        prioridad: 1,
+        created_at: new Date(),
+        updated_at: new Date()
+      },
+      {
+        id_articulo: 12,
+        url: 'membrecia_imagen.ib64.model',
+        prioridad: 1,
+        created_at: new Date(),
+        updated_at: new Date()
+      },
+      {
+        id_articulo: 13,
+        url: 'bicicleta_imagen.ib64.model',
+        prioridad: 1,
+        created_at: new Date(),
+        updated_at: new Date()
       }
     ];
     await queryInterface.bulkInsert('image', images, {});

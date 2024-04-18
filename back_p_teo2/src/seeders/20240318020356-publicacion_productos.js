@@ -83,6 +83,56 @@ module.exports = {
         f_validacion: new Date(),
         created_at: new Date(),
         updated_at: new Date()
+      },
+      {
+        id: 9,
+        id_articulo: 9,
+        id_tipo_publicacion: 1,
+        id_usuario: 2,
+        isValidate: true,
+        f_validacion: new Date(),
+        created_at: new Date(),
+        updated_at: new Date()
+      },
+      {
+        id: 10,
+        id_articulo: 10,
+        id_tipo_publicacion: 1,
+        id_usuario: 2,
+        isValidate: true,
+        f_validacion: new Date(),
+        created_at: new Date(),
+        updated_at: new Date()
+      },
+      {
+        id: 11,
+        id_articulo: 11,
+        id_tipo_publicacion: 1,
+        id_usuario: 2,
+        isValidate: true,
+        f_validacion: new Date(),
+        created_at: new Date(),
+        updated_at: new Date()
+      },
+      {
+        id: 12,
+        id_articulo: 12,
+        id_tipo_publicacion: 1,
+        id_usuario: 3,
+        isValidate: true,
+        f_validacion: new Date(),
+        created_at: new Date(),
+        updated_at: new Date()
+      },
+      {
+        id: 13,
+        id_articulo: 13,
+        id_tipo_publicacion: 1,
+        id_usuario: 3,
+        isValidate: true,
+        f_validacion: new Date(),
+        created_at: new Date(),
+        updated_at: new Date()
       }
     ];
     await queryInterface.bulkInsert('publicacion', publicaciones, {});
